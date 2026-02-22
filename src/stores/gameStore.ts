@@ -67,8 +67,17 @@ function getLevelConfig(level: number): LevelConfig {
     gridSize = 12  // 之后保持12×12
   }
 
-  // 生成随机图片URL
-  const imageUrl = `https://picsum.photos/800/800?random=${level}`
+  // 使用南湾湖风景图片
+  const nanwanLakeImages = [
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop', // 山水风景
+    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&h=600&fit=crop', // 湖泊风景
+    'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&h=600&fit=crop', // 自然风光
+    'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&h=600&fit=crop', // 山峦风景
+    'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&h=600&fit=crop'  // 草原风景
+  ]
+
+  // 根据关卡循环使用不同的图片
+  const imageUrl = nanwanLakeImages[(level - 1) % nanwanLakeImages.length]
 
   return {
     level,
