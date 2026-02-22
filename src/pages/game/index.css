@@ -1,0 +1,226 @@
+.game-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
+  padding-bottom: 100px;
+}
+
+/* 加载状态 */
+.game-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-loading text {
+  font-size: 18px;
+  color: #6B7280;
+}
+
+/* 顶部信息栏 */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 16px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.header-left,
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header-label {
+  font-size: 14px;
+  color: #6B7280;
+  margin-bottom: 4px;
+}
+
+.header-info {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1F2937;
+}
+
+/* 游戏容器 */
+.game-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+/* 原图显示 */
+.original-image-container {
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.original-image {
+  width: 100%;
+  height: 100%;
+}
+
+/* 拼图区域 */
+.puzzle-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1;
+}
+
+.puzzle-board {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.puzzle-grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* 拼图碎片 */
+.puzzle-piece {
+  position: absolute;
+  background-repeat: no-repeat;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.puzzle-piece.selected {
+  box-shadow: 0 0 0 3px #3B82F6;
+  z-index: 10;
+}
+
+/* 提示覆盖层 */
+.hint-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.hint-cell {
+  box-sizing: border-box;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.hint-cell.correct {
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+/* 底部功能按钮 */
+.game-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  padding: 16px;
+  background: white;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  gap: 8px;
+}
+
+.footer-button {
+  flex: 1;
+  background: #F97316;
+  color: white;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+}
+
+/* 过关弹窗 */
+.victory-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+
+.victory-content {
+  width: 100%;
+  max-width: 320px;
+  background: white;
+  border-radius: 20px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.victory-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #10B981;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.victory-time {
+  font-size: 18px;
+  color: #6B7280;
+  margin-bottom: 24px;
+}
+
+.victory-buttons {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.victory-button {
+  width: 100%;
+  border-radius: 9999px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+}
+
+.victory-button.primary {
+  background: #3B82F6;
+  color: white;
+}
+
+.victory-button.secondary {
+  background: #F3F4F6;
+  color: #4B5563;
+}

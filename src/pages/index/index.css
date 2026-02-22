@@ -1,0 +1,43 @@
+.home-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
+}
+
+.home-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80%;
+  max-width: 400px;
+}
+
+.home-title {
+  font-size: 48px;
+  font-weight: 700;
+  color: #3B82F6;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.home-subtitle {
+  font-size: 18px;
+  color: #6B7280;
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+.home-button {
+  width: 100%;
+  background: #3B82F6;
+  color: white;
+  border-radius: 9999px;
+  padding: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+  border: none;
+}

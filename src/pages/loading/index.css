@@ -1,0 +1,35 @@
+.loading-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80%;
+  max-width: 400px;
+}
+
+.loading-title {
+  font-size: 48px;
+  font-weight: 700;
+  color: #3B82F6;
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+.loading-progress {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.loading-text {
+  font-size: 16px;
+  color: #6B7280;
+  text-align: center;
+}
