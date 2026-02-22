@@ -5,6 +5,9 @@ import { useGameStore } from '@/stores/gameStore'
 import './index.css'
 
 export default function GamePage() {
+  // 平台检测
+  const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
+
   const {
     currentLevel,
     gridSize,
@@ -32,8 +35,47 @@ export default function GamePage() {
 
   const [draggingPiece, setDraggingPiece] = useState<any>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [containerRect, setContainerRect] = useState({ left: 0, top: 0, width: 0, height: 0 })
   const timerRef = useRef<NodeJS.Timeout>()
-  const puzzleBoardRef = useRef<any>(null)
+  const isMountedRef = useRef(false)
+
+  // 组件挂载后获取容器位置
+  useEffect(() => {
+    isMountedRef.current = true
+    // 延迟获取以确保 DOM 已渲染
+    setTimeout(() => {
+      getContainerRect().then((rect) => {
+        if (rect) {
+          setContainerRect(rect)
+          console.log('容器位置已获取:', rect, '平台:', isWeapp ? '小程序' : 'H5')
+        }
+      })
+    }, 100)
+
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [isWeapp])
+
+  // 获取容器位置信息
+  const getContainerRect = () => {
+    return new Promise((resolve) => {
+      const query = Taro.createSelectorQuery()
+      query.select('.puzzle-board').boundingClientRect()
+      query.exec((res) => {
+        if (res && res[0]) {
+          resolve({
+            left: res[0].left,
+            top: res[0].top,
+            width: res[0].width,
+            height: res[0].height
+          })
+        } else {
+          resolve(null)
+        }
+      })
+    })
+  }
 
   // 页面加载时开始游戏
   useEffect(() => {
@@ -112,33 +154,37 @@ export default function GamePage() {
   }
 
   // 开始拖拽
-  const handleTouchStart = (e: any, piece: any) => {
+  const handleTouchStart = async (e: any, piece: any) => {
     e.stopPropagation()
     e.preventDefault()
     if (isComplete || showOriginalImage) return
 
     const touch = e.touches[0]
-    const containerRect = puzzleBoardRef.current.getBoundingClientRect()
-    const piecePixelPos = getPiecePixelPosition(piece, containerRect.width)
 
+    // 获取容器位置
+    const rect = await getContainerRect()
+    if (!rect) return
+
+    const piecePixelPos = getPiecePixelPosition(piece, rect.width)
+
+    setContainerRect(rect)
     setDraggingPiece(piece)
     setDragOffset({
-      x: touch.clientX - containerRect.left - piecePixelPos.x,
-      y: touch.clientY - containerRect.top - piecePixelPos.y
+      x: touch.clientX - rect.left - piecePixelPos.x,
+      y: touch.clientY - rect.top - piecePixelPos.y
     })
     selectPiece(piece)
 
-    console.log('开始拖拽碎片：', piece.id, '当前位置:', piece.x, piece.y, '%')
+    console.log('开始拖拽碎片：', piece.id, '当前位置:', piece.x, piece.y, '%', '平台:', isWeapp ? '小程序' : 'H5')
   }
 
   // 拖拽移动
   const handleTouchMove = (_e: any) => {
     _e.stopPropagation()
     _e.preventDefault()
-    if (!draggingPiece || !puzzleBoardRef.current || isComplete || showOriginalImage) return
+    if (!draggingPiece || isComplete || showOriginalImage || containerRect.width === 0) return
 
     const touch = _e.touches[0]
-    const containerRect = puzzleBoardRef.current.getBoundingClientRect()
     const containerWidth = containerRect.width
     const containerHeight = containerRect.height
     const pieceWidth = containerWidth / gridSize
@@ -173,6 +219,7 @@ export default function GamePage() {
     if (!latestDraggingPiece) {
       setDraggingPiece(null)
       setDragOffset({ x: 0, y: 0 })
+      setContainerRect({ left: 0, top: 0, width: 0, height: 0 })
       return
     }
 
@@ -189,7 +236,8 @@ export default function GamePage() {
       targetRow,
       targetIndex,
       totalPieces: pieces.length,
-      gridSize
+      gridSize,
+      platform: isWeapp ? '小程序' : 'H5'
     })
 
     // 找到目标格子里的碎片
@@ -221,12 +269,15 @@ export default function GamePage() {
 
     setDraggingPiece(null)
     setDragOffset({ x: 0, y: 0 })
+    setContainerRect({ left: 0, top: 0, width: 0, height: 0 })
 
     // 检查是否完成拼图
     setTimeout(() => {
       const complete = checkComplete()
       if (complete) {
-        Taro.vibrateShort()
+        if (isWeapp) {
+          Taro.vibrateShort()
+        }
       }
     }, 200)
   }
@@ -268,10 +319,11 @@ export default function GamePage() {
         ) : (
           <View className="puzzle-container">
             <View
-              ref={puzzleBoardRef}
               className="puzzle-board"
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
+              catchTouchMove={handleTouchMove}
+              catchTouchEnd={handleTouchEnd}
             >
               {/* 拼图碎片将由 JS 动态渲染 */}
               <View className="puzzle-grid">
@@ -290,7 +342,7 @@ export default function GamePage() {
                         backgroundSize: `${gridSize * 100}%`,
                         backgroundPosition: `${(piece.correctIndex % gridSize) * (100 / (gridSize - 1))}% ${Math.floor(piece.correctIndex / gridSize) * (100 / (gridSize - 1))}%`
                       }}
-                      onTouchStart={(e) => handleTouchStart(e, piece)}
+                      catchTouchStart={(e) => handleTouchStart(e, piece)}
                     />
                   )
                 })}
