@@ -134,19 +134,21 @@ export default function GamePage() {
     const touch = _e.touches[0]
     const containerRect = _e.currentTarget.getBoundingClientRect()
     const containerWidth = containerRect.width
-    const pieceSize = containerWidth / gridSize
+    const containerHeight = containerRect.height
+    const pieceWidth = containerWidth / gridSize
+    const pieceHeight = containerHeight / gridSize
 
     // 计算新的位置
     let newX = touch.clientX - containerRect.left - dragOffset.x
     let newY = touch.clientY - containerRect.top - dragOffset.y
 
     // 限制在容器范围内
-    newX = Math.max(0, Math.min(newX, containerWidth - pieceSize))
-    newY = Math.max(0, Math.min(newY, containerWidth - pieceSize))
+    newX = Math.max(0, Math.min(newX, containerWidth - pieceWidth))
+    newY = Math.max(0, Math.min(newY, containerHeight - pieceHeight))
 
     // 转换为百分比
     const newXPercent = (newX / containerWidth) * 100
-    const newYPercent = (newY / containerWidth) * 100
+    const newYPercent = (newY / containerHeight) * 100
 
     movePiece(draggingPiece, newXPercent, newYPercent)
   }
@@ -160,10 +162,25 @@ export default function GamePage() {
     const targetRow = Math.round((draggingPiece.y / 100) * gridSize)
     const targetIndex = targetRow * gridSize + targetCol
 
+    console.log('拖拽结束：', {
+      draggingPieceId: draggingPiece.id,
+      draggingPieceX: draggingPiece.x,
+      draggingPieceY: draggingPiece.y,
+      targetCol,
+      targetRow,
+      targetIndex
+    })
+
     // 找到目标格子里的碎片
     const targetPiece = pieces.find(p => p.currentIndex === targetIndex && p.id !== draggingPiece.id)
 
     if (targetPiece) {
+      console.log('交换碎片：', {
+        piece1: draggingPiece.id,
+        piece2: targetPiece.id,
+        piece1OldIndex: draggingPiece.currentIndex,
+        piece2OldIndex: targetPiece.currentIndex
+      })
       // 如果目标位置有其他碎片，交换位置
       swapPieces(draggingPiece, targetPiece)
     } else {

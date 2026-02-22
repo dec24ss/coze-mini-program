@@ -179,6 +179,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       const piece1Index = newPieces.findIndex(p => p.id === piece1.id)
       const piece2Index = newPieces.findIndex(p => p.id === piece2.id)
 
+      console.log('swapPieces - 交换前：', {
+        piece1: { id: piece1.id, currentIndex: newPieces[piece1Index].currentIndex, x: newPieces[piece1Index].x, y: newPieces[piece1Index].y },
+        piece2: { id: piece2.id, currentIndex: newPieces[piece2Index].currentIndex, x: newPieces[piece2Index].x, y: newPieces[piece2Index].y }
+      })
+
       // 交换当前位置索引
       const tempCurrentIndex = newPieces[piece1Index].currentIndex
       newPieces[piece1Index].currentIndex = newPieces[piece2Index].currentIndex
@@ -199,6 +204,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       const piece2NewCol = newPieces[piece2Index].currentIndex % gridSize
       newPieces[piece2Index].x = piece2NewCol * pieceSize
       newPieces[piece2Index].y = piece2NewRow * pieceSize
+
+      console.log('swapPieces - 交换后：', {
+        piece1: { id: piece1.id, currentIndex: newPieces[piece1Index].currentIndex, x: newPieces[piece1Index].x, y: newPieces[piece1Index].y },
+        piece2: { id: piece2.id, currentIndex: newPieces[piece2Index].currentIndex, x: newPieces[piece2Index].x, y: newPieces[piece2Index].y }
+      })
 
       return { pieces: newPieces }
     })
