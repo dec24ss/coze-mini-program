@@ -157,6 +157,9 @@ export default function GamePage() {
     const newYPercent = (newY / containerHeight) * 100
 
     movePiece(draggingPiece, newXPercent, newYPercent)
+
+    // 同步更新 draggingPiece 的坐标
+    setDraggingPiece((prev: any) => ({ ...prev, x: newXPercent, y: newYPercent }))
   }
 
   // 结束拖拽
@@ -165,15 +168,23 @@ export default function GamePage() {
     _e.preventDefault()
     if (!draggingPiece || isComplete || showOriginalImage) return
 
+    // 从 pieces 数组中重新获取最新的 draggingPiece 数据
+    const latestDraggingPiece = pieces.find(p => p.id === draggingPiece.id)
+    if (!latestDraggingPiece) {
+      setDraggingPiece(null)
+      setDragOffset({ x: 0, y: 0 })
+      return
+    }
+
     // 计算目标格子位置
-    const targetCol = Math.round((draggingPiece.x / 100) * gridSize)
-    const targetRow = Math.round((draggingPiece.y / 100) * gridSize)
+    const targetCol = Math.round((latestDraggingPiece.x / 100) * gridSize)
+    const targetRow = Math.round((latestDraggingPiece.y / 100) * gridSize)
     const targetIndex = targetRow * gridSize + targetCol
 
     console.log('拖拽结束：', {
-      draggingPieceId: draggingPiece.id,
-      draggingPieceX: draggingPiece.x,
-      draggingPieceY: draggingPiece.y,
+      draggingPieceId: latestDraggingPiece.id,
+      draggingPieceX: latestDraggingPiece.x,
+      draggingPieceY: latestDraggingPiece.y,
       targetCol,
       targetRow,
       targetIndex,
@@ -182,30 +193,30 @@ export default function GamePage() {
     })
 
     // 找到目标格子里的碎片
-    const targetPiece = pieces.find(p => p.currentIndex === targetIndex && p.id !== draggingPiece.id)
+    const targetPiece = pieces.find(p => p.currentIndex === targetIndex && p.id !== latestDraggingPiece.id)
 
     console.log('目标碎片：', targetPiece ? `id=${targetPiece.id}, currentIndex=${targetPiece.currentIndex}` : 'null')
 
     if (targetPiece) {
       console.log('交换碎片：', {
-        piece1: draggingPiece.id,
+        piece1: latestDraggingPiece.id,
         piece2: targetPiece.id,
-        piece1OldIndex: draggingPiece.currentIndex,
+        piece1OldIndex: latestDraggingPiece.currentIndex,
         piece2OldIndex: targetPiece.currentIndex
       })
       // 如果目标位置有其他碎片，交换位置
-      swapPieces(draggingPiece, targetPiece)
+      swapPieces(latestDraggingPiece, targetPiece)
     } else {
       // 如果目标位置为空（理论上不会发生，因为打乱后所有位置都有碎片）
       // 直接移动到目标格子（吸附）
       const pieceSize = 100 / gridSize
       const newX = targetCol * pieceSize
       const newY = targetRow * pieceSize
-      movePiece(draggingPiece, newX, newY)
+      movePiece(latestDraggingPiece, newX, newY)
 
       // 更新 currentIndex
-      updatePieceIndex(draggingPiece.id, targetIndex)
-      console.log('移动碎片到空位：', draggingPiece.id, '->', targetIndex)
+      updatePieceIndex(latestDraggingPiece.id, targetIndex)
+      console.log('移动碎片到空位：', latestDraggingPiece.id, '->', targetIndex)
     }
 
     setDraggingPiece(null)
