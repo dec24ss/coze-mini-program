@@ -33,6 +33,7 @@ export default function GamePage() {
   const [draggingPiece, setDraggingPiece] = useState<any>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const timerRef = useRef<NodeJS.Timeout>()
+  const puzzleBoardRef = useRef<any>(null)
 
   // 页面加载时开始游戏
   useEffect(() => {
@@ -113,10 +114,11 @@ export default function GamePage() {
   // 开始拖拽
   const handleTouchStart = (e: any, piece: any) => {
     e.stopPropagation()
+    e.preventDefault()
     if (isComplete || showOriginalImage) return
 
     const touch = e.touches[0]
-    const containerRect = e.currentTarget.getBoundingClientRect()
+    const containerRect = puzzleBoardRef.current.getBoundingClientRect()
     const piecePixelPos = getPiecePixelPosition(piece, containerRect.width)
 
     setDraggingPiece(piece)
@@ -125,14 +127,18 @@ export default function GamePage() {
       y: touch.clientY - containerRect.top - piecePixelPos.y
     })
     selectPiece(piece)
+
+    console.log('开始拖拽碎片：', piece.id, '当前位置:', piece.x, piece.y, '%')
   }
 
   // 拖拽移动
   const handleTouchMove = (_e: any) => {
-    if (!draggingPiece || isComplete || showOriginalImage) return
+    _e.stopPropagation()
+    _e.preventDefault()
+    if (!draggingPiece || !puzzleBoardRef.current || isComplete || showOriginalImage) return
 
     const touch = _e.touches[0]
-    const containerRect = _e.currentTarget.getBoundingClientRect()
+    const containerRect = puzzleBoardRef.current.getBoundingClientRect()
     const containerWidth = containerRect.width
     const containerHeight = containerRect.height
     const pieceWidth = containerWidth / gridSize
@@ -155,6 +161,8 @@ export default function GamePage() {
 
   // 结束拖拽
   const handleTouchEnd = (_e: any) => {
+    _e.stopPropagation()
+    _e.preventDefault()
     if (!draggingPiece || isComplete || showOriginalImage) return
 
     // 计算目标格子位置
@@ -168,11 +176,15 @@ export default function GamePage() {
       draggingPieceY: draggingPiece.y,
       targetCol,
       targetRow,
-      targetIndex
+      targetIndex,
+      totalPieces: pieces.length,
+      gridSize
     })
 
     // 找到目标格子里的碎片
     const targetPiece = pieces.find(p => p.currentIndex === targetIndex && p.id !== draggingPiece.id)
+
+    console.log('目标碎片：', targetPiece ? `id=${targetPiece.id}, currentIndex=${targetPiece.currentIndex}` : 'null')
 
     if (targetPiece) {
       console.log('交换碎片：', {
@@ -193,6 +205,7 @@ export default function GamePage() {
 
       // 更新 currentIndex
       updatePieceIndex(draggingPiece.id, targetIndex)
+      console.log('移动碎片到空位：', draggingPiece.id, '->', targetIndex)
     }
 
     setDraggingPiece(null)
@@ -242,12 +255,13 @@ export default function GamePage() {
             />
           </View>
         ) : (
-          <View
-            className="puzzle-container"
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          >
-            <View className="puzzle-board">
+          <View className="puzzle-container">
+            <View
+              ref={puzzleBoardRef}
+              className="puzzle-board"
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
               {/* 拼图碎片将由 JS 动态渲染 */}
               <View className="puzzle-grid">
                 {pieces.map((piece) => {
