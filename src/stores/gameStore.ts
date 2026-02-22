@@ -56,24 +56,36 @@ interface GameState {
 function getLevelConfig(level: number): LevelConfig {
   let gridSize: number
 
-  // 关卡难度规则
+  // 关卡难度规则：从 3×3 开始逐步升高
   if (level === 1) {
-    gridSize = 8   // 第1关：8×8
+    gridSize = 3   // 第1关：3×3（简单）
   } else if (level === 2) {
-    gridSize = 10  // 第2关：10×10
+    gridSize = 4   // 第2关：4×4
   } else if (level === 3) {
-    gridSize = 12  // 第3关：12×12
+    gridSize = 5   // 第3关：5×5
+  } else if (level === 4) {
+    gridSize = 6   // 第4关：6×6
+  } else if (level === 5) {
+    gridSize = 7   // 第5关：7×7
+  } else if (level === 6) {
+    gridSize = 8   // 第6关：8×8
+  } else if (level === 7) {
+    gridSize = 9   // 第7关：9×9
+  } else if (level === 8) {
+    gridSize = 10  // 第8关：10×10
+  } else if (level === 9) {
+    gridSize = 11  // 第9关：11×11
   } else {
-    gridSize = 12  // 之后保持12×12
+    gridSize = 12  // 第10关及以后：12×12（最高难度）
   }
 
-  // 使用南湾湖风景图片
+  // 使用南湾湖风景图片（竖屏）
   const nanwanLakeImages = [
-    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop', // 山水风景
-    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&h=600&fit=crop', // 湖泊风景
-    'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&h=600&fit=crop', // 自然风光
-    'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&h=600&fit=crop', // 山峦风景
-    'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800&h=600&fit=crop'  // 草原风景
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=800&fit=crop', // 山水风景
+    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&h=800&fit=crop', // 湖泊风景
+    'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=600&h=800&fit=crop', // 自然风光
+    'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&h=800&fit=crop', // 山峦风景
+    'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600&h=800&fit=crop'  // 草原风景
   ]
 
   // 根据关卡循环使用不同的图片
@@ -90,7 +102,7 @@ function getLevelConfig(level: number): LevelConfig {
 export const useGameStore = create<GameState>((set, get) => ({
   // 初始状态
   currentLevel: 1,
-  gridSize: 8,
+  gridSize: 3,
   imageUrl: '',
   isPlaying: false,
   isComplete: false,
