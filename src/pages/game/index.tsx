@@ -21,6 +21,7 @@ export default function GamePage() {
     resetGame,
     selectPiece,
     movePiece,
+    updatePieceIndex,
     swapPieces,
     toggleHint,
     toggleOriginalImage,
@@ -166,11 +167,15 @@ export default function GamePage() {
       // 如果目标位置有其他碎片，交换位置
       swapPieces(draggingPiece, targetPiece)
     } else {
-      // 如果目标位置为空（打乱后所有位置都有碎片，这个分支理论上不会执行）
-      // 直接移动到目标格子
-      const newX = (targetCol / gridSize) * 100
-      const newY = (targetRow / gridSize) * 100
+      // 如果目标位置为空（理论上不会发生，因为打乱后所有位置都有碎片）
+      // 直接移动到目标格子（吸附）
+      const pieceSize = 100 / gridSize
+      const newX = targetCol * pieceSize
+      const newY = targetRow * pieceSize
       movePiece(draggingPiece, newX, newY)
+
+      // 更新 currentIndex
+      updatePieceIndex(draggingPiece.id, targetIndex)
     }
 
     setDraggingPiece(null)

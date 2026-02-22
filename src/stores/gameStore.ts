@@ -44,6 +44,7 @@ interface GameState {
   resetGame: () => void
   selectPiece: (piece: PuzzlePiece) => void
   movePiece: (piece: PuzzlePiece, targetX: number, targetY: number) => void
+  updatePieceIndex: (pieceId: number, newIndex: number) => void
   swapPieces: (piece1: PuzzlePiece, piece2: PuzzlePiece) => void
   toggleHint: () => void
   toggleOriginalImage: () => void
@@ -160,6 +161,17 @@ export const useGameStore = create<GameState>((set, get) => ({
     }))
   },
 
+  // 更新碎片索引
+  updatePieceIndex: (pieceId: number, newIndex: number) => {
+    set(state => ({
+      pieces: state.pieces.map(p =>
+        p.id === pieceId
+          ? { ...p, currentIndex: newIndex }
+          : p
+      )
+    }))
+  },
+
   // 交换碎片位置
   swapPieces: (piece1: PuzzlePiece, piece2: PuzzlePiece) => {
     set(state => {
@@ -167,18 +179,26 @@ export const useGameStore = create<GameState>((set, get) => ({
       const piece1Index = newPieces.findIndex(p => p.id === piece1.id)
       const piece2Index = newPieces.findIndex(p => p.id === piece2.id)
 
-      // 交换当前位置
-      const tempIndex = newPieces[piece1Index].currentIndex
+      // 交换当前位置索引
+      const tempCurrentIndex = newPieces[piece1Index].currentIndex
       newPieces[piece1Index].currentIndex = newPieces[piece2Index].currentIndex
-      newPieces[piece2Index].currentIndex = tempIndex
+      newPieces[piece2Index].currentIndex = tempCurrentIndex
 
-      // 交换坐标
-      const tempX = newPieces[piece1Index].x
-      const tempY = newPieces[piece1Index].y
-      newPieces[piece1Index].x = newPieces[piece2Index].x
-      newPieces[piece1Index].y = newPieces[piece2Index].y
-      newPieces[piece2Index].x = tempX
-      newPieces[piece2Index].y = tempY
+      // 计算新的格子坐标（吸附到格子）
+      const gridSize = Math.sqrt(newPieces.length)
+      const pieceSize = 100 / gridSize
+
+      // 更新 piece1 的坐标（吸附到它的新格子位置）
+      const piece1NewRow = Math.floor(newPieces[piece1Index].currentIndex / gridSize)
+      const piece1NewCol = newPieces[piece1Index].currentIndex % gridSize
+      newPieces[piece1Index].x = piece1NewCol * pieceSize
+      newPieces[piece1Index].y = piece1NewRow * pieceSize
+
+      // 更新 piece2 的坐标（吸附到它的新格子位置）
+      const piece2NewRow = Math.floor(newPieces[piece2Index].currentIndex / gridSize)
+      const piece2NewCol = newPieces[piece2Index].currentIndex % gridSize
+      newPieces[piece2Index].x = piece2NewCol * pieceSize
+      newPieces[piece2Index].y = piece2NewRow * pieceSize
 
       return { pieces: newPieces }
     })
