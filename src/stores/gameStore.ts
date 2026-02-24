@@ -80,13 +80,13 @@ function getLevelConfig(level: number): LevelConfig {
     gridSize = 12  // 第10关及以后：12×12（最高难度）
   }
 
-  // 使用南湾湖风景图片（竖屏）- 增加分辨率以占满屏幕
+  // 使用南湾湖风格风景图片（竖屏）- 湖泊、岛屿、山水
   const nanwanLakeImages = [
-    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1080&h=1440&fit=crop', // 山水风景
-    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1080&h=1440&fit=crop', // 湖泊风景
-    'https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=1080&h=1440&fit=crop', // 自然风光
-    'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1080&h=1440&fit=crop', // 山峦风景
-    'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1080&h=1440&fit=crop'  // 草原风景
+    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1080&h=1440&fit=crop', // 湖泊山水
+    'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1080&h=1440&fit=crop', // 山湖风景
+    'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=1080&h=1440&fit=crop', // 湖岛风光
+    'https://images.unsplash.com/photo-1501854140884-074cf2b21d25?w=1080&h=1440&fit=crop', // 湖泊远景
+    'https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1080&h=1440&fit=crop'  // 湖水倒影
   ]
 
   // 根据关卡循环使用不同的图片
