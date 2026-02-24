@@ -155,15 +155,27 @@ export default function GamePage() {
 
   // 开始拖拽
   const handleTouchStart = async (e: any, piece: any) => {
+    console.log('handleTouchStart 被调用', { e, piece, isWeapp, isComplete, showOriginalImage })
+
     e.stopPropagation()
     e.preventDefault()
-    if (isComplete || showOriginalImage) return
+    if (isComplete || showOriginalImage) {
+      console.log('触摸被阻止：游戏已完成或正在显示原图')
+      return
+    }
 
-    const touch = e.touches[0]
+    // 获取触摸点位置（兼容 H5 和小程序）
+    const touch = e.touches ? e.touches[0] : e.detail.touches[0]
+    console.log('触摸点位置:', touch)
 
     // 获取容器位置
     const rect = await getContainerRect()
-    if (!rect) return
+    console.log('容器位置:', rect)
+
+    if (!rect) {
+      console.log('无法获取容器位置')
+      return
+    }
 
     const piecePixelPos = getPiecePixelPosition(piece, rect.width)
 
@@ -180,11 +192,19 @@ export default function GamePage() {
 
   // 拖拽移动
   const handleTouchMove = (_e: any) => {
+    console.log('handleTouchMove 被调用', { draggingPiece, containerRect })
+
     _e.stopPropagation()
     _e.preventDefault()
-    if (!draggingPiece || isComplete || showOriginalImage || containerRect.width === 0) return
+    if (!draggingPiece || isComplete || showOriginalImage || containerRect.width === 0) {
+      console.log('拖拽被阻止')
+      return
+    }
 
-    const touch = _e.touches[0]
+    // 获取触摸点位置（兼容 H5 和小程序）
+    const touch = _e.touches ? _e.touches[0] : _e.detail.touches[0]
+    console.log('触摸点位置:', touch)
+
     const containerWidth = containerRect.width
     const containerHeight = containerRect.height
     const pieceWidth = containerWidth / gridSize
@@ -202,6 +222,8 @@ export default function GamePage() {
     const newXPercent = (newX / containerWidth) * 100
     const newYPercent = (newY / containerHeight) * 100
 
+    console.log('新位置:', { newXPercent, newYPercent })
+
     movePiece(draggingPiece, newXPercent, newYPercent)
 
     // 同步更新 draggingPiece 的坐标
@@ -210,13 +232,19 @@ export default function GamePage() {
 
   // 结束拖拽
   const handleTouchEnd = (_e: any) => {
+    console.log('handleTouchEnd 被调用', { draggingPiece })
+
     _e.stopPropagation()
     _e.preventDefault()
-    if (!draggingPiece || isComplete || showOriginalImage) return
+    if (!draggingPiece || isComplete || showOriginalImage) {
+      console.log('拖拽结束被阻止')
+      return
+    }
 
     // 从 pieces 数组中重新获取最新的 draggingPiece 数据
     const latestDraggingPiece = pieces.find(p => p.id === draggingPiece.id)
     if (!latestDraggingPiece) {
+      console.log('无法找到最新的拖拽碎片')
       setDraggingPiece(null)
       setDragOffset({ x: 0, y: 0 })
       setContainerRect({ left: 0, top: 0, width: 0, height: 0 })
@@ -336,9 +364,9 @@ export default function GamePage() {
                         backgroundSize: `${gridSize * 100}%`,
                         backgroundPosition: `${(piece.correctIndex % gridSize) * (100 / (gridSize - 1))}% ${Math.floor(piece.correctIndex / gridSize) * (100 / (gridSize - 1))}%`
                       }}
-                      catchTouchStart={(e) => handleTouchStart(e, piece)}
-                      catchTouchMove={handleTouchMove}
-                      catchTouchEnd={handleTouchEnd}
+                      onTouchStart={(e) => handleTouchStart(e, piece)}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
                     />
                   )
                 })}
