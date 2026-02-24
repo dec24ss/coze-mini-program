@@ -35,8 +35,8 @@ export default function GamePage() {
 
   const [draggingPiece, setDraggingPiece] = useState<any>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
-  const [containerRect, setContainerRect] = useState({ left: 0, top: 0, width: 0, height: 0 })
-  const timerRef = useRef<NodeJS.Timeout>()
+  const [containerRect, setContainerRect] = useState<{ left: number; top: number; width: number; height: number }>({ left: 0, top: 0, width: 0, height: 0 })
+  const timerRef = useRef<ReturnType<typeof setTimeout>>()
   const isMountedRef = useRef(false)
 
   // 组件挂载后获取容器位置
@@ -58,7 +58,7 @@ export default function GamePage() {
   }, [isWeapp])
 
   // 获取容器位置信息
-  const getContainerRect = () => {
+  const getContainerRect = (): Promise<{ left: number; top: number; width: number; height: number } | null> => {
     return new Promise((resolve) => {
       const query = Taro.createSelectorQuery()
       query.select('.puzzle-board').boundingClientRect()
