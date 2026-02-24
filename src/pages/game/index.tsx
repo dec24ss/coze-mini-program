@@ -318,13 +318,7 @@ export default function GamePage() {
           </View>
         ) : (
           <View className="puzzle-container">
-            <View
-              className="puzzle-board"
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-              catchTouchMove={handleTouchMove}
-              catchTouchEnd={handleTouchEnd}
-            >
+            <View className="puzzle-board">
               {/* 拼图碎片将由 JS 动态渲染 */}
               <View className="puzzle-grid">
                 {pieces.map((piece) => {
@@ -343,6 +337,8 @@ export default function GamePage() {
                         backgroundPosition: `${(piece.correctIndex % gridSize) * (100 / (gridSize - 1))}% ${Math.floor(piece.correctIndex / gridSize) * (100 / (gridSize - 1))}%`
                       }}
                       catchTouchStart={(e) => handleTouchStart(e, piece)}
+                      catchTouchMove={handleTouchMove}
+                      catchTouchEnd={handleTouchEnd}
                     />
                   )
                 })}
