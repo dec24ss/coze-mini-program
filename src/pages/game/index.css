@@ -18,35 +18,6 @@
   color: #6B7280;
 }
 
-/* 顶部信息栏 */
-.game-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.header-left,
-.header-right {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.header-label {
-  font-size: 16px;
-  color: #6B7280;
-  margin-bottom: 6px;
-}
-
-.header-info {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1F2937;
-}
-
 /* 游戏容器 */
 .game-container {
   flex: 1;
@@ -54,7 +25,7 @@
   align-items: center;
   justify-content: center;
   padding: 12px;
-  padding-bottom: 100px;
+  padding-bottom: 140px; /* 增加底部内边距，为底部栏留出空间 */
 }
 
 /* 原图显示 */
@@ -167,6 +138,41 @@
   }
 }
 
+/* 底部信息栏 */
+.game-info-bar {
+  position: fixed;
+  bottom: 80px; /* 在按钮上方 */
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  z-index: 50;
+}
+
+.info-left,
+.info-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.info-label {
+  font-size: 14px;
+  color: #6B7280;
+  margin-bottom: 4px;
+}
+
+.info-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1F2937;
+}
+
 /* 底部功能按钮 */
 .game-footer {
   position: fixed;
@@ -178,6 +184,7 @@
   background: white;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
   gap: 8px;
+  z-index: 50;
 }
 
 .footer-button {
