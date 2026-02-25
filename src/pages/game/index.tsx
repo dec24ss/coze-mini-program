@@ -397,6 +397,11 @@ export default function GamePage() {
                       borderBottom: bottomNeighborCorrect ? '0 solid transparent' : '2px solid rgba(16, 185, 129, 0.6)',
                       borderRight: rightNeighborCorrect ? '0 solid transparent' : '2px solid rgba(16, 185, 129, 0.6)'
                     }
+                  } else {
+                    // 不在正确位置的图块，不显示绿色边框
+                    borderStyle = {
+                      border: 'none'
+                    }
                   }
 
                   return (
