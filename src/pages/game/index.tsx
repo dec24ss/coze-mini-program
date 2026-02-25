@@ -19,6 +19,7 @@ export default function GamePage() {
     isLoading,
     isGameCompleted,
     countdownTime,
+    totalTimeSpent,
     isTimeFrozen,
     freezeTimeRemaining,
     pieces,
@@ -261,9 +262,9 @@ export default function GamePage() {
     loadNextLevel()
   }
 
-  // 通关后重新开始游戏（重新加载图片）
+  // 通关后重新开始游戏（跳转到关卡选择页面）
   const handleRestartAll = () => {
-    restartGame()
+    Taro.navigateTo({ url: '/pages/level-select/index' })
   }
 
   // 下载原图到相册
@@ -765,16 +766,13 @@ export default function GamePage() {
         </View>
       )}
 
-      {/* 过关弹窗 */}
+      {/* 过关弹窗（1-9关） */}
       {isComplete && !isGameCompleted && (
         <View className="victory-modal">
           <View className="victory-content">
-            <Text className="block victory-title">恭喜通关！</Text>
-            <Text className="block victory-time">剩余时间：{formatTime(countdownTime)}</Text>
+            <Text className="block victory-title">恭喜过关！</Text>
+            <Text className="block victory-time">花费时间：{formatTime(180 - countdownTime)}</Text>
             <View className="victory-buttons">
-              <Button className="victory-button secondary" onClick={handleBackHome}>
-                返回首页
-              </Button>
               {isWeapp && (
                 <Button className="victory-button secondary" onClick={handleDownloadImage}>
                   下载原图
@@ -793,19 +791,16 @@ export default function GamePage() {
         <View className="victory-modal">
           <View className="victory-content">
             <Text className="block victory-title" style={{ color: '#F59E0B' }}>🎉 恭喜通关！</Text>
-            <Text className="block victory-time">你已经完成了所有10个关卡</Text>
+            <Text className="block victory-time">总花费时间：{formatTime(totalTimeSpent)}</Text>
             <Text className="block victory-desc">你真是个拼图高手！</Text>
             <View className="victory-buttons">
-              <Button className="victory-button secondary" onClick={handleBackHome}>
-                返回首页
-              </Button>
               {isWeapp && (
                 <Button className="victory-button secondary" onClick={handleDownloadImage}>
                   下载原图
                 </Button>
               )}
               <Button className="victory-button primary" onClick={handleRestartAll}>
-                重新开始（新图片）
+                重新来过
               </Button>
             </View>
           </View>

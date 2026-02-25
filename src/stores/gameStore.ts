@@ -44,6 +44,8 @@ interface GameState {
   countdownTime: number          // 倒计时剩余时间（秒）
   isTimeFrozen: boolean          // 是否时间冻结
   freezeTimeRemaining: number    // 时间冻结剩余时间（秒）
+  totalTimeSpent: number         // 总花费时间（秒），从第1关开始累计
+  levelStartTime: number         // 当前关卡开始时间戳
 
   // 拼图数据
   pieces: PuzzlePiece[]          // 拼图碎片数组
@@ -138,6 +140,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   countdownTime: 180,
   isTimeFrozen: false,
   freezeTimeRemaining: 0,
+  totalTimeSpent: 0,
+  levelStartTime: 0,
   pieces: [],
   selectedPiece: null,
   showHint: false,
@@ -284,7 +288,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       showOriginalImage: false,
       hintCount: 0,
       originalImageCount: 0,
-      freezeCount: 0
+      freezeCount: 0,
+      levelStartTime: Date.now()  // 记录当前关卡开始时间
     })
 
     // 生成拼图碎片
@@ -446,7 +451,18 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // 进入下一关
   loadNextLevel: async () => {
-    const { currentLevel } = get()
+    const { currentLevel, levelStartTime, totalTimeSpent } = get()
+
+    // 计算当前关卡花费的时间（秒）
+    const currentTime = Date.now()
+    const timeSpentThisLevel = Math.floor((currentTime - levelStartTime) / 1000)
+
+    // 累计到总花费时间
+    const newTotalTimeSpent = totalTimeSpent + timeSpentThisLevel
+    console.log(`⏱️  关卡 ${currentLevel} 花费时间: ${timeSpentThisLevel}秒，总花费时间: ${newTotalTimeSpent}秒`)
+
+    // 更新总花费时间
+    set({ totalTimeSpent: newTotalTimeSpent })
 
     // 检查是否完成第10关（通关）
     if (currentLevel >= 10) {
@@ -482,6 +498,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       countdownTime: 180,
       isTimeFrozen: false,
       freezeTimeRemaining: 0,
+      totalTimeSpent: 0,  // 重置总花费时间
+      levelStartTime: 0,  // 重置关卡开始时间
       levelImageMap: {}  // 清空关卡图片映射
     })
 
