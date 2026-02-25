@@ -262,18 +262,40 @@ export default function GamePage() {
         return
       }
 
-      // 下载图片到本地临时路径（使用 Network.downloadFile）
-      const downloadRes = await Network.downloadFile({
-        url: imageUrl
-      })
+      let filePath: string
 
-      if (!downloadRes.tempFilePath) {
-        throw new Error('下载图片失败')
+      // 检查图片类型
+      if (imageUrl.startsWith('wxfile://')) {
+        // 小程序本地路径，直接使用
+        filePath = imageUrl
+        console.log('📥 使用本地路径保存:', filePath)
+      } else if (imageUrl.startsWith('data:image')) {
+        // Base64 数据，需要先下载
+        console.log('📥 Base64 数据，先下载到临时文件')
+        const downloadRes = await Network.downloadFile({
+          url: imageUrl
+        })
+        if (!downloadRes.tempFilePath) {
+          throw new Error('Base64 图片下载失败')
+        }
+        filePath = downloadRes.tempFilePath
+      } else if (imageUrl.startsWith('http')) {
+        // 网络路径，先下载
+        console.log('📥 网络路径，先下载到临时文件')
+        const downloadRes = await Network.downloadFile({
+          url: imageUrl
+        })
+        if (!downloadRes.tempFilePath) {
+          throw new Error('网络图片下载失败')
+        }
+        filePath = downloadRes.tempFilePath
+      } else {
+        throw new Error('不支持的图片路径格式')
       }
 
       // 保存到相册
       await Taro.saveImageToPhotosAlbum({
-        filePath: downloadRes.tempFilePath
+        filePath: filePath
       })
 
       Taro.hideLoading()

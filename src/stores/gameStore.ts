@@ -99,7 +99,7 @@ function getLevelConfig(level: number, imageList: string[], levelImageMap: Recor
   // 使用预先规划的每一关的图片映射（优先使用本地路径）
   let imageUrl: string
   if (levelImageMap[level]) {
-    // 优先使用本地路径（已缓存，加载更快）
+    // 优先使用本地路径（已缓存，加载更快，且下载时能保存正确的图片）
     imageUrl = levelImageMap[level].path
     console.log(`🖼️  关卡 ${level} 使用本地路径:`, imageUrl)
   } else {
@@ -260,17 +260,9 @@ export const useGameStore = create<GameState>((set, get) => ({
       config.imageUrl.startsWith('wxfile://') ? '本地路径' : '网络路径'
     )
 
-    // 小程序端特殊处理：如果是 Base64 或本地路径，转换为网络 URL
-    let finalImageUrl = config.imageUrl
-    if (isWeapp) {
-      if (levelImageMap[level] && levelImageMap[level].url) {
-        finalImageUrl = levelImageMap[level].url  // 使用网络 URL
-        console.log('🖼️  小程序端，使用网络 URL:', finalImageUrl)
-      } else if (imageList.length > 0) {
-        finalImageUrl = imageList[(level - 1) % imageList.length]
-        console.log('🖼️  小程序端，使用 imageList:', finalImageUrl)
-      }
-    }
+    // 直接使用 getLevelConfig 返回的图片路径
+    // 小程序端使用本地路径（wxfile://），H5 端使用 Base64 或网络路径
+    const finalImageUrl = config.imageUrl
 
     console.log('🖼️  最终图片 URL:', finalImageUrl.substring(0, 80))
     console.log('==========================================')
@@ -278,7 +270,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({
       currentLevel: config.level,
       gridSize: config.gridSize,
-      imageUrl: finalImageUrl,  // 使用处理后的 URL
+      imageUrl: finalImageUrl,  // 使用本地路径或 Base64
       isPlaying: true,
       isComplete: false,
       isFailed: false,
