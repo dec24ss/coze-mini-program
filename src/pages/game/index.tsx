@@ -44,7 +44,7 @@ export default function GamePage() {
   const [draggingPiece, setDraggingPiece] = useState<any>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [containerRect, setContainerRect] = useState<{ left: number; top: number; width: number; height: number }>({ left: 0, top: 0, width: 0, height: 0 })
-  const [isImageLoaded, setIsImageLoaded] = useState(false)  // 图片是否已加载完成
+  const [isImageLoaded, setIsImageLoaded] = useState(true)  // 默认为 true，避免一直显示加载中
   const timerRef = useRef<ReturnType<typeof setTimeout>>()
   const isMountedRef = useRef(false)
 
@@ -70,14 +70,30 @@ export default function GamePage() {
   useEffect(() => {
     if (imageUrl) {
       console.log('🖼️  监听到图片 URL 变化:', imageUrl)
-      setIsImageLoaded(false)  // 先重置为未加载
+      console.log('🖼️  图片长度:', imageUrl.length)
 
-      // 图片已经在加载页面预加载并缓存到本地，直接显示
-      // 给浏览器/小程序极短的时间确保图片已渲染（从300ms减少到50ms）
+      // 如果是 base64 数据，立即显示（已经是完整的图片数据）
+      if (imageUrl.startsWith('data:image')) {
+        console.log('✅ Base64 图片数据，立即显示')
+        setIsImageLoaded(true)
+        return
+      }
+
+      // 如果是本地路径（wxfile://），立即显示
+      if (imageUrl.startsWith('wxfile://') || imageUrl.startsWith('/')) {
+        console.log('✅ 本地路径图片，立即显示')
+        setIsImageLoaded(true)
+        return
+      }
+
+      // 如果是网络路径，等待图片加载完成
+      setIsImageLoaded(false)
       setTimeout(() => {
         setIsImageLoaded(true)
-        console.log('✅ 图片已显示拼图（使用缓存图片）')
-      }, 50)  // 从300ms减少到50ms
+        console.log('✅ 网络路径图片已显示')
+      }, 100)  // 100ms延迟
+    } else {
+      console.log('⚠️  imageUrl 为空')
     }
   }, [imageUrl])
 
@@ -103,15 +119,32 @@ export default function GamePage() {
 
   // 页面加载时开始游戏
   useEffect(() => {
-    startGame(1)
+    console.log('🎮 GamePage 挂载')
+
+    const initGame = async () => {
+      const { isImagesPreloaded, levelImageMap, preloadImages } = useGameStore.getState()
+
+      console.log('📋 isImagesPreloaded:', isImagesPreloaded)
+      console.log('📋 levelImageMap 长度:', Object.keys(levelImageMap).length)
+
+      // 如果图片未预加载，先进行预加载
+      if (!isImagesPreloaded || Object.keys(levelImageMap).length === 0) {
+        console.log('⚠️  图片未预加载，开始预加载...')
+        await preloadImages()
+        console.log('✅ 图片预加载完成')
+      }
+
+      // 开始游戏
+      startGame(1)
+    }
+
+    initGame()
 
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current)
-      }
+      console.log('🎮 GamePage 卸载')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [startGame])
 
   // 计时器
   useEffect(() => {

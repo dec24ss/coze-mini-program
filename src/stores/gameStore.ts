@@ -208,9 +208,13 @@ export const useGameStore = create<GameState>((set, get) => ({
           }
           console.log(`📋 关卡 ${i + 1} 使用图片 ${imageIndex + 1}:`, {
             url: loadedImages[imageIndex].substring(0, 50),
-            path: loadedPaths[imageIndex]
+            path: loadedPaths[imageIndex],
+            pathType: loadedPaths[imageIndex].startsWith('wxfile://') ? '本地路径' : '网络路径'
           })
         }
+
+        console.log('✅ levelImageMap 已生成，长度:', Object.keys(levelImageMap).length)
+        console.log('✅ 第一关图片路径:', levelImageMap[1]?.path)
 
         set({
           imageList: loadedImages,
@@ -238,13 +242,22 @@ export const useGameStore = create<GameState>((set, get) => ({
   // 开始游戏
   startGame: async (level: number) => {
     const { imageList, levelImageMap } = get()
+
+    console.log('==========================================')
+    console.log('🎮 startGame 被调用，关卡:', level)
+    console.log('📋 imageList 长度:', imageList.length)
+    console.log('📋 levelImageMap 长度:', Object.keys(levelImageMap).length)
+
     const config = getLevelConfig(level, imageList, levelImageMap)
 
     console.log('🎮 开始游戏，关卡:', config.level)
-    console.log('🖼️  图片 URL:', config.imageUrl)
-    console.log('📋 imageList 长度:', imageList.length)
-    console.log('📋 imageList 第一张:', imageList[0]?.substring(0, 50) || '空')
-    console.log('📋 levelImageMap:', levelImageMap)
+    console.log('🖼️  图片 URL:', config.imageUrl.substring(0, 80))
+    console.log('🖼️  图片 URL 长度:', config.imageUrl.length)
+    console.log('🖼️  图片 URL 类型:', 
+      config.imageUrl.startsWith('data:image') ? 'Base64' :
+      config.imageUrl.startsWith('wxfile://') ? '本地路径' : '网络路径'
+    )
+    console.log('==========================================')
 
     set({
       currentLevel: config.level,
