@@ -1,6 +1,7 @@
 import { View, Text, Button, Image } from '@tarojs/components'
 import { useEffect, useRef, useState } from 'react'
 import Taro from '@tarojs/taro'
+import { Network } from '@/network'
 import { useGameStore } from '@/stores/gameStore'
 import './index.css'
 
@@ -226,6 +227,62 @@ export default function GamePage() {
   // 通关后重新开始游戏（重新加载图片）
   const handleRestartAll = () => {
     restartGame()
+  }
+
+  // 下载原图到相册
+  const handleDownloadImage = async () => {
+    if (!isWeapp) {
+      Taro.showToast({ title: '仅小程序支持保存图片', icon: 'none' })
+      return
+    }
+
+    try {
+      Taro.showLoading({ title: '保存中...' })
+
+      // 请求相册权限
+      const authResult = await Taro.authorize({
+        scope: 'scope.writePhotosAlbum'
+      }).catch(() => {
+        // 权限被拒绝，引导用户去设置
+        Taro.showModal({
+          title: '提示',
+          content: '需要您授权保存图片到相册',
+          confirmText: '去授权',
+          success: (res) => {
+            if (res.confirm) {
+              Taro.openSetting()
+            }
+          }
+        })
+        return null
+      })
+
+      if (authResult === null) {
+        Taro.hideLoading()
+        return
+      }
+
+      // 下载图片到本地临时路径（使用 Network.downloadFile）
+      const downloadRes = await Network.downloadFile({
+        url: imageUrl
+      })
+
+      if (!downloadRes.tempFilePath) {
+        throw new Error('下载图片失败')
+      }
+
+      // 保存到相册
+      await Taro.saveImageToPhotosAlbum({
+        filePath: downloadRes.tempFilePath
+      })
+
+      Taro.hideLoading()
+      Taro.showToast({ title: '已保存到相册', icon: 'success' })
+    } catch (error) {
+      Taro.hideLoading()
+      console.error('保存图片失败:', error)
+      Taro.showToast({ title: '保存失败，请重试', icon: 'none' })
+    }
   }
 
   // 获取需要交换的两个图块
@@ -658,6 +715,11 @@ export default function GamePage() {
               <Button className="victory-button secondary" onClick={handleBackHome}>
                 返回首页
               </Button>
+              {isWeapp && (
+                <Button className="victory-button secondary" onClick={handleDownloadImage}>
+                  下载原图
+                </Button>
+              )}
               <Button className="victory-button primary" onClick={handleNextLevel}>
                 下一关
               </Button>
@@ -677,6 +739,11 @@ export default function GamePage() {
               <Button className="victory-button secondary" onClick={handleBackHome}>
                 返回首页
               </Button>
+              {isWeapp && (
+                <Button className="victory-button secondary" onClick={handleDownloadImage}>
+                  下载原图
+                </Button>
+              )}
               <Button className="victory-button primary" onClick={handleRestartAll}>
                 重新开始（新图片）
               </Button>
