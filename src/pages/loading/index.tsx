@@ -98,7 +98,7 @@ export default function LoadingPage() {
                 }}
               >
                 {/* 预渲染所有拼图碎片 */}
-                {[...Array(gridSize * gridSize)].map((_, pieceIndex) => {
+                {[...Array(gridSize * gridSize)].map((__unused, pieceIndex) => {
                   const col = pieceIndex % gridSize
                   const row = Math.floor(pieceIndex / gridSize)
 
