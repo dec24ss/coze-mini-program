@@ -1,0 +1,23 @@
+# dependencies
+node_modules
+.pnpm-debug.log*
+.yarn-integrity
+
+# production
+dist-web
+dist
+build
+
+# logs
+logs
+*.log
+
+# OS
+.DS_Store
+
+# IDE
+.vscode
+.idea
+
+# 图片资源（下载到本地）
+public/images

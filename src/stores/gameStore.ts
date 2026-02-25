@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { getRandomPaintings } from '@/config/images'
+import { Network } from '@/network'
 
 // 拼图碎片类型
 export interface PuzzlePiece {
@@ -140,41 +140,62 @@ export const useGameStore = create<GameState>((set, get) => ({
   preloadImages: async () => {
     set({ isImagesLoading: true, imagesLoaded: 0, imageList: [] })
 
-    // 从100张世界名画中随机选择10张
-    const shuffledImages = getRandomPaintings(10)
+    try {
+      // 从服务器获取随机图片列表
+      console.log('🖼️  从服务器获取图片列表...')
+      const response = await Network.request({
+        url: '/api/images/random',
+        method: 'GET'
+      })
 
-    const loadedImages: string[] = []
-    let loadedCount = 0
+      if (response.data?.data?.images) {
+        const serverImages = response.data.data.images
+        console.log(`✅ 从服务器获取到 ${serverImages.length} 张图片`)
 
-    // 预加载每张图片
-    const loadImagePromise = (url: string, index: number): Promise<void> => {
-      return new Promise((resolve) => {
-        const img = new Image()
-        img.onload = () => {
-          loadedImages[index] = url
-          loadedCount++
-          set({ imagesLoaded: loadedCount })
-          resolve()
+        const loadedImages: string[] = []
+        let loadedCount = 0
+
+        // 预加载每张图片
+        const loadImagePromise = (url: string, index: number): Promise<void> => {
+          return new Promise((resolve) => {
+            const img = new Image()
+            img.onload = () => {
+              loadedImages[index] = url
+              loadedCount++
+              set({ imagesLoaded: loadedCount })
+              resolve()
+            }
+            img.onerror = () => {
+              // 加载失败也继续
+              loadedImages[index] = url
+              loadedCount++
+              set({ imagesLoaded: loadedCount })
+              resolve()
+            }
+            img.src = url
+          })
         }
-        img.onerror = () => {
-          // 加载失败也继续
-          loadedImages[index] = url
-          loadedCount++
-          set({ imagesLoaded: loadedCount })
-          resolve()
-        }
-        img.src = url
+
+        // 并行加载所有图片
+        await Promise.all(serverImages.map((url, index) => loadImagePromise(url, index)))
+
+        set({
+          imageList: loadedImages,
+          imagesLoaded: serverImages.length,
+          isImagesLoading: false
+        })
+      } else {
+        throw new Error('服务器返回数据格式错误')
+      }
+    } catch (error) {
+      console.error('❌ 获取图片列表失败:', error)
+      // 失败时使用默认图片
+      set({
+        imageList: [],
+        imagesLoaded: 0,
+        isImagesLoading: false
       })
     }
-
-    // 并行加载所有图片
-    await Promise.all(shuffledImages.map((url, index) => loadImagePromise(url, index)))
-
-    set({
-      imageList: loadedImages,
-      imagesLoaded: 10,
-      isImagesLoading: false
-    })
   },
 
   // 开始游戏
