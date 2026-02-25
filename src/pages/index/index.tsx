@@ -10,7 +10,7 @@ export default function IndexPage() {
   return (
     <View className="home-page">
       <View className="home-content">
-        <Text className="block home-title">拼图游戏</Text>
+        <Text className="block home-title">海海拼图大作战</Text>
         <Text className="block home-subtitle">拖拽碎片，完成拼图</Text>
         <Button className="home-button" onClick={handleStartGame}>
           开始游戏

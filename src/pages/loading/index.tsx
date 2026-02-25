@@ -28,7 +28,7 @@ export default function LoadingPage() {
   return (
     <View className="loading-page">
       <View className="loading-content">
-        <Text className="block loading-title">拼图游戏</Text>
+        <Text className="block loading-title">海海拼图大作战</Text>
         <Progress
           className="loading-progress"
           percent={progress}
