@@ -1,4 +1,4 @@
-import { View, Text } from '@tarojs/components'
+import { View, Text, Image } from '@tarojs/components'
 import { useEffect, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { useGameStore } from '@/stores/gameStore'
@@ -7,7 +7,7 @@ import './index.css'
 const TOTAL_IMAGES = 30 // 固定30张图片
 
 export default function LoadingPage() {
-  const { preloadImages, imagesLoaded } = useGameStore()
+  const { preloadImages, imagesLoaded, imageList } = useGameStore()
   const [totalImages] = useState(TOTAL_IMAGES)
 
   useEffect(() => {
@@ -59,6 +59,20 @@ export default function LoadingPage() {
             </Text>
           </View>
         )}
+      </View>
+
+      {/* 隐藏的图片列表，确保所有图片都被真正加载到 DOM 中 */}
+      <View style={{ display: 'none' }}>
+        {imageList.map((url, index) => (
+          <Image
+            key={`preload-${index}`}
+            src={url}
+            mode="aspectFill"
+            onLoad={() => {
+              console.log(`🖼️ 图片 ${index + 1} 已加载到 DOM`)
+            }}
+          />
+        ))}
       </View>
     </View>
   )

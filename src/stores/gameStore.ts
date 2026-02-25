@@ -29,11 +29,13 @@ interface GameState {
   isComplete: boolean            // 是否完成拼图
   isFailed: boolean              // 是否失败
   isLoading: boolean             // 是否加载中
+  isGameCompleted: boolean       // 是否通关（完成所有关卡）
 
   // 图片资源
-  imageList: string[]            // 图片列表（预加载的10张图片）
+  imageList: string[]            // 图片列表（预加载的30张图片）
   imagesLoaded: number           // 已加载的图片数量
   isImagesLoading: boolean       // 是否正在加载图片
+  isImagesPreloaded: boolean     // 图片是否已预加载并缓存
 
   // 计时相关
   startTime: number              // 开始时间戳
@@ -58,6 +60,7 @@ interface GameState {
   preloadImages: () => Promise<void>
   startGame: (level: number) => Promise<void>
   resetGame: () => void
+  restartGame: () => Promise<void>  // 重新开始游戏（重新加载图片）
   selectPiece: (piece: PuzzlePiece) => void
   movePiece: (piece: PuzzlePiece, targetX: number, targetY: number) => void
   updatePieceIndex: (pieceId: number, newIndex: number) => void
@@ -76,27 +79,19 @@ interface GameState {
 function getLevelConfig(level: number, imageList: string[]): LevelConfig {
   let gridSize: number
 
-  // 关卡难度规则：从 3×3 开始逐步升高
-  if (level === 1) {
-    gridSize = 3   // 第1关：3×3（简单）
-  } else if (level === 2) {
-    gridSize = 4   // 第2关：4×4
-  } else if (level === 3) {
-    gridSize = 5   // 第3关：5×5
-  } else if (level === 4) {
-    gridSize = 6   // 第4关：6×6
-  } else if (level === 5) {
-    gridSize = 7   // 第5关：7×7
-  } else if (level === 6) {
-    gridSize = 8   // 第6关：8×8
-  } else if (level === 7) {
-    gridSize = 9   // 第7关：9×9
-  } else if (level === 8) {
-    gridSize = 10  // 第8关：10×10
-  } else if (level === 9) {
-    gridSize = 11  // 第9关：11×11
+  // 关卡难度规则：
+  // 第1-3关：3×3
+  // 第4-6关：4×4
+  // 第7-9关：5×5
+  // 第10关：6×6（最终挑战）
+  if (level >= 1 && level <= 3) {
+    gridSize = 3   // 第1-3关：3×3（入门）
+  } else if (level >= 4 && level <= 6) {
+    gridSize = 4   // 第4-6关：4×4（进阶）
+  } else if (level >= 7 && level <= 9) {
+    gridSize = 5   // 第7-9关：5×5（挑战）
   } else {
-    gridSize = 12  // 第10关及以后：12×12（最高难度）
+    gridSize = 6   // 第10关：6×6（最终挑战）
   }
 
   // 使用预加载的图片列表
@@ -122,9 +117,11 @@ export const useGameStore = create<GameState>((set, get) => ({
   isComplete: false,
   isFailed: false,
   isLoading: false,
+  isGameCompleted: false,
   imageList: [],
   imagesLoaded: 0,
   isImagesLoading: false,
+  isImagesPreloaded: false,
   startTime: 0,
   countdownTime: 180,
   isTimeFrozen: false,
@@ -139,7 +136,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // 预加载图片（使用 Taro.getImageInfo 真正缓存图片）
   preloadImages: async () => {
-    set({ isImagesLoading: true, imagesLoaded: 0, imageList: [] })
+    set({ isImagesLoading: true, imagesLoaded: 0, imageList: [], isImagesPreloaded: false })
 
     try {
       // 从服务器获取随机图片列表
@@ -188,7 +185,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         set({
           imageList: loadedImages,
           imagesLoaded: serverImages.length,
-          isImagesLoading: false
+          isImagesLoading: false,
+          isImagesPreloaded: true  // 标记图片已预加载完成
         })
       } else {
         throw new Error('服务器返回数据格式错误')
@@ -199,7 +197,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       set({
         imageList: [],
         imagesLoaded: 0,
-        isImagesLoading: false
+        isImagesLoading: false,
+        isImagesPreloaded: false
       })
     }
   },
@@ -394,7 +393,48 @@ export const useGameStore = create<GameState>((set, get) => ({
   // 进入下一关
   loadNextLevel: async () => {
     const { currentLevel } = get()
-    await get().startGame(currentLevel + 1)
+
+    // 检查是否完成第10关（通关）
+    if (currentLevel >= 10) {
+      console.log('🎉 恭喜通关！')
+      set({ isGameCompleted: true, isComplete: false })
+    } else {
+      await get().startGame(currentLevel + 1)
+    }
+  },
+
+  // 重新开始游戏（重新加载新图片）
+  restartGame: async () => {
+    console.log('🔄 重新开始游戏，重新加载图片...')
+
+    // 清空当前游戏状态
+    set({
+      currentLevel: 1,
+      gridSize: 3,
+      imageUrl: '',
+      isPlaying: false,
+      isComplete: false,
+      isFailed: false,
+      isLoading: false,
+      isGameCompleted: false,
+      pieces: [],
+      selectedPiece: null,
+      showHint: false,
+      showOriginalImage: false,
+      hintCount: 0,
+      originalImageCount: 0,
+      freezeCount: 0,
+      startTime: 0,
+      countdownTime: 180,
+      isTimeFrozen: false,
+      freezeTimeRemaining: 0
+    })
+
+    // 重新加载新图片
+    await get().preloadImages()
+
+    // 开始第一关
+    await get().startGame(1)
   }
 }))
 

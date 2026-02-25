@@ -16,6 +16,7 @@ export default function GamePage() {
     isComplete,
     isFailed,
     isLoading,
+    isGameCompleted,
     countdownTime,
     isTimeFrozen,
     freezeTimeRemaining,
@@ -36,7 +37,8 @@ export default function GamePage() {
     freezeTime,
     checkComplete,
     checkFailed,
-    loadNextLevel
+    loadNextLevel,
+    restartGame
   } = useGameStore()
 
   const [draggingPiece, setDraggingPiece] = useState<any>(null)
@@ -162,7 +164,7 @@ export default function GamePage() {
     freezeTime()
   }
 
-  // 重新开始
+  // 重新开始当前关卡
   const handleRestart = () => {
     startGame(currentLevel)
   }
@@ -170,6 +172,11 @@ export default function GamePage() {
   // 下一关
   const handleNextLevel = () => {
     loadNextLevel()
+  }
+
+  // 通关后重新开始游戏（重新加载图片）
+  const handleRestartAll = () => {
+    restartGame()
   }
 
   // 获取需要交换的两个图块
@@ -185,14 +192,6 @@ export default function GamePage() {
       }
     }
     return null
-  }
-
-  // 计算碎片在容器中的实际位置（像素）
-  const getPiecePixelPosition = (piece: any, containerWidth: number) => {
-    return {
-      x: (piece.x / 100) * containerWidth,
-      y: (piece.y / 100) * containerWidth
-    }
   }
 
   // 开始拖拽
@@ -219,16 +218,18 @@ export default function GamePage() {
       return
     }
 
-    const piecePixelPos = getPiecePixelPosition(piece, rect.width)
+    const pieceSize = rect.width / gridSize  // 图块的实际像素尺寸
 
     setContainerRect(rect)
     setDraggingPiece(piece)
+
+    // 设置偏移为图块尺寸的一半，让触摸点始终在图块中心
     setDragOffset({
-      x: touch.clientX - rect.left - piecePixelPos.x,
-      y: touch.clientY - rect.top - piecePixelPos.y
+      x: pieceSize / 2,
+      y: pieceSize / 2
     })
 
-    console.log('开始拖拽碎片：', piece.id, '当前位置:', piece.x, piece.y, '%', '平台:', isWeapp ? '小程序' : 'H5')
+    console.log('开始拖拽碎片：', piece.id, '当前位置:', piece.x, piece.y, '%', '图块尺寸:', pieceSize, '平台:', isWeapp ? '小程序' : 'H5')
   }
 
   // 拖拽移动
@@ -575,7 +576,7 @@ export default function GamePage() {
       )}
 
       {/* 过关弹窗 */}
-      {isComplete && (
+      {isComplete && !isGameCompleted && (
         <View className="victory-modal">
           <View className="victory-content">
             <Text className="block victory-title">恭喜通关！</Text>
@@ -586,6 +587,25 @@ export default function GamePage() {
               </Button>
               <Button className="victory-button primary" onClick={handleNextLevel}>
                 下一关
+              </Button>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* 通关弹窗（完成所有关卡） */}
+      {isGameCompleted && (
+        <View className="victory-modal">
+          <View className="victory-content">
+            <Text className="block victory-title" style={{ color: '#F59E0B' }}>🎉 恭喜通关！</Text>
+            <Text className="block victory-time">你已经完成了所有10个关卡</Text>
+            <Text className="block victory-desc">你真是个拼图高手！</Text>
+            <View className="victory-buttons">
+              <Button className="victory-button secondary" onClick={handleBackHome}>
+                返回首页
+              </Button>
+              <Button className="victory-button primary" onClick={handleRestartAll}>
+                重新开始（新图片）
               </Button>
             </View>
           </View>

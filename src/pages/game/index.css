@@ -275,7 +275,14 @@
 .victory-time {
   font-size: 22px; /* 字体缩小50% */
   color: #6B7280;
-  margin-bottom: 28px;
+  margin-bottom: 12px;
+}
+
+.victory-desc {
+  font-size: 20px;
+  color: #10B981;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 .victory-buttons {
