@@ -21,8 +21,7 @@
 /* 顶部信息栏 */
 .game-header {
   position: fixed;
-  top: 50%; /* 屏幕中间 */
-  transform: translateY(-50%); /* 垂直居中 */
+  top: 50px; /* 距离屏幕上边缘50px */
   left: 0;
   right: 0;
   display: flex;
@@ -32,7 +31,6 @@
   padding: 16px 20px;
   background: transparent;
   z-index: 50;
-  margin-top: -35%; /* 向上偏移，使其位于屏幕顶部和图片中间 */
 }
 
 .header-text {
@@ -49,7 +47,8 @@
   justify-content: center;
   padding: 12px;
   position: relative;
-  padding-top: 120px; /* 为顶部信息栏留出空间 */
+  padding-top: 80px; /* 为顶部信息栏留出空间 */
+  padding-bottom: 100px; /* 为底部按钮留出空间 */
 }
 
 /* 原图显示 */
@@ -169,31 +168,41 @@
 
 /* 底部功能按钮 */
 .game-footer {
-  position: absolute;
-  bottom: 30px;
-  left: 12px;
-  right: 12px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
-  justify-content: center;
-  gap: 20px;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 12px;
+  background: white;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
   z-index: 50;
 }
 
+.footer-buttons-row {
+  display: flex;
+  width: 100%;
+  max-width: 400px;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
 .footer-button {
-  width: 120px;
-  height: 120px;
+  flex: 1;
+  height: 50px;
   background: #3B82F6;
   color: white;
   border-radius: 9999px;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   border: none;
   box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 12px;
   transition: all 0.15s ease;
 }
 
@@ -209,14 +218,21 @@
   cursor: not-allowed;
 }
 
-.footer-button .button-label {
-  font-size: 18px;
-  margin-bottom: 4px;
+.footer-rules {
+  display: flex;
+  width: 100%;
+  max-width: 400px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 4px;
 }
 
-.footer-button .button-sublabel {
-  font-size: 14px;
-  opacity: 0.9;
+.footer-rule {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  color: #1F2937;
+  line-height: 1.5;
 }
 
 /* 过关弹窗 */

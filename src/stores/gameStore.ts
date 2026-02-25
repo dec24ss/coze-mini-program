@@ -42,6 +42,11 @@ interface GameState {
   showHint: boolean              // 是否显示提示
   showOriginalImage: boolean     // 是否显示原图
 
+  // 使用次数限制
+  hintCount: number              // 提示使用次数（最多3次）
+  originalImageCount: number     // 原图查看次数（最多3次）
+  freezeCount: number            // 冻结时间使用次数（最多1次）
+
   // 动作方法
   startGame: (level: number) => Promise<void>
   resetGame: () => void
@@ -132,6 +137,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   selectedPiece: null,
   showHint: false,
   showOriginalImage: false,
+  hintCount: 0,
+  originalImageCount: 0,
+  freezeCount: 0,
 
   // 开始游戏
   startGame: async (level: number) => {
@@ -151,7 +159,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       freezeTimeRemaining: 0,
       selectedPiece: null,
       showHint: false,
-      showOriginalImage: false
+      showOriginalImage: false,
+      hintCount: 0,
+      originalImageCount: 0,
+      freezeCount: 0
     })
 
     // 生成拼图碎片
@@ -237,12 +248,34 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // 切换提示显示
   toggleHint: () => {
-    set(state => ({ showHint: !state.showHint }))
+    set(state => {
+      // 如果当前显示提示，则关闭
+      if (state.showHint) {
+        return { showHint: false }
+      }
+      // 如果未显示提示，检查使用次数
+      if (state.hintCount >= 3) {
+        return { showHint: false }
+      }
+      // 增加使用次数并显示提示
+      return { showHint: true, hintCount: state.hintCount + 1 }
+    })
   },
 
   // 切换原图显示
   toggleOriginalImage: () => {
-    set(state => ({ showOriginalImage: !state.showOriginalImage }))
+    set(state => {
+      // 如果当前显示原图，则关闭
+      if (state.showOriginalImage) {
+        return { showOriginalImage: false }
+      }
+      // 如果未显示原图，检查使用次数
+      if (state.originalImageCount >= 3) {
+        return { showOriginalImage: false }
+      }
+      // 增加使用次数并显示原图
+      return { showOriginalImage: true, originalImageCount: state.originalImageCount + 1 }
+    })
   },
 
   // 更新倒计时
@@ -265,9 +298,9 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // 冻结时间
   freezeTime: () => {
-    const { isTimeFrozen, freezeTimeRemaining } = get()
-    if (!isTimeFrozen && freezeTimeRemaining <= 0) {
-      set({ isTimeFrozen: true, freezeTimeRemaining: 30 })
+    const { isTimeFrozen, freezeTimeRemaining, freezeCount } = get()
+    if (!isTimeFrozen && freezeTimeRemaining <= 0 && freezeCount < 1) {
+      set({ isTimeFrozen: true, freezeTimeRemaining: 30, freezeCount: 1 })
     }
   },
 

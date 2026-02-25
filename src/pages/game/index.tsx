@@ -22,6 +22,9 @@ export default function GamePage() {
     pieces,
     showHint,
     showOriginalImage,
+    hintCount,
+    originalImageCount,
+    freezeCount,
     startGame,
     movePiece,
     updatePieceIndex,
@@ -131,24 +134,30 @@ export default function GamePage() {
     Taro.redirectTo({ url: '/pages/index/index' })
   }
 
-  // 查看原图
-  const handleToggleOriginal = () => {
-    toggleOriginalImage()
-  }
-
   // 提示功能
   const handleHint = () => {
-    if (!showHint) {
-      // 只提示一次，显示后自动隐藏
-      toggleHint()
-      setTimeout(() => {
-        toggleHint()
-      }, 3000)  // 3秒后自动隐藏
+    if (hintCount >= 3) {
+      Taro.showToast({ title: '提示次数已用完', icon: 'none' })
+      return
     }
+    toggleHint()
+  }
+
+  // 查看原图
+  const handleToggleOriginal = () => {
+    if (originalImageCount >= 3 && !showOriginalImage) {
+      Taro.showToast({ title: '原图查看次数已用完', icon: 'none' })
+      return
+    }
+    toggleOriginalImage()
   }
 
   // 冻结时间
   const handleFreezeTime = () => {
+    if (freezeCount >= 1) {
+      Taro.showToast({ title: '冻结次数已用完', icon: 'none' })
+      return
+    }
     freezeTime()
   }
 
@@ -506,20 +515,39 @@ export default function GamePage() {
 
       {/* 底部功能按钮 */}
       <View className="game-footer">
-        <Button className="footer-button" onClick={handleHint}>
-          <Text className="block button-label">提示</Text>
-          <Text className="block button-sublabel">只显示一次</Text>
-        </Button>
-        <Button className="footer-button" onClick={handleToggleOriginal}>
-          <Text className="block button-label">{showOriginalImage ? '隐藏' : '原图'}</Text>
-          <Text className="block button-sublabel">查看完整图</Text>
-        </Button>
-        <Button className="footer-button" onClick={handleFreezeTime} disabled={isTimeFrozen || isFailed}>
-          <Text className="block button-label">
+        <View className="footer-buttons-row">
+          <Button
+            className="footer-button"
+            onClick={handleHint}
+            disabled={hintCount >= 3}
+          >
+            提示
+          </Button>
+          <Button
+            className="footer-button"
+            onClick={handleToggleOriginal}
+          >
+            {showOriginalImage ? '隐藏' : '原图'}
+          </Button>
+          <Button
+            className="footer-button"
+            onClick={handleFreezeTime}
+            disabled={isTimeFrozen || freezeCount >= 1 || isFailed}
+          >
             {isTimeFrozen ? `${freezeTimeRemaining}s` : '冻结'}
+          </Button>
+        </View>
+        <View className="footer-rules">
+          <Text className="block footer-rule">
+            已用 {hintCount}/3 次
           </Text>
-          <Text className="block button-sublabel">暂停倒计时</Text>
-        </Button>
+          <Text className="block footer-rule">
+            已用 {originalImageCount}/3 次
+          </Text>
+          <Text className="block footer-rule">
+            {freezeCount >= 1 ? '已用 1/1 次' : '可用 1 次'}
+          </Text>
+        </View>
       </View>
 
       {/* 失败弹窗 */}
