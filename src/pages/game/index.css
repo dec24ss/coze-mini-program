@@ -20,8 +20,8 @@
 
 /* 顶部信息栏 */
 .game-header {
-  position: fixed;
-  top: 0;
+  position: absolute;
+  top: 30px;
   left: 0;
   right: 0;
   display: flex;
@@ -46,7 +46,7 @@
   align-items: center;
   justify-content: center;
   padding: 12px;
-  padding-bottom: 80px; /* 为底部按钮留出空间 */
+  position: relative;
 }
 
 /* 原图显示 */
@@ -166,27 +166,59 @@
 
 /* 底部功能按钮 */
 .game-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  position: absolute;
+  bottom: 30px;
+  left: 12px;
+  right: 12px;
   display: flex;
-  padding: 12px;
-  background: white;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
-  gap: 8px;
+  justify-content: center;
+  gap: 12px;
   z-index: 50;
 }
 
 .footer-button {
-  flex: 1;
-  background: #F97316;
+  width: 120px;
+  height: 50px;
+  background: linear-gradient(180deg, #4A5568 0%, #2D3748 100%);
   color: white;
-  border-radius: 12px;
-  padding: 12px;
-  font-size: 18px;
+  border-radius: 8px;
+  font-size: 16px;
   font-weight: 500;
   border: none;
+  box-shadow: 0 4px 0 #1A202C, 0 6px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.1s ease;
+  position: relative;
+  top: 0;
+}
+
+.footer-button:active {
+  top: 4px;
+  box-shadow: 0 0 0 #1A202C, 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.footer-button:disabled {
+  background: linear-gradient(180deg, #A0AEC0 0%, #718096 100%);
+  box-shadow: 0 4px 0 #4A5568, 0 6px 12px rgba(0, 0, 0, 0.3);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.footer-button.freeze-button {
+  background: linear-gradient(180deg, #4299E1 0%, #2B6CB0 100%);
+  box-shadow: 0 4px 0 #2C5282, 0 6px 12px rgba(66, 153, 225, 0.3);
+}
+
+.footer-button.freeze-button:active {
+  box-shadow: 0 0 0 #2C5282, 0 2px 4px rgba(66, 153, 225, 0.3);
+}
+
+.footer-button.hint-button {
+  background: linear-gradient(180deg, #F6AD55 0%, #ED8936 100%);
+  box-shadow: 0 4px 0 #C05621, 0 6px 12px rgba(246, 173, 85, 0.3);
+}
+
+.footer-button.hint-button:active {
+  box-shadow: 0 0 0 #C05621, 0 2px 4px rgba(246, 173, 85, 0.3);
 }
 
 /* 过关弹窗 */

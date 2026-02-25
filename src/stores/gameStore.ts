@@ -25,11 +25,14 @@ interface GameState {
   imageUrl: string               // 当前图片URL
   isPlaying: boolean             // 是否正在游戏
   isComplete: boolean            // 是否完成拼图
+  isFailed: boolean              // 是否失败
   isLoading: boolean             // 是否加载中
 
   // 计时相关
   startTime: number              // 开始时间戳
-  elapsedTime: number            // 已用时间（秒）
+  countdownTime: number          // 倒计时剩余时间（秒）
+  isTimeFrozen: boolean          // 是否时间冻结
+  freezeTimeRemaining: number    // 时间冻结剩余时间（秒）
 
   // 拼图数据
   pieces: PuzzlePiece[]          // 拼图碎片数组
@@ -48,8 +51,10 @@ interface GameState {
   swapPieces: (piece1: PuzzlePiece, piece2: PuzzlePiece) => void
   toggleHint: () => void
   toggleOriginalImage: () => void
-  updateElapsedTime: () => void
+  updateCountdown: () => void
+  freezeTime: () => void
   checkComplete: () => boolean
+  checkFailed: () => boolean
   loadNextLevel: () => Promise<void>
 }
 
@@ -116,9 +121,12 @@ export const useGameStore = create<GameState>((set, get) => ({
   imageUrl: '',
   isPlaying: false,
   isComplete: false,
+  isFailed: false,
   isLoading: false,
   startTime: 0,
-  elapsedTime: 0,
+  countdownTime: 180,
+  isTimeFrozen: false,
+  freezeTimeRemaining: 0,
   pieces: [],
   selectedPiece: null,
   showHint: false,
@@ -134,9 +142,12 @@ export const useGameStore = create<GameState>((set, get) => ({
       imageUrl: config.imageUrl,
       isPlaying: true,
       isComplete: false,
+      isFailed: false,
       isLoading: true,
       startTime: Date.now(),
-      elapsedTime: 0,
+      countdownTime: 180,
+      isTimeFrozen: false,
+      freezeTimeRemaining: 0,
       selectedPiece: null,
       showHint: false,
       showOriginalImage: false
@@ -198,21 +209,21 @@ export const useGameStore = create<GameState>((set, get) => ({
       newPieces[piece1Index].currentIndex = newPieces[piece2Index].currentIndex
       newPieces[piece2Index].currentIndex = tempCurrentIndex
 
-      // 计算新的格子坐标（吸附到格子）
+      // 计算新的格子坐标（精确吸附）
       const gridSize = Math.sqrt(newPieces.length)
       const pieceSize = 100 / gridSize
 
       // 更新 piece1 的坐标（吸附到它的新格子位置）
       const piece1NewRow = Math.floor(newPieces[piece1Index].currentIndex / gridSize)
       const piece1NewCol = newPieces[piece1Index].currentIndex % gridSize
-      newPieces[piece1Index].x = piece1NewCol * pieceSize
-      newPieces[piece1Index].y = piece1NewRow * pieceSize
+      newPieces[piece1Index].x = Math.round(piece1NewCol * pieceSize * 100) / 100  // 保留2位小数
+      newPieces[piece1Index].y = Math.round(piece1NewRow * pieceSize * 100) / 100  // 保留2位小数
 
       // 更新 piece2 的坐标（吸附到它的新格子位置）
       const piece2NewRow = Math.floor(newPieces[piece2Index].currentIndex / gridSize)
       const piece2NewCol = newPieces[piece2Index].currentIndex % gridSize
-      newPieces[piece2Index].x = piece2NewCol * pieceSize
-      newPieces[piece2Index].y = piece2NewRow * pieceSize
+      newPieces[piece2Index].x = Math.round(piece2NewCol * pieceSize * 100) / 100  // 保留2位小数
+      newPieces[piece2Index].y = Math.round(piece2NewRow * pieceSize * 100) / 100  // 保留2位小数
 
       console.log('swapPieces - 交换后：', {
         piece1: { id: piece1.id, currentIndex: newPieces[piece1Index].currentIndex, x: newPieces[piece1Index].x, y: newPieces[piece1Index].y },
@@ -233,13 +244,36 @@ export const useGameStore = create<GameState>((set, get) => ({
     set(state => ({ showOriginalImage: !state.showOriginalImage }))
   },
 
-  // 更新计时
-  updateElapsedTime: () => {
-    const { startTime, isPlaying, isComplete } = get()
-    if (isPlaying && !isComplete) {
+  // 更新倒计时
+  updateCountdown: () => {
+    const { startTime, isPlaying, isComplete, isFailed, isTimeFrozen } = get()
+    if (isPlaying && !isComplete && !isFailed && !isTimeFrozen) {
       const elapsed = Math.floor((Date.now() - startTime) / 1000)
-      set({ elapsedTime: elapsed })
+      const remaining = Math.max(0, 180 - elapsed)  // 3分钟 = 180秒
+      set({ countdownTime: remaining })
     }
+  },
+
+  // 冻结时间
+  freezeTime: () => {
+    const { isTimeFrozen, freezeTimeRemaining } = get()
+    if (!isTimeFrozen && freezeTimeRemaining <= 0) {
+      set({ isTimeFrozen: true, freezeTimeRemaining: 30 })
+      // 30秒后自动解冻
+      setTimeout(() => {
+        set({ isTimeFrozen: false, freezeTimeRemaining: 0 })
+      }, 30000)
+    }
+  },
+
+  // 检查是否失败
+  checkFailed: () => {
+    const { countdownTime, isPlaying, isComplete } = get()
+    if (isPlaying && !isComplete && countdownTime <= 0) {
+      set({ isFailed: true, isPlaying: false })
+      return true
+    }
+    return false
   },
 
   // 检查是否完成

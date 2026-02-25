@@ -14,22 +14,24 @@ export default function GamePage() {
     imageUrl,
     isPlaying,
     isComplete,
+    isFailed,
     isLoading,
-    elapsedTime,
+    countdownTime,
+    isTimeFrozen,
+    freezeTimeRemaining,
     pieces,
-    selectedPiece,
     showHint,
     showOriginalImage,
     startGame,
-    resetGame,
-    selectPiece,
     movePiece,
     updatePieceIndex,
     swapPieces,
     toggleHint,
     toggleOriginalImage,
-    updateElapsedTime,
+    updateCountdown,
+    freezeTime,
     checkComplete,
+    checkFailed,
     loadNextLevel
   } = useGameStore()
 
@@ -91,9 +93,10 @@ export default function GamePage() {
 
   // 计时器
   useEffect(() => {
-    if (isPlaying && !isComplete) {
+    if (isPlaying && !isComplete && !isFailed) {
       timerRef.current = setInterval(() => {
-        updateElapsedTime()
+        updateCountdown()
+        checkFailed()
       }, 1000)
     }
 
@@ -103,7 +106,20 @@ export default function GamePage() {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying, isComplete])
+  }, [isPlaying, isComplete, isFailed])
+
+  // 时间冻结倒计时
+  useEffect(() => {
+    if (isTimeFrozen && freezeTimeRemaining > 0) {
+      const freezeTimer = setInterval(() => {
+        const newRemaining = Math.max(0, freezeTimeRemaining - 1)
+        if (newRemaining === 0) {
+          clearInterval(freezeTimer)
+        }
+      }, 1000)
+      return () => clearInterval(freezeTimer)
+    }
+  }, [isTimeFrozen, freezeTimeRemaining])
 
   // 格式化时间
   const formatTime = (seconds: number): string => {
@@ -124,20 +140,23 @@ export default function GamePage() {
 
   // 提示功能
   const handleHint = () => {
-    toggleHint()
+    if (!showHint) {
+      // 只提示一次，显示后自动隐藏
+      toggleHint()
+      setTimeout(() => {
+        toggleHint()
+      }, 3000)  // 3秒后自动隐藏
+    }
   }
 
-  // 重置游戏
-  const handleReset = () => {
-    Taro.showModal({
-      title: '提示',
-      content: '确定要重新开始本关吗？',
-      success: (res) => {
-        if (res.confirm) {
-          resetGame()
-        }
-      }
-    })
+  // 冻结时间
+  const handleFreezeTime = () => {
+    freezeTime()
+  }
+
+  // 重新开始
+  const handleRestart = () => {
+    startGame(currentLevel)
   }
 
   // 下一关
@@ -200,7 +219,6 @@ export default function GamePage() {
       x: touch.clientX - rect.left - piecePixelPos.x,
       y: touch.clientY - rect.top - piecePixelPos.y
     })
-    selectPiece(piece)
 
     console.log('开始拖拽碎片：', piece.id, '当前位置:', piece.x, piece.y, '%', '平台:', isWeapp ? '小程序' : 'H5')
   }
@@ -222,21 +240,23 @@ export default function GamePage() {
 
     const containerWidth = containerRect.width
     const containerHeight = containerRect.height
-    const pieceWidth = containerWidth / gridSize
-    const pieceHeight = containerHeight / gridSize
 
     // 计算新的位置（更灵敏的拖动）
     let newX = touch.clientX - containerRect.left - dragOffset.x
     let newY = touch.clientY - containerRect.top - dragOffset.y
 
-    // 限制在容器范围内（允许稍微超出边界，提升拖动体验）
-    const margin = pieceWidth * 0.3 // 允许超出30%的边界
-    newX = Math.max(-margin, Math.min(newX, containerWidth - pieceWidth + margin))
-    newY = Math.max(-margin, Math.min(newY, containerHeight - pieceHeight + margin))
+    // 限制在容器范围内（严格限制，确保图块始终在有效范围内）
+    const pieceSizePercent = 100 / gridSize
+    const maxXPercent = 100 - pieceSizePercent
+    const maxYPercent = 100 - pieceSizePercent
 
     // 转换为百分比
-    const newXPercent = (newX / containerWidth) * 100
-    const newYPercent = (newY / containerHeight) * 100
+    let newXPercent = (newX / containerWidth) * 100
+    let newYPercent = (newY / containerHeight) * 100
+
+    // 严格限制在有效范围内
+    newXPercent = Math.max(0, Math.min(newXPercent, maxXPercent))
+    newYPercent = Math.max(0, Math.min(newYPercent, maxYPercent))
 
     console.log('新位置:', { newXPercent, newYPercent })
 
@@ -267,16 +287,20 @@ export default function GamePage() {
       return
     }
 
-    // 计算目标格子位置（更精确的吸附）
+    // 计算目标格子位置（精确吸附）
     const pieceSize = 100 / gridSize
     const targetCol = Math.round(latestDraggingPiece.x / pieceSize)
     const targetRow = Math.round(latestDraggingPiece.y / pieceSize)
     const targetIndex = targetRow * gridSize + targetCol
 
-    // 确保目标位置在有效范围内
+    // 确保目标位置在有效范围内（严格限制）
     const clampedCol = Math.max(0, Math.min(targetCol, gridSize - 1))
     const clampedRow = Math.max(0, Math.min(targetRow, gridSize - 1))
     const clampedTargetIndex = clampedRow * gridSize + clampedCol
+
+    // 精确吸附到格子（确保对齐）
+    const snapX = clampedCol * pieceSize
+    const snapY = clampedRow * pieceSize
 
     console.log('拖拽结束：', {
       draggingPieceId: latestDraggingPiece.id,
@@ -310,13 +334,11 @@ export default function GamePage() {
     } else {
       // 如果目标位置为空（理论上不会发生，因为打乱后所有位置都有碎片）
       // 直接移动到目标格子（精确吸附）
-      const newX = clampedCol * pieceSize
-      const newY = clampedRow * pieceSize
-      movePiece(latestDraggingPiece, newX, newY)
+      movePiece(latestDraggingPiece, snapX, snapY)
 
       // 更新 currentIndex
       updatePieceIndex(latestDraggingPiece.id, clampedTargetIndex)
-      console.log('移动碎片到空位：', latestDraggingPiece.id, '->', clampedTargetIndex)
+      console.log('移动碎片到空位：', latestDraggingPiece.id, '->', clampedTargetIndex, `位置：${snapX}%, ${snapY}%`)
     }
 
     setDraggingPiece(null)
@@ -348,8 +370,14 @@ export default function GamePage() {
     <View className="game-page">
       {/* 顶部信息栏 */}
       <View className="game-header">
-        <Text className="block header-text">第 {currentLevel} 关</Text>
-        <Text className="block header-text">{formatTime(elapsedTime)}</Text>
+        <Text className="block header-text">
+          {isTimeFrozen ? '已冻结' : ''} {formatTime(countdownTime)}
+        </Text>
+        {isTimeFrozen && (
+          <Text className="block header-text">
+            {freezeTimeRemaining}秒后恢复
+          </Text>
+        )}
       </View>
 
       {/* 拼图区域 */}
@@ -412,7 +440,7 @@ export default function GamePage() {
                   return (
                     <View
                       key={piece.id}
-                      className={`puzzle-piece-outer ${selectedPiece?.id === piece.id ? 'selected' : ''}`}
+                      className="puzzle-piece-outer"
                       style={{
                         width: `${pieceSize}%`,
                         height: `${pieceSize}%`,
@@ -478,22 +506,40 @@ export default function GamePage() {
       {/* 底部功能按钮 */}
       <View className="game-footer">
         <Button className="footer-button" onClick={handleHint}>
-          {showHint ? '隐藏提示' : '提示'}
+          {showHint ? '隐藏' : '提示'}
         </Button>
         <Button className="footer-button" onClick={handleToggleOriginal}>
-          {showOriginalImage ? '隐藏原图' : '查看原图'}
+          {showOriginalImage ? '隐藏' : '原图'}
         </Button>
-        <Button className="footer-button" onClick={handleReset}>
-          重置
+        <Button className="footer-button" onClick={handleFreezeTime} disabled={isTimeFrozen || isFailed}>
+          {isTimeFrozen ? `冻结 ${freezeTimeRemaining}s` : '冻结'}
         </Button>
       </View>
+
+      {/* 失败弹窗 */}
+      {isFailed && (
+        <View className="victory-modal">
+          <View className="victory-content">
+            <Text className="block victory-title" style={{ color: '#EF4444' }}>时间到！</Text>
+            <Text className="block victory-time">很遗憾，未能完成拼图</Text>
+            <View className="victory-buttons">
+              <Button className="victory-button secondary" onClick={handleBackHome}>
+                返回首页
+              </Button>
+              <Button className="victory-button primary" onClick={handleRestart}>
+                重新开始
+              </Button>
+            </View>
+          </View>
+        </View>
+      )}
 
       {/* 过关弹窗 */}
       {isComplete && (
         <View className="victory-modal">
           <View className="victory-content">
             <Text className="block victory-title">恭喜通关！</Text>
-            <Text className="block victory-time">用时：{formatTime(elapsedTime)}</Text>
+            <Text className="block victory-time">剩余时间：{formatTime(countdownTime)}</Text>
             <View className="victory-buttons">
               <Button className="victory-button secondary" onClick={handleBackHome}>
                 返回首页
