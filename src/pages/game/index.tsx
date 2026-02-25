@@ -534,18 +534,29 @@ export default function GamePage() {
                       onTouchMove={handleTouchMove}
                       onTouchEnd={handleTouchEnd}
                     >
+                      {/* 使用 Image 组件替代 backgroundImage（小程序兼容） */}
                       <View
                         className="puzzle-piece-inner"
                         style={{
                           width: '100%',
                           height: '100%',
-                          backgroundImage: `url(${imageUrl})`,
-                          backgroundSize: `${gridSize * 100}%`,
-                          backgroundPosition: `${(piece.correctIndex % gridSize) * (100 / (gridSize - 1))}% ${Math.floor(piece.correctIndex / gridSize) * (100 / (gridSize - 1))}%`,
+                          overflow: 'hidden',
                           ...innerBorderStyle,
                           boxSizing: 'border-box'
                         }}
-                      />
+                      >
+                        <Image
+                          src={imageUrl}
+                          mode="aspectFill"
+                          style={{
+                            width: `${gridSize * 100}%`,
+                            height: `${gridSize * 100}%`,
+                            position: 'absolute',
+                            left: `-${(piece.correctIndex % gridSize) * 100}%`,
+                            top: `-${Math.floor(piece.correctIndex / gridSize) * 100}%`,
+                          }}
+                        />
+                      </View>
                     </View>
                   )
                 })}

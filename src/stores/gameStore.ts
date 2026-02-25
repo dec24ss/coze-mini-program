@@ -242,27 +242,43 @@ export const useGameStore = create<GameState>((set, get) => ({
   // 开始游戏
   startGame: async (level: number) => {
     const { imageList, levelImageMap } = get()
+    const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
+
+    const config = getLevelConfig(level, imageList, levelImageMap)
 
     console.log('==========================================')
     console.log('🎮 startGame 被调用，关卡:', level)
     console.log('📋 imageList 长度:', imageList.length)
     console.log('📋 levelImageMap 长度:', Object.keys(levelImageMap).length)
-
-    const config = getLevelConfig(level, imageList, levelImageMap)
+    console.log('📋 当前平台:', isWeapp ? '小程序' : 'H5')
 
     console.log('🎮 开始游戏，关卡:', config.level)
     console.log('🖼️  图片 URL:', config.imageUrl.substring(0, 80))
     console.log('🖼️  图片 URL 长度:', config.imageUrl.length)
-    console.log('🖼️  图片 URL 类型:', 
+    console.log('🖼️  图片 URL 类型:',
       config.imageUrl.startsWith('data:image') ? 'Base64' :
       config.imageUrl.startsWith('wxfile://') ? '本地路径' : '网络路径'
     )
+
+    // 小程序端特殊处理：如果是 Base64 或本地路径，转换为网络 URL
+    let finalImageUrl = config.imageUrl
+    if (isWeapp) {
+      if (levelImageMap[level] && levelImageMap[level].url) {
+        finalImageUrl = levelImageMap[level].url  // 使用网络 URL
+        console.log('🖼️  小程序端，使用网络 URL:', finalImageUrl)
+      } else if (imageList.length > 0) {
+        finalImageUrl = imageList[(level - 1) % imageList.length]
+        console.log('🖼️  小程序端，使用 imageList:', finalImageUrl)
+      }
+    }
+
+    console.log('🖼️  最终图片 URL:', finalImageUrl.substring(0, 80))
     console.log('==========================================')
 
     set({
       currentLevel: config.level,
       gridSize: config.gridSize,
-      imageUrl: config.imageUrl,
+      imageUrl: finalImageUrl,  // 使用处理后的 URL
       isPlaying: true,
       isComplete: false,
       isFailed: false,
@@ -280,7 +296,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     })
 
     // 生成拼图碎片
-    await generatePieces(config.gridSize, config.imageUrl)
+    await generatePieces(config.gridSize, finalImageUrl)
 
     set({ isLoading: false })
   },
