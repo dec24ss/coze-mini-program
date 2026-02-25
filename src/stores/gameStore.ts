@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import Taro from '@tarojs/taro'
 import { Network } from '@/network'
 
 // 拼图碎片类型
@@ -136,7 +137,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   originalImageCount: 0,
   freezeCount: 0,
 
-  // 预加载图片
+  // 预加载图片（使用 Taro.getImageInfo 真正缓存图片）
   preloadImages: async () => {
     set({ isImagesLoading: true, imagesLoaded: 0, imageList: [] })
 
@@ -155,30 +156,34 @@ export const useGameStore = create<GameState>((set, get) => ({
         const loadedImages: string[] = []
         let loadedCount = 0
 
-        // 预加载每张图片
-        const loadImagePromise = (url: string, index: number): Promise<void> => {
-          return new Promise((resolve) => {
-            const img = new Image()
-            img.onload = () => {
-              loadedImages[index] = url
-              loadedCount++
-              set({ imagesLoaded: loadedCount })
-              resolve()
-            }
-            img.onerror = () => {
-              // 加载失败也继续
-              loadedImages[index] = url
-              loadedCount++
-              set({ imagesLoaded: loadedCount })
-              resolve()
-            }
-            img.src = url
-          })
+        // 使用 Taro.getImageInfo 预加载每张图片（真正缓存到本地）
+        const loadImagePromise = async (url: string, index: number): Promise<void> => {
+          try {
+            console.log(`📥 正在加载图片 ${index + 1}/${serverImages.length}: ${url.substring(0, 50)}...`)
+
+            // 使用 Taro.getImageInfo 下载并缓存图片
+            const res = await Taro.getImageInfo({
+              src: url
+            })
+
+            // 使用本地缓存的路径
+            loadedImages[index] = res.path
+            loadedCount++
+            set({ imagesLoaded: loadedCount })
+            console.log(`✅ 图片 ${index + 1} 加载完成，本地路径: ${res.path.substring(0, 30)}...`)
+          } catch (error) {
+            console.error(`❌ 图片 ${index + 1} 加载失败:`, error)
+            // 加载失败也继续，使用原始 URL
+            loadedImages[index] = url
+            loadedCount++
+            set({ imagesLoaded: loadedCount })
+          }
         }
 
         // 并行加载所有图片
         await Promise.all(serverImages.map((url, index) => loadImagePromise(url, index)))
 
+        console.log(`✅ 所有图片加载完成，成功 ${loadedCount}/${serverImages.length}`)
         set({
           imageList: loadedImages,
           imagesLoaded: serverImages.length,
