@@ -14,7 +14,7 @@
 }
 
 .game-loading text {
-  font-size: 44px; /* 字体增大一倍 */
+  font-size: 22px; /* 字体缩小50% */
   color: #6B7280;
 }
 
@@ -34,7 +34,7 @@
 }
 
 .header-text {
-  font-size: 48px;
+  font-size: 24px; /* 字体缩小50% */
   font-weight: 700;
   color: #1F2937;
 }
@@ -189,11 +189,11 @@
 
 .footer-button {
   flex: 1; /* 宽度自适应 */
-  height: 60px; /* 按钮高度增大 */
+  height: 50px; /* 按钮高度恢复 */
   background: #3B82F6;
   color: white;
   border-radius: 9999px;
-  font-size: 36px; /* 字体增大一倍 */
+  font-size: 18px; /* 字体缩小50% */
   font-weight: 600;
   border: none;
   box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
@@ -227,7 +227,7 @@
 .footer-rule {
   flex: 1;
   text-align: center;
-  font-size: 24px; /* 字体增大一倍 */
+  font-size: 12px; /* 字体缩小50% */
   color: #1F2937;
   line-height: 1.5;
 }
@@ -260,7 +260,7 @@
 }
 
 .victory-title {
-  font-size: 64px; /* 字体增大一倍 */
+  font-size: 32px; /* 字体缩小50% */
   font-weight: 700;
   color: #10B981;
   margin-bottom: 20px;
@@ -268,7 +268,7 @@
 }
 
 .victory-time {
-  font-size: 44px; /* 字体增大一倍 */
+  font-size: 22px; /* 字体缩小50% */
   color: #6B7280;
   margin-bottom: 28px;
 }
@@ -283,8 +283,8 @@
 .victory-button {
   width: 100%;
   border-radius: 9999px;
-  padding: 20px; /* 内边距增大 */
-  font-size: 36px; /* 字体增大一倍 */
+  padding: 16px; /* 内边距恢复 */
+  font-size: 18px; /* 字体缩小50% */
   font-weight: 600;
   border: none;
 }
