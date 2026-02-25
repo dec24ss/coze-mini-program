@@ -162,15 +162,16 @@ export const useGameStore = create<GameState>((set, get) => ({
             console.log(`📥 正在加载图片 ${index + 1}/${serverImages.length}: ${url.substring(0, 50)}...`)
 
             // 使用 Taro.getImageInfo 下载并缓存图片
-            const res = await Taro.getImageInfo({
+            await Taro.getImageInfo({
               src: url
             })
 
-            // 使用本地缓存的路径
-            loadedImages[index] = res.path
+            // 存储原始 URL（在小程序中可以直接使用，因为已被缓存）
+            // 注意：不使用返回的 path，因为 backgroundImage 不支持本地路径
+            loadedImages[index] = url
             loadedCount++
             set({ imagesLoaded: loadedCount })
-            console.log(`✅ 图片 ${index + 1} 加载完成，本地路径: ${res.path.substring(0, 30)}...`)
+            console.log(`✅ 图片 ${index + 1} 加载完成，已被缓存`)
           } catch (error) {
             console.error(`❌ 图片 ${index + 1} 加载失败:`, error)
             // 加载失败也继续，使用原始 URL
@@ -207,6 +208,11 @@ export const useGameStore = create<GameState>((set, get) => ({
   startGame: async (level: number) => {
     const { imageList } = get()
     const config = getLevelConfig(level, imageList)
+
+    console.log('🎮 开始游戏，关卡:', config.level)
+    console.log('🖼️  图片 URL:', config.imageUrl)
+    console.log('📋 imageList 长度:', imageList.length)
+    console.log('📋 imageList 第一张:', imageList[0]?.substring(0, 50) || '空')
 
     set({
       currentLevel: config.level,
