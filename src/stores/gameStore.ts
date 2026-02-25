@@ -32,11 +32,12 @@ interface GameState {
   isGameCompleted: boolean       // 是否通关（完成所有关卡）
 
   // 图片资源
-  imageList: string[]            // 图片列表（预加载的30张图片）
+  imageList: string[]            // 图片列表（预加载的10张图片URL）
+  imagePaths: string[]           // 图片本地路径列表（缓存后的本地路径）
   imagesLoaded: number           // 已加载的图片数量
   isImagesLoading: boolean       // 是否正在加载图片
   isImagesPreloaded: boolean     // 图片是否已预加载并缓存
-  levelImageMap: Record<number, string>  // 每一关的图片映射（预先规划好每一关用哪张图片）
+  levelImageMap: Record<number, { url: string; path: string }>  // 每一关的图片映射（包含URL和本地路径）
 
   // 计时相关
   startTime: number              // 开始时间戳
@@ -77,7 +78,7 @@ interface GameState {
 }
 
 // 关卡配置生成器
-function getLevelConfig(level: number, imageList: string[], levelImageMap: Record<number, string>): LevelConfig {
+function getLevelConfig(level: number, imageList: string[], levelImageMap: Record<number, { url: string; path: string }>): LevelConfig {
   let gridSize: number
 
   // 关卡难度规则：
@@ -95,12 +96,12 @@ function getLevelConfig(level: number, imageList: string[], levelImageMap: Recor
     gridSize = 6   // 第10关：6×6（最终挑战）
   }
 
-  // 使用预先规划的每一关的图片映射
-  // 如果映射不存在（兼容旧代码），则使用原来的逻辑
+  // 使用预先规划的每一关的图片映射（优先使用本地路径）
   let imageUrl: string
   if (levelImageMap[level]) {
-    imageUrl = levelImageMap[level]
-    console.log(`🖼️  关卡 ${level} 使用预先规划的图片`)
+    // 优先使用本地路径（已缓存，加载更快）
+    imageUrl = levelImageMap[level].path
+    console.log(`🖼️  关卡 ${level} 使用本地路径:`, imageUrl)
   } else {
     // 降级逻辑：使用预加载的图片列表
     imageUrl = imageList.length > 0
@@ -128,6 +129,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   isLoading: false,
   isGameCompleted: false,
   imageList: [],
+  imagePaths: [],
   imagesLoaded: 0,
   isImagesLoading: false,
   isImagesPreloaded: false,
@@ -161,6 +163,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         console.log(`✅ 从服务器获取到 ${serverImages.length} 张图片`)
 
         const loadedImages: string[] = []
+        const loadedPaths: string[] = []  // 新增：保存本地路径
         let loadedCount = 0
 
         // 使用 Taro.getImageInfo 预加载每张图片（真正缓存到本地）
@@ -168,21 +171,22 @@ export const useGameStore = create<GameState>((set, get) => ({
           try {
             console.log(`📥 正在加载图片 ${index + 1}/${serverImages.length}: ${url.substring(0, 50)}...`)
 
-            // 使用 Taro.getImageInfo 下载并缓存图片
-            await Taro.getImageInfo({
+            // 使用 Taro.getImageInfo 下载并缓存图片，并获取本地路径
+            const res = await Taro.getImageInfo({
               src: url
             })
 
-            // 存储原始 URL（在小程序中可以直接使用，因为已被缓存）
-            // 注意：不使用返回的 path，因为 backgroundImage 不支持本地路径
+            // 保存原始 URL 和本地路径
             loadedImages[index] = url
+            loadedPaths[index] = res.path  // 保存本地路径
             loadedCount++
             set({ imagesLoaded: loadedCount })
-            console.log(`✅ 图片 ${index + 1} 加载完成，已被缓存`)
+            console.log(`✅ 图片 ${index + 1} 加载完成，本地路径:`, res.path)
           } catch (error) {
             console.error(`❌ 图片 ${index + 1} 加载失败:`, error)
             // 加载失败也继续，使用原始 URL
             loadedImages[index] = url
+            loadedPaths[index] = url  // 降级使用 URL
             loadedCount++
             set({ imagesLoaded: loadedCount })
           }
@@ -193,17 +197,24 @@ export const useGameStore = create<GameState>((set, get) => ({
 
         console.log(`✅ 所有图片加载完成，成功 ${loadedCount}/${serverImages.length}`)
 
-        // 预先规划每一关用哪张图片
+        // 预先规划每一关用哪张图片（包含URL和本地路径）
         // 前10关使用前10张图片，如果图片不够则循环使用
-        const levelImageMap: Record<number, string> = {}
+        const levelImageMap: Record<number, { url: string; path: string }> = {}
         for (let i = 0; i < 10; i++) {
           const imageIndex = i % loadedImages.length
-          levelImageMap[i + 1] = loadedImages[imageIndex]
-          console.log(`📋 关卡 ${i + 1} 使用图片 ${imageIndex + 1}: ${loadedImages[imageIndex].substring(0, 50)}...`)
+          levelImageMap[i + 1] = {
+            url: loadedImages[imageIndex],
+            path: loadedPaths[imageIndex]
+          }
+          console.log(`📋 关卡 ${i + 1} 使用图片 ${imageIndex + 1}:`, {
+            url: loadedImages[imageIndex].substring(0, 50),
+            path: loadedPaths[imageIndex]
+          })
         }
 
         set({
           imageList: loadedImages,
+          imagePaths: loadedPaths,  // 保存本地路径列表
           imagesLoaded: serverImages.length,
           isImagesLoading: false,
           isImagesPreloaded: true,  // 标记图片已预加载完成

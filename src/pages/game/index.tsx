@@ -66,30 +66,18 @@ export default function GamePage() {
     }
   }, [isWeapp])
 
-  // 监听图片 URL 变化，预加载图片
+  // 监听图片 URL 变化，确认图片已准备就绪
   useEffect(() => {
     if (imageUrl) {
       console.log('🖼️  监听到图片 URL 变化:', imageUrl)
       setIsImageLoaded(false)  // 先重置为未加载
 
-      // 使用 Taro.getImageInfo 确保图片已缓存
-      Taro.getImageInfo({
-        src: imageUrl
-      }).then((res) => {
-        console.log('✅ 图片已缓存:', res.path)
-        // 图片缓存后，再等待一小段时间确保图片已渲染
-        setTimeout(() => {
-          setIsImageLoaded(true)
-          console.log('✅ 图片已渲染完成，显示拼图')
-        }, 300)  // 给图片渲染预留 300ms
-      }).catch((error) => {
-        console.error('❌ 图片缓存失败:', error)
-        // 即使失败也显示拼图（使用原始 URL）
-        setTimeout(() => {
-          setIsImageLoaded(true)
-          console.log('⚠️  图片缓存失败，直接显示拼图')
-        }, 300)
-      })
+      // 图片已经在加载页面预加载并缓存到本地，直接显示
+      // 给浏览器/小程序极短的时间确保图片已渲染（从300ms减少到50ms）
+      setTimeout(() => {
+        setIsImageLoaded(true)
+        console.log('✅ 图片已显示拼图（使用缓存图片）')
+      }, 50)  // 从300ms减少到50ms
     }
   }, [imageUrl])
 
