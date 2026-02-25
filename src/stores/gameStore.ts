@@ -139,18 +139,18 @@ export const useGameStore = create<GameState>((set, get) => ({
   preloadImages: async () => {
     set({ isImagesLoading: true, imagesLoaded: 0, imageList: [] })
 
-    // 手绘、卡通风格，明暗对比强烈，场景复杂的图片
+    // 世界名画（油画为主，梵高、莫奈等）
     const imageUrls = [
-      'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1440&fit=crop&q=80', // 动漫风格蓝天
-      'https://images.unsplash.com/photo-1563089145-599997674d42?w=1080&h=1440&fit=crop&q=80', // 卡通云朵
-      'https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=1080&h=1440&fit=crop&q=80', // 艺术绘画
-      'https://images.unsplash.com/photo-1514539079130-25950c84af65?w=1080&h=1440&fit=crop&q=80', // 手绘风格
-      'https://images.unsplash.com/photo-1574169208507-84376144848b?w=1080&h=1440&fit=crop&q=80', // 插画风格
-      'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1080&h=1440&fit=crop&q=80', // 卡通插画
-      'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?w=1080&h=1440&fit=crop&q=80', // 艺术画作
-      'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1080&h=1440&fit=crop&q=80', // 动漫风景
-      'https://images.unsplash.com/photo-1549490349-8643362247b5?w=1080&h=1440&fit=crop&q=80', // 手绘云朵
-      'https://images.unsplash.com/photo-1528360983277-13d9b152c611?w=1080&h=1440&fit=crop&q=80'  // 艺术云彩
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1080px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg', // 梵高 - 星夜
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Claude_Monet_-_Impression%2C_sunrise.jpg/1080px-Claude_Monet_-_Impression%2C_sunrise.jpg', // 莫奈 - 日出·印象
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Vincent_Willem_van_Gogh_127.jpg/1080px-Vincent_Willem_van_Gogh_127.jpg', // 梵高 - 向日葵
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Van_Gogh_-_Irises.jpg/1080px-Van_Gogh_-_Irises.jpg', // 梵高 - 鸢尾花
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Vincent_van_Gogh_-_De_serie_schoenen_van_de_Leeuw_-Google_Art_Project.jpg/1080px-Vincent_van_Gogh_-_De_serie_schoenen_van_de_Leeuw_-Google_Art_Project.jpg', // 梵高 - 柏树
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Van_Gogh_-_The_Starry_Night_-_The_MoMA.jpg/1080px-Van_Gogh_-_The_Starry_Night_-_The_MoMA.jpg', // 梵高 - 罗纳河上的星夜
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project.jpg/1080px-Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project.jpg', // 梵高 - 自画像
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Claude_Monet_-_Water_Lilies_-_1906%2C_Ryerson.jpg/1080px-Claude_Monet_-_Water_Lilies_-_1906%2C_Ryerson.jpg', // 莫奈 - 睡莲
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Vincent_van_Gogh_-_De_aardappeleters_-_The_Potato_Eaters.jpg/1080px-Vincent_van_Gogh_-_De_aardappeleters_-_The_Potato_Eaters.jpg', // 梵高 - 吃土豆的人
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Vincent_van_Gogh_-_Wheat_Field_with_Crows_-_Google_Art_Project.jpg/1080px-Vincent_van_Gogh_-_Wheat_Field_with_Crows_-_Google_Art_Project.jpg' // 梵高 - 麦田群鸦
     ]
 
     // 随机打乱图片顺序
