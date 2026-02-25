@@ -15,16 +15,9 @@ export default function IndexPage() {
 
         {/* 游戏介绍 */}
         <View className="game-intro">
-          <Text className="block intro-title">游戏介绍</Text>
-          <View className="intro-list">
-            <Text className="block intro-item">🎯 本游戏共有 10 个关卡</Text>
-            <Text className="block intro-item">🎮 前 3 关：3×3 入门难度</Text>
-            <Text className="block intro-item">🔥 4-6 关：4×4 进阶挑战</Text>
-            <Text className="block intro-item">💥 7-9 关：5×5 高难度</Text>
-            <Text className="block intro-item">🏆 第 10 关：6×6 终极挑战</Text>
-            <Text className="block intro-item">⏱️ 每关限时 3 分钟</Text>
-            <Text className="block intro-item highlight">🎁 全部通关有惊喜奖励！</Text>
-          </View>
+          <Text className="block intro-text">
+            本游戏共有10个关卡，每关限时3分钟，请善用屏幕下方提供的道具。全部通关有惊喜奖励！
+          </Text>
         </View>
 
         <Button className="home-button" onClick={handleStartGame}>

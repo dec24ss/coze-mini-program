@@ -33,37 +33,21 @@
 /* 游戏介绍 */
 .game-intro {
   width: 100%;
-  background: white;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
+  backdrop-filter: blur(10px);
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 32px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.intro-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1F2937;
-  margin-bottom: 16px;
+.intro-text {
+  font-size: 16px;
+  color: #374151;
+  line-height: 1.8;
   text-align: center;
-}
-
-.intro-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.intro-item {
-  font-size: 18px;
-  color: #4B5563;
-  line-height: 1.6;
-}
-
-.intro-item.highlight {
-  color: #DC2626;
-  font-weight: 700;
-  font-size: 20px;
+  font-weight: 400;
 }
 
 .home-button {
