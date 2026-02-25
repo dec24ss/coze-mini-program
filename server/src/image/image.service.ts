@@ -10,12 +10,39 @@ const access = promisify(fs.access);
 
 // 30张高质量艺术风格图片URL（使用Lorem Picsum，最稳定可靠）
 // Lorem Picsum 优点：永不会404、固定尺寸、免费无限调用、响应速度快
-const PAINTING_URLS = Array.from({ length: 30 }, (_, i) => {
-  // 使用不同的image ID确保每张图片不同
-  const imageId = 100 + i
-  // 固定尺寸 1200x1600 (3:4 比例)，适合拼图游戏
-  return `https://picsum.photos/id/${imageId}/1200/1600.jpg`
-})
+const PAINTING_URLS = [
+  // 使用已验证的 Image ID，确保图片存在
+  'https://picsum.photos/id/100/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/101/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/102/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/103/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/104/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/106/1200/1600.jpg', // 跳过105（不存在）
+  'https://picsum.photos/id/107/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/108/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/109/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/110/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/111/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/112/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/113/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/114/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/115/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/116/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/117/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/118/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/119/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/120/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/121/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/122/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/123/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/124/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/125/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/126/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/127/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/128/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/129/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/130/1200/1600.jpg', // 自然风光
+]
 
 @Injectable()
 export class ImageService implements OnModuleInit {
