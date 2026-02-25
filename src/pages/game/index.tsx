@@ -174,6 +174,32 @@ export default function GamePage() {
     }
   }, [isTimeFrozen, freezeTimeRemaining, updateFreezeCountdown])
 
+  // 原图查看定时器 - 打开原图时10秒自动关闭
+  useEffect(() => {
+    // 如果正在显示原图，设置10秒定时器
+    if (showOriginalImage) {
+      timerRef.current = setTimeout(() => {
+        toggleOriginalImage()
+        Taro.showToast({ title: '原图查看时间已到', icon: 'none' })
+        timerRef.current = undefined
+      }, 10000)
+    } else {
+      // 如果原图被关闭，清除定时器
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+        timerRef.current = undefined
+      }
+    }
+
+    // 组件卸载时清理定时器
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+        timerRef.current = undefined
+      }
+    }
+  }, [showOriginalImage, toggleOriginalImage])
+
   // 格式化时间
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60)
@@ -196,7 +222,7 @@ export default function GamePage() {
     toggleHint()
   }
 
-  // 查看原图
+  // 原图查看
   const handleToggleOriginal = () => {
     if (originalImageCount >= 3 && !showOriginalImage) {
       Taro.showToast({ title: '原图查看次数已用完', icon: 'none' })
