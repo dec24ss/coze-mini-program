@@ -40,7 +40,6 @@ export default function GamePage() {
   } = useGameStore()
 
   const [draggingPiece, setDraggingPiece] = useState<any>(null)
-  const [draggingPiecesGroup, setDraggingPiecesGroup] = useState<any[]>([])  // 拖拽的图块组
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [containerRect, setContainerRect] = useState<{ left: number; top: number; width: number; height: number }>({ left: 0, top: 0, width: 0, height: 0 })
   const timerRef = useRef<ReturnType<typeof setTimeout>>()
@@ -177,52 +176,6 @@ export default function GamePage() {
     loadNextLevel()
   }
 
-  // 查找所有相邻且正确的图块（用于整体拖动）
-  const getConnectedCorrectPieces = (startPiece: any, visited: Set<number> = new Set()): any[] => {
-    if (visited.has(startPiece.id)) return []
-
-    visited.add(startPiece.id)
-    const connectedPieces = [startPiece]
-
-    const currentIndex = startPiece.currentIndex
-    const correctIndex = startPiece.correctIndex
-
-    // 如果这个图块不在正确位置，不查找相邻图块
-    if (currentIndex !== correctIndex) {
-      return connectedPieces
-    }
-
-    // 检查四个方向的相邻图块
-    const directions = [
-      { dx: -1, dy: 0 },  // 左
-      { dx: 1, dy: 0 },   // 右
-      { dx: 0, dy: -1 },  // 上
-      { dx: 0, dy: 1 }    // 下
-    ]
-
-    const currentRow = Math.floor(currentIndex / gridSize)
-    const currentCol = currentIndex % gridSize
-
-    for (const { dx, dy } of directions) {
-      const newRow = currentRow + dy
-      const newCol = currentCol + dx
-
-      // 检查是否在网格范围内
-      if (newRow >= 0 && newRow < gridSize && newCol >= 0 && newCol < gridSize) {
-        const neighborIndex = newRow * gridSize + newCol
-        const neighborPiece = pieces.find(p => p.currentIndex === neighborIndex)
-
-        // 如果相邻图块也在正确位置，递归查找它的相邻图块
-        if (neighborPiece && neighborPiece.correctIndex === neighborIndex && !visited.has(neighborPiece.id)) {
-          const neighborConnected = getConnectedCorrectPieces(neighborPiece, visited)
-          connectedPieces.push(...neighborConnected)
-        }
-      }
-    }
-
-    return connectedPieces
-  }
-
   // 获取需要交换的两个图块
   const getNextSwapPieces = () => {
     for (let i = 0; i < pieces.length; i++) {
@@ -279,12 +232,7 @@ export default function GamePage() {
       y: touch.clientY - rect.top - piecePixelPos.y
     })
 
-    // 查找所有相邻且正确的图块（用于整体拖动）
-    const connectedPieces = getConnectedCorrectPieces(piece)
-    console.log('相邻的正确图块组:', connectedPieces)
-    setDraggingPiecesGroup(connectedPieces)
-
-    console.log('开始拖拽碎片：', piece.id, '当前位置:', piece.x, piece.y, '%', '平台:', isWeapp ? '小程序' : 'H5', '拖拽组大小:', connectedPieces.length)
+    console.log('开始拖拽碎片：', piece.id, '当前位置:', piece.x, piece.y, '%', '平台:', isWeapp ? '小程序' : 'H5')
   }
 
   // 拖拽移动
@@ -324,29 +272,7 @@ export default function GamePage() {
 
     console.log('新位置:', { newXPercent, newYPercent })
 
-    // 移动主图块
     movePiece(draggingPiece, newXPercent, newYPercent)
-
-    // 如果有相邻的正确图块，同时移动它们
-    if (draggingPiecesGroup.length > 1) {
-      draggingPiecesGroup.forEach(p => {
-        if (p.id !== draggingPiece.id) {
-          // 计算相对位置偏移
-          const offsetX = p.x - draggingPiece.x
-          const offsetY = p.y - draggingPiece.y
-
-          // 移动相邻图块
-          const targetX = newXPercent + offsetX
-          const targetY = newYPercent + offsetY
-
-          // 限制在有效范围内
-          const clampedX = Math.max(0, Math.min(targetX, maxXPercent))
-          const clampedY = Math.max(0, Math.min(targetY, maxYPercent))
-
-          movePiece(p, clampedX, clampedY)
-        }
-      })
-    }
 
     // 同步更新 draggingPiece 的坐标
     setDraggingPiece((prev: any) => ({ ...prev, x: newXPercent, y: newYPercent }))
@@ -368,7 +294,6 @@ export default function GamePage() {
     if (!latestDraggingPiece) {
       console.log('无法找到最新的拖拽碎片')
       setDraggingPiece(null)
-      setDraggingPiecesGroup([])
       setDragOffset({ x: 0, y: 0 })
       setContainerRect({ left: 0, top: 0, width: 0, height: 0 })
       return
@@ -429,7 +354,6 @@ export default function GamePage() {
     }
 
     setDraggingPiece(null)
-    setDraggingPiecesGroup([])
     setDragOffset({ x: 0, y: 0 })
     setContainerRect({ left: 0, top: 0, width: 0, height: 0 })
 
