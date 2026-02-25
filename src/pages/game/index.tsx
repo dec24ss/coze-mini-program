@@ -46,7 +46,8 @@ export default function GamePage() {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [containerRect, setContainerRect] = useState<{ left: number; top: number; width: number; height: number }>({ left: 0, top: 0, width: 0, height: 0 })
   const [isImageLoaded, setIsImageLoaded] = useState(true)  // 默认为 true，避免一直显示加载中
-  const timerRef = useRef<ReturnType<typeof setTimeout>>()
+  const timerRef = useRef<ReturnType<typeof setTimeout>>()  // 原图查看定时器
+  const countdownRef = useRef<ReturnType<typeof setInterval>>()  // 游戏倒计时器
   const isMountedRef = useRef(false)
 
   // 组件挂载后获取容器位置
@@ -143,22 +144,32 @@ export default function GamePage() {
 
     return () => {
       console.log('🎮 GamePage 卸载')
+      // 清理所有定时器
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+        timerRef.current = undefined
+      }
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current)
+        countdownRef.current = undefined
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startGame])
 
-  // 计时器
+  // 计时器 - 查看原图时不会停止
   useEffect(() => {
     if (isPlaying && !isComplete && !isFailed) {
-      timerRef.current = setInterval(() => {
+      countdownRef.current = setInterval(() => {
         updateCountdown()
         checkFailed()
       }, 1000)
     }
 
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current)
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current)
+        countdownRef.current = undefined
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
