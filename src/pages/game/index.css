@@ -117,6 +117,8 @@
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .puzzle-grid {
@@ -158,6 +160,17 @@
   position: relative;
   background-repeat: no-repeat;
   box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.puzzle-piece-inner image {
+  display: block;
   width: 100%;
   height: 100%;
 }

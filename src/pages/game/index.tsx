@@ -619,20 +619,18 @@ export default function GamePage() {
                   const isBottomNeighborCorrectRelationship = bottomNeighbor?.correctIndex === bottomPos && piece.correctIndex === bottomPos - gridSize
 
                   // 设置外层黑线样式：如果相邻图块是正确的相邻关系，则隐藏对应边框
-                  const outerBorderStyle = {
-                    borderTop: isTopNeighborCorrectRelationship ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)',
-                    borderLeft: isLeftNeighborCorrectRelationship ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)',
-                    borderBottom: isBottomNeighborCorrectRelationship ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)',
-                    borderRight: isRightNeighborCorrectRelationship ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)'
-                  }
+                  const outerBorderStyle: any = {}
+                  if (!isTopNeighborCorrectRelationship) outerBorderStyle.borderTop = '1px solid rgba(0, 0, 0, 0.8)'
+                  if (!isLeftNeighborCorrectRelationship) outerBorderStyle.borderLeft = '1px solid rgba(0, 0, 0, 0.8)'
+                  if (!isBottomNeighborCorrectRelationship) outerBorderStyle.borderBottom = '1px solid rgba(0, 0, 0, 0.8)'
+                  if (!isRightNeighborCorrectRelationship) outerBorderStyle.borderRight = '1px solid rgba(0, 0, 0, 0.8)'
 
                   // 设置内层白边样式：如果相邻图块是正确的相邻关系，则隐藏对应白边
-                  const innerBorderStyle = {
-                    borderTop: isTopNeighborCorrectRelationship ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)',
-                    borderLeft: isLeftNeighborCorrectRelationship ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)',
-                    borderBottom: isBottomNeighborCorrectRelationship ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)',
-                    borderRight: isRightNeighborCorrectRelationship ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)'
-                  }
+                  const innerBorderStyle: any = {}
+                  if (!isTopNeighborCorrectRelationship) innerBorderStyle.borderTop = '2px solid rgba(255, 255, 255, 0.9)'
+                  if (!isLeftNeighborCorrectRelationship) innerBorderStyle.borderLeft = '2px solid rgba(255, 255, 255, 0.9)'
+                  if (!isBottomNeighborCorrectRelationship) innerBorderStyle.borderBottom = '2px solid rgba(255, 255, 255, 0.9)'
+                  if (!isRightNeighborCorrectRelationship) innerBorderStyle.borderRight = '2px solid rgba(255, 255, 255, 0.9)'
 
                   return (
                     <View
@@ -670,6 +668,9 @@ export default function GamePage() {
                             position: 'absolute',
                             left: `-${(piece.correctIndex % gridSize) * 100}%`,
                             top: `-${Math.floor(piece.correctIndex / gridSize) * 100}%`,
+                            display: 'block',
+                            margin: 0,
+                            padding: 0
                           }}
                         />
                       </View>
