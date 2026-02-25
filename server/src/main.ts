@@ -28,7 +28,8 @@ async function bootstrap() {
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
   // 提供静态文件服务（图片）
-  const publicPath = path.join(process.cwd(), 'public');
+  // 使用相对于编译后文件的位置：从 dist 向上一级到 server，然后访问 public
+  const publicPath = path.join(__dirname, '../public');
   app.use('/api/images', express.static(publicPath + '/images'));
 
   // 全局拦截器：统一将 POST 请求的 201 状态码改为 200

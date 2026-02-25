@@ -44,7 +44,8 @@ const PAINTING_URLS = [
 
 @Injectable()
 export class ImageService implements OnModuleInit {
-  private readonly imagesDir = path.join(process.cwd(), 'public', 'images')
+  // 使用相对于编译后文件的路径：从 dist/src/image 向上回到 server/public
+  private readonly imagesDir = path.join(__dirname, '../../../public/images')
   private readonly imagesUrlBase = '/api/images'
 
   async onModuleInit() {
@@ -61,9 +62,16 @@ export class ImageService implements OnModuleInit {
   private async ensureImagesDir(): Promise<void> {
     try {
       await access(this.imagesDir)
+      console.log(`📁 图片目录已存在: ${this.imagesDir}`)
     } catch {
-      await mkdir(this.imagesDir, { recursive: true })
-      console.log(`📁 创建图片目录: ${this.imagesDir}`)
+      try {
+        await mkdir(this.imagesDir, { recursive: true })
+        console.log(`📁 创建图片目录: ${this.imagesDir}`)
+      } catch (error) {
+        console.error(`❌ 无法创建图片目录 ${this.imagesDir}:`, (error as Error).message)
+        console.error('⚠️  将使用外部 CDN URL 作为图片源')
+        throw error
+      }
     }
   }
 
@@ -156,7 +164,9 @@ export class ImageService implements OnModuleInit {
         .map(file => `${this.imagesUrlBase}/${file}`)
     } catch (error) {
       console.error('读取图片目录失败:', error)
-      return []
+      console.error('⚠️  将使用外部 CDN URL 作为图片源')
+      // 返回原始 URL 作为后备方案
+      return PAINTING_URLS
     }
   }
 }
