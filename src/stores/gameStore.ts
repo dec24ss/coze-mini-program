@@ -139,18 +139,18 @@ export const useGameStore = create<GameState>((set, get) => ({
   preloadImages: async () => {
     set({ isImagesLoading: true, imagesLoaded: 0, imageList: [] })
 
-    // 世界名画（油画为主，梵高、莫奈等）
+    // 世界名画风格图片（使用Unsplash CDN，加载速度快）
     const imageUrls = [
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1080px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg', // 梵高 - 星夜
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Claude_Monet_-_Impression%2C_sunrise.jpg/1080px-Claude_Monet_-_Impression%2C_sunrise.jpg', // 莫奈 - 日出·印象
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Vincent_Willem_van_Gogh_127.jpg/1080px-Vincent_Willem_van_Gogh_127.jpg', // 梵高 - 向日葵
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Van_Gogh_-_Irises.jpg/1080px-Van_Gogh_-_Irises.jpg', // 梵高 - 鸢尾花
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Vincent_van_Gogh_-_De_serie_schoenen_van_de_Leeuw_-Google_Art_Project.jpg/1080px-Vincent_van_Gogh_-_De_serie_schoenen_van_de_Leeuw_-Google_Art_Project.jpg', // 梵高 - 柏树
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Van_Gogh_-_The_Starry_Night_-_The_MoMA.jpg/1080px-Van_Gogh_-_The_Starry_Night_-_The_MoMA.jpg', // 梵高 - 罗纳河上的星夜
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project.jpg/1080px-Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project.jpg', // 梵高 - 自画像
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Claude_Monet_-_Water_Lilies_-_1906%2C_Ryerson.jpg/1080px-Claude_Monet_-_Water_Lilies_-_1906%2C_Ryerson.jpg', // 莫奈 - 睡莲
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Vincent_van_Gogh_-_De_aardappeleters_-_The_Potato_Eaters.jpg/1080px-Vincent_van_Gogh_-_De_aardappeleters_-_The_Potato_Eaters.jpg', // 梵高 - 吃土豆的人
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Vincent_van_Gogh_-_Wheat_Field_with_Crows_-_Google_Art_Project.jpg/1080px-Vincent_van_Gogh_-_Wheat_Field_with_Crows_-_Google_Art_Project.jpg' // 梵高 - 麦田群鸦
+      'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800&h=1067&fit=crop&q=60', // 星空油画风格
+      'https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=800&h=1067&fit=crop&q=60', // 艺术油画
+      'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=800&h=1067&fit=crop&q=60', // 梵高风格向日葵
+      'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?w=800&h=1067&fit=crop&q=60', // 油画风格
+      'https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=800&h=1067&fit=crop&q=60', // 艺术风景
+      'https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=800&h=1067&fit=crop&q=60', // 莫奈风格
+      'https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=800&h=1067&fit=crop&q=60', // 艺术画作
+      'https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=800&h=1067&fit=crop&q=60', // 古典油画
+      'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=800&h=1067&fit=crop&q=60', // 艺术油画风格
+      'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&h=1067&fit=crop&q=60' // 艺术画廊
     ]
 
     // 随机打乱图片顺序
