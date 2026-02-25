@@ -43,6 +43,7 @@ interface GameState {
   // 计时相关
   startTime: number              // 开始时间戳
   countdownTime: number          // 倒计时剩余时间（秒）
+  initialCountdownTime: number   // 初始倒计时时长（秒）
   isTimeFrozen: boolean          // 是否时间冻结
   freezeTimeRemaining: number    // 时间冻结剩余时间（秒）
   totalTimeSpent: number         // 总花费时间（秒），从第1关开始累计
@@ -141,6 +142,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   levelImageMap: {},  // 每一关的图片映射
   startTime: 0,
   countdownTime: 180,
+  initialCountdownTime: 180,
   isTimeFrozen: false,
   freezeTimeRemaining: 0,
   totalTimeSpent: 0,
@@ -274,6 +276,20 @@ export const useGameStore = create<GameState>((set, get) => ({
     console.log('🖼️  最终图片 URL:', finalImageUrl.substring(0, 80))
     console.log('==========================================')
 
+    // 根据关卡设置不同的倒计时时长
+    let countdownTime = 180
+    if (config.level >= 1 && config.level <= 3) {
+      countdownTime = 30  // 第1-3关：30秒
+    } else if (config.level >= 4 && config.level <= 6) {
+      countdownTime = 60  // 第4-6关：60秒
+    } else if (config.level >= 7 && config.level <= 9) {
+      countdownTime = 90  // 第7-9关：90秒
+    } else {
+      countdownTime = 180  // 第10关：180秒
+    }
+
+    console.log(`⏱️  关卡 ${config.level} 倒计时：${countdownTime}秒`)
+
     set({
       currentLevel: config.level,
       gridSize: config.gridSize,
@@ -283,7 +299,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       isFailed: false,
       isLoading: true,
       startTime: Date.now(),
-      countdownTime: 180,
+      countdownTime,
+      initialCountdownTime: countdownTime,  // 保存初始倒计时时长
       isTimeFrozen: false,
       freezeTimeRemaining: 0,
       selectedPiece: null,
@@ -410,11 +427,11 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // 更新倒计时
   updateCountdown: () => {
-    const { startTime, isPlaying, isComplete, isFailed, isTimeFrozen, isFreePlayMode } = get()
+    const { startTime, isPlaying, isComplete, isFailed, isTimeFrozen, isFreePlayMode, initialCountdownTime } = get()
     // 自由游玩模式下不倒计时
     if (!isFreePlayMode && isPlaying && !isComplete && !isFailed && !isTimeFrozen) {
       const elapsed = Math.floor((Date.now() - startTime) / 1000)
-      const remaining = Math.max(0, 180 - elapsed)  // 3分钟 = 180秒
+      const remaining = Math.max(0, initialCountdownTime - elapsed)
       set({ countdownTime: remaining })
     }
   },
@@ -508,6 +525,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       isFreePlayMode: true,  // 自由游玩模式，不倒计时
       startTime: Date.now(),
       countdownTime: 9999,  // 设置一个很大的值，不真正倒计时
+      initialCountdownTime: 9999,  // 初始倒计时时长
       isTimeFrozen: false,
       freezeTimeRemaining: 0,
       selectedPiece: null,
@@ -548,6 +566,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       freezeCount: 0,
       startTime: 0,
       countdownTime: 180,
+      initialCountdownTime: 180,
       isTimeFrozen: false,
       freezeTimeRemaining: 0,
       totalTimeSpent: 0,  // 重置总花费时间
