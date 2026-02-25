@@ -30,6 +30,7 @@ interface GameState {
   isFailed: boolean              // 是否失败
   isLoading: boolean             // 是否加载中
   isGameCompleted: boolean       // 是否通关（完成所有关卡）
+  isFreePlayMode: boolean        // 是否是自由游玩模式（不倒计时）
 
   // 图片资源
   imageList: string[]            // 图片列表（预加载的10张图片URL）
@@ -77,6 +78,7 @@ interface GameState {
   checkComplete: () => boolean
   checkFailed: () => boolean
   loadNextLevel: () => Promise<void>
+  startFreePlayMode: (level: number) => Promise<void>  // 自由游玩模式（不倒计时）
 }
 
 // 关卡配置生成器
@@ -130,6 +132,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   isFailed: false,
   isLoading: false,
   isGameCompleted: false,
+  isFreePlayMode: false,
   imageList: [],
   imagePaths: [],
   imagesLoaded: 0,
@@ -407,8 +410,9 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // 更新倒计时
   updateCountdown: () => {
-    const { startTime, isPlaying, isComplete, isFailed, isTimeFrozen } = get()
-    if (isPlaying && !isComplete && !isFailed && !isTimeFrozen) {
+    const { startTime, isPlaying, isComplete, isFailed, isTimeFrozen, isFreePlayMode } = get()
+    // 自由游玩模式下不倒计时
+    if (!isFreePlayMode && isPlaying && !isComplete && !isFailed && !isTimeFrozen) {
       const elapsed = Math.floor((Date.now() - startTime) / 1000)
       const remaining = Math.max(0, 180 - elapsed)  // 3分钟 = 180秒
       set({ countdownTime: remaining })
@@ -471,6 +475,54 @@ export const useGameStore = create<GameState>((set, get) => ({
     } else {
       await get().startGame(currentLevel + 1)
     }
+  },
+
+  // 自由游玩模式（不倒计时）
+  startFreePlayMode: async (level: number) => {
+    const { imageList, levelImageMap } = get()
+
+    const config = getLevelConfig(level, imageList, levelImageMap)
+
+    console.log('🎮 自由游玩模式，关卡:', level)
+
+    // 使用预先规划的每一关的图片映射
+    let imageUrl: string
+    if (levelImageMap[level]) {
+      imageUrl = levelImageMap[level].path
+    } else {
+      imageUrl = imageList.length > 0
+        ? imageList[(level - 1) % imageList.length]
+        : 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1440&fit=crop&q=80'
+    }
+
+    const finalImageUrl = imageUrl
+
+    set({
+      currentLevel: config.level,
+      gridSize: config.gridSize,
+      imageUrl: finalImageUrl,
+      isPlaying: true,
+      isComplete: false,
+      isFailed: false,
+      isLoading: true,
+      isFreePlayMode: true,  // 自由游玩模式，不倒计时
+      startTime: Date.now(),
+      countdownTime: 9999,  // 设置一个很大的值，不真正倒计时
+      isTimeFrozen: false,
+      freezeTimeRemaining: 0,
+      selectedPiece: null,
+      showHint: false,
+      showOriginalImage: false,
+      hintCount: 0,
+      originalImageCount: 0,
+      freezeCount: 0,
+      levelStartTime: Date.now()
+    })
+
+    // 生成拼图碎片
+    await generatePieces(config.gridSize, finalImageUrl)
+
+    set({ isLoading: false })
   },
 
   // 重新开始游戏（重新加载新图片）

@@ -20,6 +20,7 @@ export default function GamePage() {
     isGameCompleted,
     countdownTime,
     totalTimeSpent,
+    isFreePlayMode,
     isTimeFrozen,
     freezeTimeRemaining,
     pieces,
@@ -39,8 +40,7 @@ export default function GamePage() {
     freezeTime,
     checkComplete,
     checkFailed,
-    loadNextLevel,
-    restartGame
+    loadNextLevel
   } = useGameStore()
 
   const [draggingPiece, setDraggingPiece] = useState<any>(null)
@@ -264,6 +264,8 @@ export default function GamePage() {
 
   // 通关后重新开始游戏（跳转到关卡选择页面）
   const handleRestartAll = () => {
+    // 保存总花费时间到本地存储
+    Taro.setStorageSync('totalTimeSpent', totalTimeSpent.toString())
     Taro.navigateTo({ url: '/pages/level-select/index' })
   }
 
@@ -555,10 +557,16 @@ export default function GamePage() {
         <Text className="block header-text">
           第{currentLevel}关
         </Text>
-        <Text className="block header-text">
-          {formatTime(countdownTime)}
-        </Text>
-        {isTimeFrozen && (
+        {isFreePlayMode ? (
+          <Text className="block header-text" style={{ color: '#F59E0B' }}>
+            自由模式
+          </Text>
+        ) : (
+          <Text className="block header-text">
+            {formatTime(countdownTime)}
+          </Text>
+        )}
+        {isTimeFrozen && !isFreePlayMode && (
           <Text className="block header-text">
             {freezeTimeRemaining}秒后恢复
           </Text>

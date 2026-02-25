@@ -1,0 +1,94 @@
+.level-select-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
+  padding: 40px 20px;
+}
+
+.level-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.level-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1F2937;
+  margin-bottom: 12px;
+}
+
+.level-subtitle {
+  font-size: 18px;
+  color: #6B7280;
+}
+
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  flex: 1;
+}
+
+.level-item {
+  aspect-ratio: 1;
+  background: white;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.level-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3B82F6, #8B5CF6);
+}
+
+.level-item:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.level-number {
+  font-size: 48px;
+  font-weight: 700;
+  color: #3B82F6;
+  line-height: 1;
+}
+
+.level-hint {
+  font-size: 14px;
+  color: #9CA3AF;
+  margin-top: 8px;
+}
+
+.level-footer {
+  margin-top: 30px;
+}
+
+.footer-button {
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+  background: white;
+  color: #6B7280;
+  border: 1px solid #E5E7EB;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.footer-button::after {
+  border: none;
+}
