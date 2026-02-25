@@ -16,7 +16,7 @@
 }
 
 .home-title {
-  font-size: 56px;
+  font-size: 112px; /* 字体增大一倍 */
   font-weight: 700;
   color: #3B82F6;
   margin-bottom: 20px;
@@ -24,7 +24,7 @@
 }
 
 .home-subtitle {
-  font-size: 22px;
+  font-size: 44px; /* 字体增大一倍 */
   color: #6B7280;
   margin-bottom: 48px;
   text-align: center;
@@ -35,8 +35,8 @@
   background: #3B82F6;
   color: white;
   border-radius: 9999px;
-  padding: 18px;
-  font-size: 20px;
+  padding: 36px; /* 内边距增大 */
+  font-size: 40px; /* 字体增大一倍 */
   font-weight: 600;
   box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
   border: none;

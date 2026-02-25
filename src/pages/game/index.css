@@ -14,14 +14,14 @@
 }
 
 .game-loading text {
-  font-size: 22px;
+  font-size: 44px; /* 字体增大一倍 */
   color: #6B7280;
 }
 
 /* 顶部信息栏 */
 .game-header {
   position: fixed;
-  top: 250px; /* 距离屏幕上边缘250px */
+  top: 150px; /* 距离屏幕上边缘150px */
   left: 0;
   right: 0;
   display: flex;
@@ -34,7 +34,7 @@
 }
 
 .header-text {
-  font-size: 24px;
+  font-size: 48px;
   font-weight: 700;
   color: #1F2937;
 }
@@ -169,7 +169,7 @@
 /* 底部功能按钮 */
 .game-footer {
   position: fixed;
-  bottom: 250px; /* 距离屏幕底部250px */
+  bottom: 100px; /* 距离屏幕底部100px */
   left: 0;
   right: 0;
   display: flex;
@@ -182,18 +182,18 @@
 .footer-buttons-row {
   display: flex;
   width: 100%;
-  max-width: 400px;
-  gap: 24px; /* 间距与按钮宽度一致 */
+  max-width: 500px;
+  gap: 50px; /* 间距50px */
   padding: 0 12px;
 }
 
 .footer-button {
   flex: 1; /* 宽度自适应 */
-  height: 50px;
+  height: 60px; /* 按钮高度增大 */
   background: #3B82F6;
   color: white;
   border-radius: 9999px;
-  font-size: 18px;
+  font-size: 36px; /* 字体增大一倍 */
   font-weight: 600;
   border: none;
   box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
@@ -208,26 +208,26 @@
   box-shadow: 0 5px 15px -5px rgba(59, 130, 246, 0.3);
 }
 
-.footer-button:disabled {
+.footer-button.used {
   background: #9CA3AF;
   box-shadow: none;
-  opacity: 0.6;
+  opacity: 0.8;
   cursor: not-allowed;
 }
 
 .footer-rules {
   display: flex;
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   justify-content: space-between;
-  gap: 24px; /* 间距与按钮宽度一致 */
+  gap: 50px; /* 间距50px */
   padding: 12px 12px 0;
 }
 
 .footer-rule {
   flex: 1;
   text-align: center;
-  font-size: 12px;
+  font-size: 24px; /* 字体增大一倍 */
   color: #1F2937;
   line-height: 1.5;
 }
@@ -260,7 +260,7 @@
 }
 
 .victory-title {
-  font-size: 32px;
+  font-size: 64px; /* 字体增大一倍 */
   font-weight: 700;
   color: #10B981;
   margin-bottom: 20px;
@@ -268,7 +268,7 @@
 }
 
 .victory-time {
-  font-size: 22px;
+  font-size: 44px; /* 字体增大一倍 */
   color: #6B7280;
   margin-bottom: 28px;
 }
@@ -283,8 +283,8 @@
 .victory-button {
   width: 100%;
   border-radius: 9999px;
-  padding: 16px;
-  font-size: 18px;
+  padding: 20px; /* 内边距增大 */
+  font-size: 36px; /* 字体增大一倍 */
   font-weight: 600;
   border: none;
 }

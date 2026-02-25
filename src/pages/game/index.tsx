@@ -142,10 +142,6 @@ export default function GamePage() {
     }
     // 显示提示
     toggleHint()
-    // 3秒后自动隐藏
-    setTimeout(() => {
-      toggleHint()
-    }, 3000)
   }
 
   // 查看原图
@@ -343,6 +339,13 @@ export default function GamePage() {
       })
       // 如果目标位置有其他碎片，交换位置
       swapPieces(latestDraggingPiece, targetPiece)
+
+      // 交换后立即隐藏提示
+      if (showHint) {
+        setTimeout(() => {
+          toggleHint()
+        }, 100)  // 短暂延迟确保动画完成
+      }
     } else {
       // 如果目标位置为空（理论上不会发生，因为打乱后所有位置都有碎片）
       // 直接移动到目标格子（精确吸附）
@@ -522,22 +525,20 @@ export default function GamePage() {
       <View className="game-footer">
         <View className="footer-buttons-row">
           <Button
-            className="footer-button"
+            className={`footer-button ${hintCount >= 3 ? 'used' : ''}`}
             onClick={handleHint}
-            disabled={hintCount >= 3}
           >
             提示
           </Button>
           <Button
-            className="footer-button"
+            className={`footer-button ${originalImageCount >= 3 ? 'used' : ''}`}
             onClick={handleToggleOriginal}
           >
             {showOriginalImage ? '隐藏' : '原图'}
           </Button>
           <Button
-            className="footer-button"
+            className={`footer-button ${freezeCount >= 1 || isFailed ? 'used' : ''}`}
             onClick={handleFreezeTime}
-            disabled={isTimeFrozen || freezeCount >= 1 || isFailed}
           >
             {isTimeFrozen ? `${freezeTimeRemaining}s` : '冻结'}
           </Button>
