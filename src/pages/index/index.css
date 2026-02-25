@@ -15,12 +15,10 @@
   max-width: 400px;
 }
 
-.home-title {
-  font-size: 56px;
-  font-weight: 700;
-  color: #3B82F6;
+.home-logo {
+  width: 240px;
+  height: 240px;
   margin-bottom: 20px;
-  text-align: center;
 }
 
 .home-subtitle {
