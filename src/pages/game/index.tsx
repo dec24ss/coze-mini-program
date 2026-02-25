@@ -377,25 +377,31 @@ export default function GamePage() {
                   const pieceSize = 100 / gridSize
                   const isCorrect = piece.correctIndex === piece.currentIndex
 
-                  // 检查右侧相邻图块是否都在正确位置
-                  const rightNeighborIndex = piece.correctIndex + 1
-                  const isRightNeighborSameRow = Math.floor(piece.correctIndex / gridSize) === Math.floor(rightNeighborIndex / gridSize)
-                  const rightNeighbor = isRightNeighborSameRow ? pieces.find(p => p.currentIndex === rightNeighborIndex) : null
-                  const rightNeighborCorrect = rightNeighbor?.correctIndex === rightNeighborIndex
-
-                  // 检查下方相邻图块是否都在正确位置
-                  const bottomNeighborIndex = piece.correctIndex + gridSize
-                  const bottomNeighbor = pieces.find(p => p.currentIndex === bottomNeighborIndex)
-                  const bottomNeighborCorrect = bottomNeighbor?.correctIndex === bottomNeighborIndex
-
                   // 构建边框样式（两个相邻图块都正确时隐藏网格线）
                   let borderStyle = {}
                   if (isCorrect) {
+                    // 检查右侧位置：基于当前实际位置 currentIndex
+                    const rightPos = piece.currentIndex + 1
+                    // 检查是否在同一行
+                    const isRightSameRow = Math.floor(piece.currentIndex / gridSize) === Math.floor(rightPos / gridSize)
+                    // 找到右侧位置的图块
+                    const rightNeighbor = isRightSameRow ? pieces.find(p => p.currentIndex === rightPos) : null
+                    // 判断右侧图块是否正确
+                    const rightNeighborCorrect = rightNeighbor?.correctIndex === rightPos
+
+                    // 检查下方位置：基于当前实际位置 currentIndex
+                    const bottomPos = piece.currentIndex + gridSize
+                    // 找到下方位置的图块
+                    const bottomNeighbor = pieces.find(p => p.currentIndex === bottomPos)
+                    // 判断下方图块是否正确
+                    const bottomNeighborCorrect = bottomNeighbor?.correctIndex === bottomPos
+
+                    // 设置边框：如果相邻图块都正确，则隐藏对应边框
                     borderStyle = {
                       borderTop: '2px solid rgba(16, 185, 129, 0.6)',
                       borderLeft: '2px solid rgba(16, 185, 129, 0.6)',
-                      borderBottom: bottomNeighbor && bottomNeighborCorrect ? '0 solid transparent' : '2px solid rgba(16, 185, 129, 0.6)',
-                      borderRight: rightNeighbor && rightNeighborCorrect ? '0 solid transparent' : '2px solid rgba(16, 185, 129, 0.6)'
+                      borderBottom: bottomNeighborCorrect ? '0 solid transparent' : '2px solid rgba(16, 185, 129, 0.6)',
+                      borderRight: rightNeighborCorrect ? '0 solid transparent' : '2px solid rgba(16, 185, 129, 0.6)'
                     }
                   }
 
