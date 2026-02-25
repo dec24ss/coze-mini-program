@@ -369,50 +369,44 @@ export default function GamePage() {
               <View className="puzzle-grid">
                 {pieces.map((piece) => {
                   const pieceSize = 100 / gridSize
-                  const isCorrect = piece.correctIndex === piece.currentIndex
 
-                  // 构建边框样式（两个相邻图块都正确时隐藏白边和黑线）
-                  let outerBorderStyle = {}
-                  let innerBorderStyle = {}
+                  // 检查相邻图块的正确关系
+                  // 右侧位置
+                  const rightPos = piece.currentIndex + 1
+                  const isRightSameRow = Math.floor(piece.currentIndex / gridSize) === Math.floor(rightPos / gridSize)
+                  const rightNeighbor = isRightSameRow ? pieces.find(p => p.currentIndex === rightPos) : null
+                  const isRightNeighborCorrectRelationship = rightNeighbor?.correctIndex === rightPos && piece.correctIndex === rightPos - 1
 
-                  if (isCorrect) {
-                    // 检查右侧位置：基于当前实际位置 currentIndex
-                    const rightPos = piece.currentIndex + 1
-                    const isRightSameRow = Math.floor(piece.currentIndex / gridSize) === Math.floor(rightPos / gridSize)
-                    const rightNeighbor = isRightSameRow ? pieces.find(p => p.currentIndex === rightPos) : null
-                    const rightNeighborCorrect = rightNeighbor?.correctIndex === rightPos
+                  // 左侧位置
+                  const leftPos = piece.currentIndex - 1
+                  const isLeftSameRow = Math.floor(piece.currentIndex / gridSize) === Math.floor(leftPos / gridSize)
+                  const leftNeighbor = isLeftSameRow && leftPos >= 0 ? pieces.find(p => p.currentIndex === leftPos) : null
+                  const isLeftNeighborCorrectRelationship = leftNeighbor?.correctIndex === leftPos && piece.correctIndex === leftPos + 1
 
-                    // 检查左侧位置
-                    const leftPos = piece.currentIndex - 1
-                    const isLeftSameRow = Math.floor(piece.currentIndex / gridSize) === Math.floor(leftPos / gridSize)
-                    const leftNeighbor = isLeftSameRow && leftPos >= 0 ? pieces.find(p => p.currentIndex === leftPos) : null
-                    const leftNeighborCorrect = leftNeighbor?.correctIndex === leftPos
+                  // 上方位置
+                  const topPos = piece.currentIndex - gridSize
+                  const topNeighbor = topPos >= 0 ? pieces.find(p => p.currentIndex === topPos) : null
+                  const isTopNeighborCorrectRelationship = topNeighbor?.correctIndex === topPos && piece.correctIndex === topPos + gridSize
 
-                    // 检查上方位置
-                    const topPos = piece.currentIndex - gridSize
-                    const topNeighbor = topPos >= 0 ? pieces.find(p => p.currentIndex === topPos) : null
-                    const topNeighborCorrect = topNeighbor?.correctIndex === topPos
+                  // 下方位置
+                  const bottomPos = piece.currentIndex + gridSize
+                  const bottomNeighbor = pieces.find(p => p.currentIndex === bottomPos)
+                  const isBottomNeighborCorrectRelationship = bottomNeighbor?.correctIndex === bottomPos && piece.correctIndex === bottomPos - gridSize
 
-                    // 检查下方位置：基于当前实际位置 currentIndex
-                    const bottomPos = piece.currentIndex + gridSize
-                    const bottomNeighbor = pieces.find(p => p.currentIndex === bottomPos)
-                    const bottomNeighborCorrect = bottomNeighbor?.correctIndex === bottomPos
+                  // 设置外层黑线样式：如果相邻图块是正确的相邻关系，则隐藏对应边框
+                  const outerBorderStyle = {
+                    borderTop: isTopNeighborCorrectRelationship ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)',
+                    borderLeft: isLeftNeighborCorrectRelationship ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)',
+                    borderBottom: isBottomNeighborCorrectRelationship ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)',
+                    borderRight: isRightNeighborCorrectRelationship ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)'
+                  }
 
-                    // 设置外层黑线样式：如果相邻图块都正确，则隐藏对应边框
-                    outerBorderStyle = {
-                      borderTop: topNeighborCorrect ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)',
-                      borderLeft: leftNeighborCorrect ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)',
-                      borderBottom: bottomNeighborCorrect ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)',
-                      borderRight: rightNeighborCorrect ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)'
-                    }
-
-                    // 设置内层白边样式：如果相邻图块都正确，则隐藏对应白边
-                    innerBorderStyle = {
-                      borderTop: topNeighborCorrect ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)',
-                      borderLeft: leftNeighborCorrect ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)',
-                      borderBottom: bottomNeighborCorrect ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)',
-                      borderRight: rightNeighborCorrect ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)'
-                    }
+                  // 设置内层白边样式：如果相邻图块是正确的相邻关系，则隐藏对应白边
+                  const innerBorderStyle = {
+                    borderTop: isTopNeighborCorrectRelationship ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)',
+                    borderLeft: isLeftNeighborCorrectRelationship ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)',
+                    borderBottom: isBottomNeighborCorrectRelationship ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)',
+                    borderRight: isRightNeighborCorrectRelationship ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)'
                   }
 
                   return (
