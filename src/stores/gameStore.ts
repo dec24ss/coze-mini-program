@@ -295,6 +295,17 @@ export const useGameStore = create<GameState>((set, get) => ({
       freezeCount: 0
     })
 
+    // 先预加载当前关卡的图片，确保在小程序缓存中
+    console.log('📥 预加载当前关卡图片...')
+    try {
+      await Taro.getImageInfo({
+        src: finalImageUrl
+      })
+      console.log('✅ 当前关卡图片预加载完成')
+    } catch (error) {
+      console.error('⚠️  图片预加载失败，继续使用 URL:', error)
+    }
+
     // 生成拼图碎片
     await generatePieces(config.gridSize, finalImageUrl)
 
