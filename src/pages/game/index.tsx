@@ -346,6 +346,12 @@ export default function GamePage() {
 
   return (
     <View className="game-page">
+      {/* 顶部信息栏 */}
+      <View className="game-header">
+        <Text className="block header-text">第 {currentLevel} 关</Text>
+        <Text className="block header-text">{formatTime(elapsedTime)}</Text>
+      </View>
+
       {/* 拼图区域 */}
       <View className="game-container">
         {showOriginalImage ? (
@@ -442,18 +448,6 @@ export default function GamePage() {
             )}
           </View>
         )}
-      </View>
-
-      {/* 底部信息栏 */}
-      <View className="game-info-bar">
-        <View className="info-left">
-          <Text className="block info-label">第 {currentLevel} 关</Text>
-          <Text className="block info-value">{gridSize}×{gridSize}</Text>
-        </View>
-        <View className="info-right">
-          <Text className="block info-label">用时</Text>
-          <Text className="block info-value">{formatTime(elapsedTime)}</Text>
-        </View>
       </View>
 
       {/* 底部功能按钮 */}
