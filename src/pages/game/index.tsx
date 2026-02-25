@@ -44,8 +44,7 @@ export default function GamePage() {
   const [draggingPiece, setDraggingPiece] = useState<any>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [containerRect, setContainerRect] = useState<{ left: number; top: number; width: number; height: number }>({ left: 0, top: 0, width: 0, height: 0 })
-  const [isImageLoaded, setIsImageLoaded] = useState(false)  // 默认为 false，显示加载中
-  const [loadedPiecesCount, setLoadedPiecesCount] = useState(0)  // 已加载的碎片数量
+  const [isImageLoaded, setIsImageLoaded] = useState(true)  // 默认为 true，避免一直显示加载中
   const timerRef = useRef<ReturnType<typeof setTimeout>>()
   const isMountedRef = useRef(false)
 
@@ -67,31 +66,36 @@ export default function GamePage() {
     }
   }, [isWeapp])
 
-  // 监听所有碎片加载完成
-  useEffect(() => {
-    const totalPieces = pieces.length
-    if (totalPieces > 0 && loadedPiecesCount >= totalPieces) {
-      console.log('✅ 所有碎片已加载完成，显示拼图')
-      setIsImageLoaded(true)
-      // 重置计数器
-      setLoadedPiecesCount(0)
-    }
-  }, [loadedPiecesCount, pieces.length])
-
-  // 监听图片 URL 变化，重置加载状态
+  // 监听图片 URL 变化，确认图片已准备就绪
   useEffect(() => {
     if (imageUrl) {
-      console.log('🖼️  图片 URL 变化，重置加载状态')
+      console.log('🖼️  监听到图片 URL 变化:', imageUrl)
+      console.log('🖼️  图片长度:', imageUrl.length)
+
+      // 如果是 base64 数据，立即显示（已经是完整的图片数据）
+      if (imageUrl.startsWith('data:image')) {
+        console.log('✅ Base64 图片数据，立即显示')
+        setIsImageLoaded(true)
+        return
+      }
+
+      // 如果是本地路径（wxfile://），立即显示
+      if (imageUrl.startsWith('wxfile://') || imageUrl.startsWith('/')) {
+        console.log('✅ 本地路径图片，立即显示')
+        setIsImageLoaded(true)
+        return
+      }
+
+      // 如果是网络路径，等待图片加载完成
       setIsImageLoaded(false)
-      setLoadedPiecesCount(0)
+      setTimeout(() => {
+        setIsImageLoaded(true)
+        console.log('✅ 网络路径图片已显示')
+      }, 100)  // 100ms延迟
+    } else {
+      console.log('⚠️  imageUrl 为空')
     }
   }, [imageUrl])
-
-  // 图片加载回调
-  const handleImageLoad = (pieceId: number) => {
-    console.log(`🖼️  碎片 ${pieceId} 加载完成`)
-    setLoadedPiecesCount(prev => prev + 1)
-  }
 
   // 获取容器位置信息
   const getContainerRect = (): Promise<{ left: number; top: number; width: number; height: number } | null> => {
@@ -142,11 +146,9 @@ export default function GamePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startGame])
 
-  // 计时器（图片加载完成后才开始倒计时）
+  // 计时器
   useEffect(() => {
-    // 只有在图片已加载、游戏进行中、未完成、未失败时才开始计时
-    if (isImageLoaded && isPlaying && !isComplete && !isFailed) {
-      console.log('⏱️  开始计时，倒计时：', countdownTime)
+    if (isPlaying && !isComplete && !isFailed) {
       timerRef.current = setInterval(() => {
         updateCountdown()
         checkFailed()
@@ -156,11 +158,10 @@ export default function GamePage() {
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current)
-        console.log('⏱️  停止计时')
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isImageLoaded, isPlaying, isComplete, isFailed])
+  }, [isPlaying, isComplete, isFailed])
 
   // 时间冻结倒计时
   useEffect(() => {
@@ -462,11 +463,7 @@ export default function GamePage() {
             {/* 图片加载动画 */}
             {!isImageLoaded && (
               <View className="loading-overlay">
-                <Text className="block loading-text">
-                  {loadedPiecesCount > 0
-                    ? `加载碎片... ${loadedPiecesCount}/${pieces.length}`
-                    : '加载图片...'}
-                </Text>
+                <Text className="block loading-text">图片加载中...</Text>
               </View>
             )}
 
@@ -551,7 +548,6 @@ export default function GamePage() {
                         <Image
                           src={imageUrl}
                           mode="aspectFill"
-                          onLoad={() => handleImageLoad(piece.id)}
                           style={{
                             width: `${gridSize * 100}%`,
                             height: `${gridSize * 100}%`,
