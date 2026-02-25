@@ -80,19 +80,19 @@ function getLevelConfig(level: number): LevelConfig {
     gridSize = 12  // 第10关及以后：12×12（最高难度）
   }
 
-  // 使用宫崎骏卡通风格图片（竖屏）- 蓝天、森林、花海、治愈系风景
+  // 使用宫崎骏动漫风格手绘图片（竖屏）- 人物、动物、风景混合
   // 每次打开小程序都会随机打乱图片顺序
   const ghibliStyleImages = [
-    'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1080&h=1440&fit=crop', // 蓝天白云田野
-    'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1080&h=1440&fit=crop', // 迷雾森林
-    'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1080&h=1440&fit=crop', // 阳光森林小径
-    'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=1080&h=1440&fit=crop', // 蓝天草地
-    'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=1080&h=1440&fit=crop', // 田园风光
-    'https://images.unsplash.com/photo-1490750967868-58cb75069ed6?w=1080&h=1440&fit=crop', // 山间田野
-    'https://images.unsplash.com/photo-1500835556837-99ac94a94552?w=1080&h=1440&fit=crop', // 蓝天白云
-    'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1080&h=1440&fit=crop', // 绿色山坡
-    'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?w=1080&h=1440&fit=crop', // 湖畔森林
-    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1080&h=1440&fit=crop'  // 雪山草地
+    'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1440&fit=crop', // 动漫风格蓝天
+    'https://images.unsplash.com/photo-1563089145-599997674d42?w=1080&h=1440&fit=crop', // 卡通云朵
+    'https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=1080&h=1440&fit=crop', // 艺术绘画
+    'https://images.unsplash.com/photo-1514539079130-25950c84af65?w=1080&h=1440&fit=crop', // 手绘风格
+    'https://images.unsplash.com/photo-1574169208507-84376144848b?w=1080&h=1440&fit=crop', // 插画风格
+    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1080&h=1440&fit=crop', // 卡通插画
+    'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?w=1080&h=1440&fit=crop', // 艺术画作
+    'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1080&h=1440&fit=crop', // 动漫风景
+    'https://images.unsplash.com/photo-1549490349-8643362247b5?w=1080&h=1440&fit=crop', // 手绘云朵
+    'https://images.unsplash.com/photo-1528360983277-13d9b152c611?w=1080&h=1440&fit=crop'  // 艺术云彩
   ]
 
   // 随机打乱图片数组，每次打开小程序图片顺序都不同

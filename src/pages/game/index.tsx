@@ -145,6 +145,17 @@ export default function GamePage() {
     loadNextLevel()
   }
 
+  // 获取下一个应该移动的图块（第一个位置错误的图块）
+  const getNextIncorrectPiece = () => {
+    for (let i = 0; i < pieces.length; i++) {
+      const piece = pieces.find(p => p.currentIndex === i)
+      if (piece && piece.correctIndex !== i) {
+        return piece
+      }
+    }
+    return null
+  }
+
   // 计算碎片在容器中的实际位置（像素）
   const getPiecePixelPosition = (piece: any, containerWidth: number) => {
     return {
@@ -210,13 +221,14 @@ export default function GamePage() {
     const pieceWidth = containerWidth / gridSize
     const pieceHeight = containerHeight / gridSize
 
-    // 计算新的位置
+    // 计算新的位置（更灵敏的拖动）
     let newX = touch.clientX - containerRect.left - dragOffset.x
     let newY = touch.clientY - containerRect.top - dragOffset.y
 
-    // 限制在容器范围内
-    newX = Math.max(0, Math.min(newX, containerWidth - pieceWidth))
-    newY = Math.max(0, Math.min(newY, containerHeight - pieceHeight))
+    // 限制在容器范围内（允许稍微超出边界，提升拖动体验）
+    const margin = pieceWidth * 0.3 // 允许超出30%的边界
+    newX = Math.max(-margin, Math.min(newX, containerWidth - pieceWidth + margin))
+    newY = Math.max(-margin, Math.min(newY, containerHeight - pieceHeight + margin))
 
     // 转换为百分比
     const newXPercent = (newX / containerWidth) * 100
@@ -251,10 +263,16 @@ export default function GamePage() {
       return
     }
 
-    // 计算目标格子位置
-    const targetCol = Math.round((latestDraggingPiece.x / 100) * gridSize)
-    const targetRow = Math.round((latestDraggingPiece.y / 100) * gridSize)
+    // 计算目标格子位置（更精确的吸附）
+    const pieceSize = 100 / gridSize
+    const targetCol = Math.round(latestDraggingPiece.x / pieceSize)
+    const targetRow = Math.round(latestDraggingPiece.y / pieceSize)
     const targetIndex = targetRow * gridSize + targetCol
+
+    // 确保目标位置在有效范围内
+    const clampedCol = Math.max(0, Math.min(targetCol, gridSize - 1))
+    const clampedRow = Math.max(0, Math.min(targetRow, gridSize - 1))
+    const clampedTargetIndex = clampedRow * gridSize + clampedCol
 
     console.log('拖拽结束：', {
       draggingPieceId: latestDraggingPiece.id,
@@ -262,14 +280,17 @@ export default function GamePage() {
       draggingPieceY: latestDraggingPiece.y,
       targetCol,
       targetRow,
+      clampedCol,
+      clampedRow,
       targetIndex,
+      clampedTargetIndex,
       totalPieces: pieces.length,
       gridSize,
       platform: isWeapp ? '小程序' : 'H5'
     })
 
     // 找到目标格子里的碎片
-    const targetPiece = pieces.find(p => p.currentIndex === targetIndex && p.id !== latestDraggingPiece.id)
+    const targetPiece = pieces.find(p => p.currentIndex === clampedTargetIndex && p.id !== latestDraggingPiece.id)
 
     console.log('目标碎片：', targetPiece ? `id=${targetPiece.id}, currentIndex=${targetPiece.currentIndex}` : 'null')
 
@@ -284,15 +305,14 @@ export default function GamePage() {
       swapPieces(latestDraggingPiece, targetPiece)
     } else {
       // 如果目标位置为空（理论上不会发生，因为打乱后所有位置都有碎片）
-      // 直接移动到目标格子（吸附）
-      const pieceSize = 100 / gridSize
-      const newX = targetCol * pieceSize
-      const newY = targetRow * pieceSize
+      // 直接移动到目标格子（精确吸附）
+      const newX = clampedCol * pieceSize
+      const newY = clampedRow * pieceSize
       movePiece(latestDraggingPiece, newX, newY)
 
       // 更新 currentIndex
-      updatePieceIndex(latestDraggingPiece.id, targetIndex)
-      console.log('移动碎片到空位：', latestDraggingPiece.id, '->', targetIndex)
+      updatePieceIndex(latestDraggingPiece.id, clampedTargetIndex)
+      console.log('移动碎片到空位：', latestDraggingPiece.id, '->', clampedTargetIndex)
     }
 
     setDraggingPiece(null)
@@ -379,10 +399,13 @@ export default function GamePage() {
                 {Array.from({ length: gridSize * gridSize }).map((_, index) => {
                   const piece = pieces.find(p => p.correctIndex === index)
                   const isCorrect = piece?.currentIndex === index
+                  const nextIncorrectPiece = getNextIncorrectPiece()
+                  const isNextTarget = nextIncorrectPiece?.correctIndex === index
+
                   return (
                     <View
                       key={index}
-                      className={`hint-cell ${isCorrect ? 'correct' : ''}`}
+                      className={`hint-cell ${isCorrect ? 'correct' : ''} ${isNextTarget ? 'next-target' : ''}`}
                       style={{
                         width: `${100 / gridSize}%`,
                         height: `${100 / gridSize}%`
