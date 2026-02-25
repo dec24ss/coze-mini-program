@@ -23,11 +23,11 @@ export class ImageController {
 
   /**
    * 获取随机图片列表
-   * @param count - 返回的图片数量，默认10张
+   * 每次返回30张全新的随机图片（使用时间戳作为随机种子）
    */
   @Get('random')
   getRandomImages() {
-    const images = this.imageService.getRandomImages(10)
+    const images = this.imageService.getRandomImages(30) // 返回30张随机图片
     return {
       code: 200,
       msg: 'success',

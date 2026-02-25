@@ -167,10 +167,16 @@ export class ImageService implements OnModuleInit {
     })
   }
 
-  getRandomImages(count: number = 10): string[] {
-    const allImages = this.getAllImages()
-    const shuffled = allImages.sort(() => 0.5 - Math.random())
-    return shuffled.slice(0, Math.min(count, allImages.length))
+  // 生成随机图片列表（每次返回不同的图片）
+  getRandomImages(count: number = 30): string[] {
+    // 使用时间戳作为随机种子，确保每次请求都生成不同的图片
+    const randomSeed = Date.now()
+
+    // 生成指定数量的随机图片 URL
+    return Array.from({ length: count }, (_, i) => {
+      // 使用 ?random 参数确保每次都不同
+      return `https://picsum.photos/1200/1600?random=${randomSeed}_${i}`
+    })
   }
 
   getAllImages(): string[] {
