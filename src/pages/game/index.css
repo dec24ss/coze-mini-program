@@ -93,11 +93,9 @@
   height: 100%;
 }
 
-/* 拼图碎片 */
-.puzzle-piece {
+/* 拼图碎片外层（黑线） */
+.puzzle-piece-outer {
   position: absolute;
-  background-repeat: no-repeat;
-  border: 2px solid rgba(255, 255, 255, 0.8);
   box-sizing: border-box;
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: grab;
@@ -107,15 +105,24 @@
   will-change: transform, left, top;
 }
 
-.puzzle-piece:active {
+.puzzle-piece-outer:active {
   cursor: grabbing;
   transition: none; /* 拖拽时禁用过渡，提升响应速度 */
 }
 
-.puzzle-piece.selected {
+.puzzle-piece-outer.selected {
   box-shadow: 0 0 0 3px #3B82F6;
   z-index: 10;
   transform: scale(1.02); /* 选中的碎片稍微放大 */
+}
+
+/* 拼图碎片内层（白边 + 图片） */
+.puzzle-piece-inner {
+  position: relative;
+  background-repeat: no-repeat;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
 }
 
 /* 提示覆盖层 */

@@ -371,57 +371,79 @@ export default function GamePage() {
                   const pieceSize = 100 / gridSize
                   const isCorrect = piece.correctIndex === piece.currentIndex
 
-                  // 构建边框样式（两个相邻图块都正确时隐藏网格线）
-                  let borderStyle = {}
+                  // 构建边框样式（两个相邻图块都正确时隐藏白边和黑线）
+                  let outerBorderStyle = {}
+                  let innerBorderStyle = {}
+
                   if (isCorrect) {
                     // 检查右侧位置：基于当前实际位置 currentIndex
                     const rightPos = piece.currentIndex + 1
-                    // 检查是否在同一行
                     const isRightSameRow = Math.floor(piece.currentIndex / gridSize) === Math.floor(rightPos / gridSize)
-                    // 找到右侧位置的图块
                     const rightNeighbor = isRightSameRow ? pieces.find(p => p.currentIndex === rightPos) : null
-                    // 判断右侧图块是否正确
                     const rightNeighborCorrect = rightNeighbor?.correctIndex === rightPos
+
+                    // 检查左侧位置
+                    const leftPos = piece.currentIndex - 1
+                    const isLeftSameRow = Math.floor(piece.currentIndex / gridSize) === Math.floor(leftPos / gridSize)
+                    const leftNeighbor = isLeftSameRow && leftPos >= 0 ? pieces.find(p => p.currentIndex === leftPos) : null
+                    const leftNeighborCorrect = leftNeighbor?.correctIndex === leftPos
+
+                    // 检查上方位置
+                    const topPos = piece.currentIndex - gridSize
+                    const topNeighbor = topPos >= 0 ? pieces.find(p => p.currentIndex === topPos) : null
+                    const topNeighborCorrect = topNeighbor?.correctIndex === topPos
 
                     // 检查下方位置：基于当前实际位置 currentIndex
                     const bottomPos = piece.currentIndex + gridSize
-                    // 找到下方位置的图块
                     const bottomNeighbor = pieces.find(p => p.currentIndex === bottomPos)
-                    // 判断下方图块是否正确
                     const bottomNeighborCorrect = bottomNeighbor?.correctIndex === bottomPos
 
-                    // 设置边框：如果相邻图块都正确，则隐藏对应边框
-                    borderStyle = {
-                      borderTop: '2px solid rgba(16, 185, 129, 0.6)',
-                      borderLeft: '2px solid rgba(16, 185, 129, 0.6)',
-                      borderBottom: bottomNeighborCorrect ? '0 solid transparent' : '2px solid rgba(16, 185, 129, 0.6)',
-                      borderRight: rightNeighborCorrect ? '0 solid transparent' : '2px solid rgba(16, 185, 129, 0.6)'
+                    // 设置外层黑线样式：如果相邻图块都正确，则隐藏对应边框
+                    outerBorderStyle = {
+                      borderTop: topNeighborCorrect ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)',
+                      borderLeft: leftNeighborCorrect ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)',
+                      borderBottom: bottomNeighborCorrect ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)',
+                      borderRight: rightNeighborCorrect ? '0 solid transparent' : '1px solid rgba(0, 0, 0, 0.8)'
                     }
-                  } else {
-                    // 不在正确位置的图块，不显示绿色边框
-                    borderStyle = {
-                      border: 'none'
+
+                    // 设置内层白边样式：如果相邻图块都正确，则隐藏对应白边
+                    innerBorderStyle = {
+                      borderTop: topNeighborCorrect ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)',
+                      borderLeft: leftNeighborCorrect ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)',
+                      borderBottom: bottomNeighborCorrect ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)',
+                      borderRight: rightNeighborCorrect ? '0 solid transparent' : '2px solid rgba(255, 255, 255, 0.9)'
                     }
                   }
 
                   return (
                     <View
                       key={piece.id}
-                      className={`puzzle-piece ${selectedPiece?.id === piece.id ? 'selected' : ''}`}
+                      className={`puzzle-piece-outer ${selectedPiece?.id === piece.id ? 'selected' : ''}`}
                       style={{
                         width: `${pieceSize}%`,
                         height: `${pieceSize}%`,
                         left: `${piece.x}%`,
                         top: `${piece.y}%`,
-                        backgroundImage: `url(${imageUrl})`,
-                        backgroundSize: `${gridSize * 100}%`,
-                        backgroundPosition: `${(piece.correctIndex % gridSize) * (100 / (gridSize - 1))}% ${Math.floor(piece.correctIndex / gridSize) * (100 / (gridSize - 1))}%`,
-                        ...borderStyle
+                        ...outerBorderStyle,
+                        boxSizing: 'border-box'
                       }}
                       onTouchStart={(e) => handleTouchStart(e, piece)}
                       onTouchMove={handleTouchMove}
                       onTouchEnd={handleTouchEnd}
-                    />
+                    >
+                      <View
+                        className="puzzle-piece-inner"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          backgroundImage: `url(${imageUrl})`,
+                          backgroundSize: `${gridSize * 100}%`,
+                          backgroundPosition: `${(piece.correctIndex % gridSize) * (100 / (gridSize - 1))}% ${Math.floor(piece.correctIndex / gridSize) * (100 / (gridSize - 1))}%`,
+                          ...innerBorderStyle,
+                          boxSizing: 'border-box'
+                        }}
+                      />
+                    </View>
                   )
                 })}
               </View>
