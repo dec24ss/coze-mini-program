@@ -126,22 +126,6 @@
   transform: scale(1.02); /* 选中的碎片稍微放大 */
 }
 
-/* 正确位置的图块 */
-.puzzle-piece.correct-position {
-  border: 2px solid rgba(16, 185, 129, 0.6);
-  animation: correct-flash 2s ease-in-out infinite;
-}
-
-/* 正确位置闪光动画 */
-@keyframes correct-flash {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-  }
-  50% {
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.4);
-  }
-}
-
 /* 提示覆盖层 */
 .hint-overlay {
   position: absolute;
@@ -164,23 +148,22 @@
   background: rgba(16, 185, 129, 0.1);
 }
 
-/* 需要交换的图块高亮 */
+/* 需要交换的图块边缘持续闪烁 */
 .hint-cell.swap-hint {
-  background: rgba(59, 130, 246, 0.4);
+  background: rgba(59, 130, 246, 0.3);
   border: 3px solid #3B82F6;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
-  animation: swap-pulse 1.5s ease-in-out infinite;
+  animation: swap-flash 1s ease-in-out infinite;
 }
 
-/* 交换提示脉冲动画 */
-@keyframes swap-pulse {
+/* 交换提示边缘闪烁动画 */
+@keyframes swap-flash {
   0%, 100% {
-    opacity: 0.7;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+    border-color: #3B82F6;
   }
   50% {
-    opacity: 1;
-    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.8);
+    border-color: #60A5FA;
   }
 }
 

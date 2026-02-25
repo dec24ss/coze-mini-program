@@ -377,34 +377,32 @@ export default function GamePage() {
                   const pieceSize = 100 / gridSize
                   const isCorrect = piece.correctIndex === piece.currentIndex
 
-                  // 检查相邻的正确位置图块
-                  const correctPieceBelow = pieces.find(
-                    p => p.correctIndex === p.currentIndex && p.correctIndex === piece.correctIndex + gridSize
-                  )
-                  const correctPieceRight = pieces.find(
-                    p => p.correctIndex === p.currentIndex && p.correctIndex === piece.correctIndex + 1 &&
-                         Math.floor(piece.correctIndex / gridSize) === Math.floor((piece.correctIndex + 1) / gridSize)
-                  )
+                  // 检查右侧相邻图块是否都在正确位置
+                  const rightNeighborIndex = piece.correctIndex + 1
+                  const isRightNeighborSameRow = Math.floor(piece.correctIndex / gridSize) === Math.floor(rightNeighborIndex / gridSize)
+                  const rightNeighbor = isRightNeighborSameRow ? pieces.find(p => p.currentIndex === rightNeighborIndex) : null
+                  const rightNeighborCorrect = rightNeighbor?.correctIndex === rightNeighborIndex
 
-                  // 构建边框样式（隐藏正确位置之间的网格线）
+                  // 检查下方相邻图块是否都在正确位置
+                  const bottomNeighborIndex = piece.correctIndex + gridSize
+                  const bottomNeighbor = pieces.find(p => p.currentIndex === bottomNeighborIndex)
+                  const bottomNeighborCorrect = bottomNeighbor?.correctIndex === bottomNeighborIndex
+
+                  // 构建边框样式（两个相邻图块都正确时隐藏网格线）
                   let borderStyle = {}
                   if (isCorrect) {
-                    const borderParts: string[] = []
-                    if (!correctPieceRight) borderParts.push('2px solid rgba(16, 185, 129, 0.6)')
-                    else borderParts.push('0 solid transparent')
-                    const borderStr = borderParts.join(' ')
                     borderStyle = {
                       borderTop: '2px solid rgba(16, 185, 129, 0.6)',
                       borderLeft: '2px solid rgba(16, 185, 129, 0.6)',
-                      borderBottom: correctPieceBelow ? '0 solid transparent' : '2px solid rgba(16, 185, 129, 0.6)',
-                      borderRight: borderStr
+                      borderBottom: bottomNeighbor && bottomNeighborCorrect ? '0 solid transparent' : '2px solid rgba(16, 185, 129, 0.6)',
+                      borderRight: rightNeighbor && rightNeighborCorrect ? '0 solid transparent' : '2px solid rgba(16, 185, 129, 0.6)'
                     }
                   }
 
                   return (
                     <View
                       key={piece.id}
-                      className={`puzzle-piece ${selectedPiece?.id === piece.id ? 'selected' : ''} ${isCorrect ? 'correct-position' : ''}`}
+                      className={`puzzle-piece ${selectedPiece?.id === piece.id ? 'selected' : ''}`}
                       style={{
                         width: `${pieceSize}%`,
                         height: `${pieceSize}%`,
