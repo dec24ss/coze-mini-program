@@ -21,7 +21,7 @@
 /* 顶部信息栏 */
 .game-header {
   position: fixed;
-  top: 250px; /* 距离屏幕上边缘250px */
+  top: 150px; /* 距离屏幕上边缘150px */
   left: 0;
   right: 0;
   display: flex;
@@ -169,7 +169,7 @@
 /* 底部功能按钮 */
 .game-footer {
   position: fixed;
-  bottom: 250px; /* 距离屏幕底部250px */
+  bottom: 150px; /* 距离屏幕底部150px */
   left: 0;
   right: 0;
   display: flex;
@@ -183,7 +183,7 @@
   display: flex;
   width: 100%;
   max-width: 400px;
-  gap: 24px; /* 间距与按钮宽度一致 */
+  gap: 50px; /* 间距50px */
   padding: 0 12px;
 }
 
@@ -220,7 +220,7 @@
   width: 100%;
   max-width: 400px;
   justify-content: space-between;
-  gap: 24px; /* 间距与按钮宽度一致 */
+  gap: 50px; /* 间距50px */
   padding: 12px 12px 0;
 }
 
