@@ -26,28 +26,8 @@
 .home-subtitle {
   font-size: 22px; /* 字体缩小50% */
   color: #6B7280;
-  margin-bottom: 32px;
+  margin-bottom: 48px;
   text-align: center;
-}
-
-/* 游戏介绍 */
-.game-intro {
-  width: 100%;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 32px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.intro-text {
-  font-size: 16px;
-  color: #374151;
-  line-height: 1.8;
-  text-align: center;
-  font-weight: 400;
 }
 
 .home-button {
