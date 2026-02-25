@@ -46,8 +46,9 @@ const PAINTING_URLS = [
 
 @Injectable()
 export class ImageService implements OnModuleInit {
-  // 使用相对于编译后文件的路径：从 dist/src/image 向上回到 server/public
-  private readonly imagesDir = path.join(__dirname, '../../../public/images')
+  // 使用相对于编译后文件的路径：从 dist/image 向上回到 server/public
+  // 注意：编译后 image.service.ts 在 dist/image/ 目录，需要上2级到 dist，再上1级到 server，然后到 public/images
+  private readonly imagesDir = path.join(__dirname, '../../public/images')
   private readonly imagesUrlBase = '/api/images'
 
   async onModuleInit() {
@@ -126,8 +127,22 @@ export class ImageService implements OnModuleInit {
         reject(new Error(`下载超时: ${url}`))
       }, 30000) // 30秒超时
 
+      // 使用 https 并跟随重定向
       https.get(url, (response) => {
         clearTimeout(timeout)
+
+        // 处理重定向 (302, 301, 307, 308)
+        if ([301, 302, 307, 308].includes(response.statusCode || 0)) {
+          const redirectUrl = response.headers.location || response.headers.Location
+          if (redirectUrl && typeof redirectUrl === 'string') {
+            console.log(`🔄 跟随重定向: ${url.substring(0, 50)}...`)
+            // 递归下载重定向后的 URL
+            this.downloadImage(redirectUrl, filepath)
+              .then(resolve)
+              .catch(reject)
+            return
+          }
+        }
 
         if (response.statusCode === 200) {
           const fileStream = fs.createWriteStream(filepath)
