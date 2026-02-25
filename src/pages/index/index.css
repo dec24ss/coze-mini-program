@@ -26,8 +26,44 @@
 .home-subtitle {
   font-size: 22px; /* 字体缩小50% */
   color: #6B7280;
-  margin-bottom: 48px;
+  margin-bottom: 32px;
   text-align: center;
+}
+
+/* 游戏介绍 */
+.game-intro {
+  width: 100%;
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.intro-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1F2937;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.intro-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.intro-item {
+  font-size: 18px;
+  color: #4B5563;
+  line-height: 1.6;
+}
+
+.intro-item.highlight {
+  color: #DC2626;
+  font-weight: 700;
+  font-size: 20px;
 }
 
 .home-button {

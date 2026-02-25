@@ -37,14 +37,13 @@ export default function GamePage() {
     freezeTime,
     checkComplete,
     checkFailed,
-    loadNextLevel,
-    restartGame
+    loadNextLevel
   } = useGameStore()
 
   const [draggingPiece, setDraggingPiece] = useState<any>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [containerRect, setContainerRect] = useState<{ left: number; top: number; width: number; height: number }>({ left: 0, top: 0, width: 0, height: 0 })
-  const [isImageLoaded, setIsImageLoaded] = useState(true)  // 默认为 true，避免一直显示加载中
+  const [isImageLoaded, setIsImageLoaded] = useState(false)  // 图片是否已加载完成
   const timerRef = useRef<ReturnType<typeof setTimeout>>()
   const isMountedRef = useRef(false)
 
@@ -221,11 +220,6 @@ export default function GamePage() {
   // 下一关
   const handleNextLevel = () => {
     loadNextLevel()
-  }
-
-  // 通关后重新开始游戏（重新加载图片）
-  const handleRestartAll = () => {
-    restartGame()
   }
 
   // 获取需要交换的两个图块
@@ -670,15 +664,18 @@ export default function GamePage() {
       {isGameCompleted && (
         <View className="victory-modal">
           <View className="victory-content">
-            <Text className="block victory-title" style={{ color: '#F59E0B' }}>🎉 恭喜通关！</Text>
+            <Text className="block victory-title" style={{ color: '#F59E0B' }}>🎉 恭喜全通！</Text>
             <Text className="block victory-time">你已经完成了所有10个关卡</Text>
             <Text className="block victory-desc">你真是个拼图高手！</Text>
             <View className="victory-buttons">
               <Button className="victory-button secondary" onClick={handleBackHome}>
                 返回首页
               </Button>
-              <Button className="victory-button primary" onClick={handleRestartAll}>
-                重新开始（新图片）
+              <Button className="victory-button primary" onClick={() => {
+                Taro.redirectTo({ url: '/pages/surprise/index' })
+              }}
+              >
+                领取惊喜 🎁
               </Button>
             </View>
           </View>
