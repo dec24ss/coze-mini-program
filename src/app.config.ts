@@ -2,7 +2,8 @@ export default defineAppConfig({
   pages: [
     'pages/loading/index',
     'pages/index/index',
-    'pages/game/index'
+    'pages/game/index',
+    'pages/level-select/index'
   ],
   window: {
     backgroundTextStyle: 'light',
