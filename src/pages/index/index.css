@@ -16,15 +16,15 @@
 }
 
 .home-title {
-  font-size: 48px;
+  font-size: 56px;
   font-weight: 700;
   color: #3B82F6;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   text-align: center;
 }
 
 .home-subtitle {
-  font-size: 18px;
+  font-size: 22px;
   color: #6B7280;
   margin-bottom: 48px;
   text-align: center;
@@ -35,8 +35,8 @@
   background: #3B82F6;
   color: white;
   border-radius: 9999px;
-  padding: 16px;
-  font-size: 18px;
+  padding: 18px;
+  font-size: 20px;
   font-weight: 600;
   box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
   border: none;
