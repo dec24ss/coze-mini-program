@@ -36,6 +36,7 @@ interface GameState {
   imagesLoaded: number           // 已加载的图片数量
   isImagesLoading: boolean       // 是否正在加载图片
   isImagesPreloaded: boolean     // 图片是否已预加载并缓存
+  levelImageMap: Record<number, string>  // 每一关的图片映射（预先规划好每一关用哪张图片）
 
   // 计时相关
   startTime: number              // 开始时间戳
@@ -76,7 +77,7 @@ interface GameState {
 }
 
 // 关卡配置生成器
-function getLevelConfig(level: number, imageList: string[]): LevelConfig {
+function getLevelConfig(level: number, imageList: string[], levelImageMap: Record<number, string>): LevelConfig {
   let gridSize: number
 
   // 关卡难度规则：
@@ -94,11 +95,19 @@ function getLevelConfig(level: number, imageList: string[]): LevelConfig {
     gridSize = 6   // 第10关：6×6（最终挑战）
   }
 
-  // 使用预加载的图片列表
-  // 根据关卡循环使用不同的图片
-  const imageUrl = imageList.length > 0
-    ? imageList[(level - 1) % imageList.length]
-    : 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1440&fit=crop&q=80' // 默认图片
+  // 使用预先规划的每一关的图片映射
+  // 如果映射不存在（兼容旧代码），则使用原来的逻辑
+  let imageUrl: string
+  if (levelImageMap[level]) {
+    imageUrl = levelImageMap[level]
+    console.log(`🖼️  关卡 ${level} 使用预先规划的图片`)
+  } else {
+    // 降级逻辑：使用预加载的图片列表
+    imageUrl = imageList.length > 0
+      ? imageList[(level - 1) % imageList.length]
+      : 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1440&fit=crop&q=80' // 默认图片
+    console.log(`🖼️  关卡 ${level} 使用动态计算的图片（降级逻辑）`)
+  }
 
   return {
     level,
@@ -122,6 +131,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   imagesLoaded: 0,
   isImagesLoading: false,
   isImagesPreloaded: false,
+  levelImageMap: {},  // 每一关的图片映射
   startTime: 0,
   countdownTime: 180,
   isTimeFrozen: false,
@@ -182,11 +192,22 @@ export const useGameStore = create<GameState>((set, get) => ({
         await Promise.all(serverImages.map((url, index) => loadImagePromise(url, index)))
 
         console.log(`✅ 所有图片加载完成，成功 ${loadedCount}/${serverImages.length}`)
+
+        // 预先规划每一关用哪张图片
+        // 前10关使用前10张图片，如果图片不够则循环使用
+        const levelImageMap: Record<number, string> = {}
+        for (let i = 0; i < 10; i++) {
+          const imageIndex = i % loadedImages.length
+          levelImageMap[i + 1] = loadedImages[imageIndex]
+          console.log(`📋 关卡 ${i + 1} 使用图片 ${imageIndex + 1}: ${loadedImages[imageIndex].substring(0, 50)}...`)
+        }
+
         set({
           imageList: loadedImages,
           imagesLoaded: serverImages.length,
           isImagesLoading: false,
-          isImagesPreloaded: true  // 标记图片已预加载完成
+          isImagesPreloaded: true,  // 标记图片已预加载完成
+          levelImageMap  // 保存每一关的图片映射
         })
       } else {
         throw new Error('服务器返回数据格式错误')
@@ -205,13 +226,14 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // 开始游戏
   startGame: async (level: number) => {
-    const { imageList } = get()
-    const config = getLevelConfig(level, imageList)
+    const { imageList, levelImageMap } = get()
+    const config = getLevelConfig(level, imageList, levelImageMap)
 
     console.log('🎮 开始游戏，关卡:', config.level)
     console.log('🖼️  图片 URL:', config.imageUrl)
     console.log('📋 imageList 长度:', imageList.length)
     console.log('📋 imageList 第一张:', imageList[0]?.substring(0, 50) || '空')
+    console.log('📋 levelImageMap:', levelImageMap)
 
     set({
       currentLevel: config.level,
@@ -427,7 +449,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       startTime: 0,
       countdownTime: 180,
       isTimeFrozen: false,
-      freezeTimeRemaining: 0
+      freezeTimeRemaining: 0,
+      levelImageMap: {}  // 清空关卡图片映射
     })
 
     // 重新加载新图片

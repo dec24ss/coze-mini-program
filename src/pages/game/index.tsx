@@ -44,6 +44,7 @@ export default function GamePage() {
   const [draggingPiece, setDraggingPiece] = useState<any>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [containerRect, setContainerRect] = useState<{ left: number; top: number; width: number; height: number }>({ left: 0, top: 0, width: 0, height: 0 })
+  const [isImageLoaded, setIsImageLoaded] = useState(false)  // 图片是否已加载完成
   const timerRef = useRef<ReturnType<typeof setTimeout>>()
   const isMountedRef = useRef(false)
 
@@ -64,6 +65,33 @@ export default function GamePage() {
       isMountedRef.current = false
     }
   }, [isWeapp])
+
+  // 监听图片 URL 变化，预加载图片
+  useEffect(() => {
+    if (imageUrl) {
+      console.log('🖼️  监听到图片 URL 变化:', imageUrl)
+      setIsImageLoaded(false)  // 先重置为未加载
+
+      // 使用 Taro.getImageInfo 确保图片已缓存
+      Taro.getImageInfo({
+        src: imageUrl
+      }).then((res) => {
+        console.log('✅ 图片已缓存:', res.path)
+        // 图片缓存后，再等待一小段时间确保图片已渲染
+        setTimeout(() => {
+          setIsImageLoaded(true)
+          console.log('✅ 图片已渲染完成，显示拼图')
+        }, 300)  // 给图片渲染预留 300ms
+      }).catch((error) => {
+        console.error('❌ 图片缓存失败:', error)
+        // 即使失败也显示拼图（使用原始 URL）
+        setTimeout(() => {
+          setIsImageLoaded(true)
+          console.log('⚠️  图片缓存失败，直接显示拼图')
+        }, 300)
+      })
+    }
+  }, [imageUrl])
 
   // 获取容器位置信息
   const getContainerRect = (): Promise<{ left: number; top: number; width: number; height: number } | null> => {
@@ -411,7 +439,20 @@ export default function GamePage() {
           </View>
         ) : (
           <View className="puzzle-container">
-            <View className="puzzle-board">
+            {/* 图片加载动画 */}
+            {!isImageLoaded && (
+              <View className="loading-overlay">
+                <Text className="block loading-text">图片加载中...</Text>
+              </View>
+            )}
+
+            <View
+              className="puzzle-board"
+              style={{
+                opacity: isImageLoaded ? 1 : 0,
+                transition: 'opacity 0.3s ease-in-out'
+              }}
+            >
               {/* 拼图碎片将由 JS 动态渲染 */}
               <View className="puzzle-grid">
                 {pieces.map((piece) => {
