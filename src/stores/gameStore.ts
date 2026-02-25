@@ -28,6 +28,11 @@ interface GameState {
   isFailed: boolean              // 是否失败
   isLoading: boolean             // 是否加载中
 
+  // 图片资源
+  imageList: string[]            // 图片列表（预加载的10张图片）
+  imagesLoaded: number           // 已加载的图片数量
+  isImagesLoading: boolean       // 是否正在加载图片
+
   // 计时相关
   startTime: number              // 开始时间戳
   countdownTime: number          // 倒计时剩余时间（秒）
@@ -48,6 +53,7 @@ interface GameState {
   freezeCount: number            // 冻结时间使用次数（最多1次）
 
   // 动作方法
+  preloadImages: () => Promise<void>
   startGame: (level: number) => Promise<void>
   resetGame: () => void
   selectPiece: (piece: PuzzlePiece) => void
@@ -65,7 +71,7 @@ interface GameState {
 }
 
 // 关卡配置生成器
-function getLevelConfig(level: number): LevelConfig {
+function getLevelConfig(level: number, imageList: string[]): LevelConfig {
   let gridSize: number
 
   // 关卡难度规则：从 3×3 开始逐步升高
@@ -91,26 +97,11 @@ function getLevelConfig(level: number): LevelConfig {
     gridSize = 12  // 第10关及以后：12×12（最高难度）
   }
 
-  // 使用宫崎骏动漫风格手绘图片（竖屏）- 人物、动物、风景混合
-  // 每次打开小程序都会随机打乱图片顺序
-  const ghibliStyleImages = [
-    'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1440&fit=crop', // 动漫风格蓝天
-    'https://images.unsplash.com/photo-1563089145-599997674d42?w=1080&h=1440&fit=crop', // 卡通云朵
-    'https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=1080&h=1440&fit=crop', // 艺术绘画
-    'https://images.unsplash.com/photo-1514539079130-25950c84af65?w=1080&h=1440&fit=crop', // 手绘风格
-    'https://images.unsplash.com/photo-1574169208507-84376144848b?w=1080&h=1440&fit=crop', // 插画风格
-    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1080&h=1440&fit=crop', // 卡通插画
-    'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?w=1080&h=1440&fit=crop', // 艺术画作
-    'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1080&h=1440&fit=crop', // 动漫风景
-    'https://images.unsplash.com/photo-1549490349-8643362247b5?w=1080&h=1440&fit=crop', // 手绘云朵
-    'https://images.unsplash.com/photo-1528360983277-13d9b152c611?w=1080&h=1440&fit=crop'  // 艺术云彩
-  ]
-
-  // 随机打乱图片数组，每次打开小程序图片顺序都不同
-  const shuffledImages = [...ghibliStyleImages].sort(() => Math.random() - 0.5)
-
+  // 使用预加载的图片列表
   // 根据关卡循环使用不同的图片
-  const imageUrl = shuffledImages[(level - 1) % shuffledImages.length]
+  const imageUrl = imageList.length > 0
+    ? imageList[(level - 1) % imageList.length]
+    : 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1440&fit=crop&q=80' // 默认图片
 
   return {
     level,
@@ -129,6 +120,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   isComplete: false,
   isFailed: false,
   isLoading: false,
+  imageList: [],
+  imagesLoaded: 0,
+  isImagesLoading: false,
   startTime: 0,
   countdownTime: 180,
   isTimeFrozen: false,
@@ -141,9 +135,65 @@ export const useGameStore = create<GameState>((set, get) => ({
   originalImageCount: 0,
   freezeCount: 0,
 
+  // 预加载图片
+  preloadImages: async () => {
+    set({ isImagesLoading: true, imagesLoaded: 0, imageList: [] })
+
+    // 手绘、卡通风格，明暗对比强烈，场景复杂的图片
+    const imageUrls = [
+      'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1440&fit=crop&q=80', // 动漫风格蓝天
+      'https://images.unsplash.com/photo-1563089145-599997674d42?w=1080&h=1440&fit=crop&q=80', // 卡通云朵
+      'https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=1080&h=1440&fit=crop&q=80', // 艺术绘画
+      'https://images.unsplash.com/photo-1514539079130-25950c84af65?w=1080&h=1440&fit=crop&q=80', // 手绘风格
+      'https://images.unsplash.com/photo-1574169208507-84376144848b?w=1080&h=1440&fit=crop&q=80', // 插画风格
+      'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1080&h=1440&fit=crop&q=80', // 卡通插画
+      'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?w=1080&h=1440&fit=crop&q=80', // 艺术画作
+      'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1080&h=1440&fit=crop&q=80', // 动漫风景
+      'https://images.unsplash.com/photo-1549490349-8643362247b5?w=1080&h=1440&fit=crop&q=80', // 手绘云朵
+      'https://images.unsplash.com/photo-1528360983277-13d9b152c611?w=1080&h=1440&fit=crop&q=80'  // 艺术云彩
+    ]
+
+    // 随机打乱图片顺序
+    const shuffledImages = imageUrls.sort(() => Math.random() - 0.5)
+
+    const loadedImages: string[] = []
+    let loadedCount = 0
+
+    // 预加载每张图片
+    const loadImagePromise = (url: string, index: number): Promise<void> => {
+      return new Promise((resolve) => {
+        const img = new Image()
+        img.onload = () => {
+          loadedImages[index] = url
+          loadedCount++
+          set({ imagesLoaded: loadedCount })
+          resolve()
+        }
+        img.onerror = () => {
+          // 加载失败也继续
+          loadedImages[index] = url
+          loadedCount++
+          set({ imagesLoaded: loadedCount })
+          resolve()
+        }
+        img.src = url
+      })
+    }
+
+    // 并行加载所有图片
+    await Promise.all(shuffledImages.map((url, index) => loadImagePromise(url, index)))
+
+    set({
+      imageList: loadedImages,
+      imagesLoaded: 10,
+      isImagesLoading: false
+    })
+  },
+
   // 开始游戏
   startGame: async (level: number) => {
-    const config = getLevelConfig(level)
+    const { imageList } = get()
+    const config = getLevelConfig(level, imageList)
 
     set({
       currentLevel: config.level,
