@@ -52,6 +52,7 @@ interface GameState {
   toggleHint: () => void
   toggleOriginalImage: () => void
   updateCountdown: () => void
+  updateFreezeCountdown: () => void
   freezeTime: () => void
   checkComplete: () => boolean
   checkFailed: () => boolean
@@ -254,15 +255,19 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
   },
 
+  // 更新冻结倒计时
+  updateFreezeCountdown: () => {
+    const { isTimeFrozen, freezeTimeRemaining } = get()
+    if (isTimeFrozen && freezeTimeRemaining > 0) {
+      set({ freezeTimeRemaining: freezeTimeRemaining - 1 })
+    }
+  },
+
   // 冻结时间
   freezeTime: () => {
     const { isTimeFrozen, freezeTimeRemaining } = get()
     if (!isTimeFrozen && freezeTimeRemaining <= 0) {
       set({ isTimeFrozen: true, freezeTimeRemaining: 30 })
-      // 30秒后自动解冻
-      setTimeout(() => {
-        set({ isTimeFrozen: false, freezeTimeRemaining: 0 })
-      }, 30000)
     }
   },
 

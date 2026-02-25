@@ -29,6 +29,7 @@ export default function GamePage() {
     toggleHint,
     toggleOriginalImage,
     updateCountdown,
+    updateFreezeCountdown,
     freezeTime,
     checkComplete,
     checkFailed,
@@ -112,14 +113,11 @@ export default function GamePage() {
   useEffect(() => {
     if (isTimeFrozen && freezeTimeRemaining > 0) {
       const freezeTimer = setInterval(() => {
-        const newRemaining = Math.max(0, freezeTimeRemaining - 1)
-        if (newRemaining === 0) {
-          clearInterval(freezeTimer)
-        }
+        updateFreezeCountdown()
       }, 1000)
       return () => clearInterval(freezeTimer)
     }
-  }, [isTimeFrozen, freezeTimeRemaining])
+  }, [isTimeFrozen, freezeTimeRemaining, updateFreezeCountdown])
 
   // 格式化时间
   const formatTime = (seconds: number): string => {
@@ -371,7 +369,10 @@ export default function GamePage() {
       {/* 顶部信息栏 */}
       <View className="game-header">
         <Text className="block header-text">
-          {isTimeFrozen ? '已冻结' : ''} {formatTime(countdownTime)}
+          第{currentLevel}关
+        </Text>
+        <Text className="block header-text">
+          {formatTime(countdownTime)}
         </Text>
         {isTimeFrozen && (
           <Text className="block header-text">
@@ -506,13 +507,18 @@ export default function GamePage() {
       {/* 底部功能按钮 */}
       <View className="game-footer">
         <Button className="footer-button" onClick={handleHint}>
-          {showHint ? '隐藏' : '提示'}
+          <Text className="block button-label">提示</Text>
+          <Text className="block button-sublabel">只显示一次</Text>
         </Button>
         <Button className="footer-button" onClick={handleToggleOriginal}>
-          {showOriginalImage ? '隐藏' : '原图'}
+          <Text className="block button-label">{showOriginalImage ? '隐藏' : '原图'}</Text>
+          <Text className="block button-sublabel">查看完整图</Text>
         </Button>
         <Button className="footer-button" onClick={handleFreezeTime} disabled={isTimeFrozen || isFailed}>
-          {isTimeFrozen ? `冻结 ${freezeTimeRemaining}s` : '冻结'}
+          <Text className="block button-label">
+            {isTimeFrozen ? `${freezeTimeRemaining}s` : '冻结'}
+          </Text>
+          <Text className="block button-sublabel">暂停倒计时</Text>
         </Button>
       </View>
 
