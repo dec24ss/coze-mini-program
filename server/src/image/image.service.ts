@@ -8,39 +8,14 @@ const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
 const access = promisify(fs.access);
 
-// 30张高质量艺术风格图片URL（使用Unsplash，稳定可靠）
-const PAINTING_URLS = [
-  'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1549289524-06cf8837ace5?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1578924679036-9c6589887646?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1579789927302-5894700706f1?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1545989253-02cc26577f88?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1577720643272-265f09367456?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1579783245133-3cb47169b9b5?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1578320146475-872b7530a994?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1584716544323-8c95380d6b16?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1578320212374-9955323bcdf2?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1579783245133-3cb47169b9b5?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1578320146475-872b7530a994?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1578320212374-9955323bcdf2?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1579783245133-3cb47169b9b5?w=1200&h=1600&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1578320146475-872b7530a994?w=1200&h=1600&fit=crop&q=80'
-]
+// 30张高质量艺术风格图片URL（使用Lorem Picsum，最稳定可靠）
+// Lorem Picsum 优点：永不会404、固定尺寸、免费无限调用、响应速度快
+const PAINTING_URLS = Array.from({ length: 30 }, (_, i) => {
+  // 使用不同的image ID确保每张图片不同
+  const imageId = 100 + i
+  // 固定尺寸 1200x1600 (3:4 比例)，适合拼图游戏
+  return `https://picsum.photos/id/${imageId}/1200/1600.jpg`
+})
 
 @Injectable()
 export class ImageService implements OnModuleInit {
