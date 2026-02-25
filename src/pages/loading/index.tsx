@@ -74,6 +74,56 @@ export default function LoadingPage() {
           />
         ))}
       </View>
+
+      {/* 预渲染拼图板（使用 backgroundImage，确保进入关卡时立即可用） */}
+      {imagesLoaded === totalImages && imageList.length > 0 && (
+        <View style={{ display: 'none' }}>
+          {/* 为前10关预渲染拼图板 */}
+          {[...Array(10)].map((_, levelIndex) => {
+            const level = levelIndex + 1
+            let gridSize = 3
+            if (level >= 4 && level <= 6) gridSize = 4
+            else if (level >= 7 && level <= 9) gridSize = 5
+            else if (level >= 10) gridSize = 6
+
+            const imageUrl = imageList[levelIndex % imageList.length]
+
+            return (
+              <View
+                key={`puzzle-board-${level}`}
+                style={{
+                  width: '300px',
+                  height: '400px',
+                  position: 'relative'
+                }}
+              >
+                {/* 预渲染所有拼图碎片 */}
+                {[...Array(gridSize * gridSize)].map((_, pieceIndex) => {
+                  const col = pieceIndex % gridSize
+                  const row = Math.floor(pieceIndex / gridSize)
+
+                  return (
+                    <View
+                      key={`piece-${level}-${pieceIndex}`}
+                      style={{
+                        position: 'absolute',
+                        width: `${100 / gridSize}%`,
+                        height: `${100 / gridSize}%`,
+                        left: `${col * (100 / gridSize)}%`,
+                        top: `${row * (100 / gridSize)}%`,
+                        backgroundImage: `url(${imageUrl})`,
+                        backgroundSize: `${gridSize * 100}%`,
+                        backgroundPosition: `${(col) * (100 / (gridSize - 1))}% ${row * (100 / (gridSize - 1))}%`,
+                        boxSizing: 'border-box'
+                      }}
+                    />
+                  )
+                })}
+              </View>
+            )
+          })}
+        </View>
+      )}
     </View>
   )
 }
