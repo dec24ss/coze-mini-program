@@ -431,6 +431,10 @@ export default function GamePage() {
                   const isPiece2Hint = nextSwapPieces?.piece2?.id === piece.id
                   const isCorrect = piece.correctIndex === piece.currentIndex
 
+                  // 如果正在拖动该图块，使用 draggingPiece 的实时位置，否则使用 piece 的位置
+                  const currentX = draggingPiece?.id === piece.id ? draggingPiece.x : piece.x
+                  const currentY = draggingPiece?.id === piece.id ? draggingPiece.y : piece.y
+
                   return (
                     <View
                       key={piece.id}
@@ -438,8 +442,8 @@ export default function GamePage() {
                       style={{
                         width: `${100 / gridSize}%`,
                         height: `${100 / gridSize}%`,
-                        left: `${piece.x}%`,
-                        top: `${piece.y}%`
+                        left: `${currentX}%`,
+                        top: `${currentY}%`
                       }}
                     />
                   )
