@@ -145,12 +145,16 @@ export default function GamePage() {
     loadNextLevel()
   }
 
-  // 获取下一个应该移动的图块（第一个位置错误的图块）
-  const getNextIncorrectPiece = () => {
+  // 获取需要交换的两个图块
+  const getNextSwapPieces = () => {
     for (let i = 0; i < pieces.length; i++) {
       const piece = pieces.find(p => p.currentIndex === i)
       if (piece && piece.correctIndex !== i) {
-        return piece
+        // 找到这个图块正确位置上的图块
+        const targetPiece = pieces.find(p => p.currentIndex === piece.correctIndex)
+        if (targetPiece && targetPiece.id !== piece.id) {
+          return { piece1: piece, piece2: targetPiece }
+        }
       }
     }
     return null
@@ -371,10 +375,36 @@ export default function GamePage() {
               <View className="puzzle-grid">
                 {pieces.map((piece) => {
                   const pieceSize = 100 / gridSize
+                  const isCorrect = piece.correctIndex === piece.currentIndex
+
+                  // 检查相邻的正确位置图块
+                  const correctPieceBelow = pieces.find(
+                    p => p.correctIndex === p.currentIndex && p.correctIndex === piece.correctIndex + gridSize
+                  )
+                  const correctPieceRight = pieces.find(
+                    p => p.correctIndex === p.currentIndex && p.correctIndex === piece.correctIndex + 1 &&
+                         Math.floor(piece.correctIndex / gridSize) === Math.floor((piece.correctIndex + 1) / gridSize)
+                  )
+
+                  // 构建边框样式（隐藏正确位置之间的网格线）
+                  let borderStyle = {}
+                  if (isCorrect) {
+                    const borderParts: string[] = []
+                    if (!correctPieceRight) borderParts.push('2px solid rgba(16, 185, 129, 0.6)')
+                    else borderParts.push('0 solid transparent')
+                    const borderStr = borderParts.join(' ')
+                    borderStyle = {
+                      borderTop: '2px solid rgba(16, 185, 129, 0.6)',
+                      borderLeft: '2px solid rgba(16, 185, 129, 0.6)',
+                      borderBottom: correctPieceBelow ? '0 solid transparent' : '2px solid rgba(16, 185, 129, 0.6)',
+                      borderRight: borderStr
+                    }
+                  }
+
                   return (
                     <View
                       key={piece.id}
-                      className={`puzzle-piece ${selectedPiece?.id === piece.id ? 'selected' : ''}`}
+                      className={`puzzle-piece ${selectedPiece?.id === piece.id ? 'selected' : ''} ${isCorrect ? 'correct-position' : ''}`}
                       style={{
                         width: `${pieceSize}%`,
                         height: `${pieceSize}%`,
@@ -382,7 +412,8 @@ export default function GamePage() {
                         top: `${piece.y}%`,
                         backgroundImage: `url(${imageUrl})`,
                         backgroundSize: `${gridSize * 100}%`,
-                        backgroundPosition: `${(piece.correctIndex % gridSize) * (100 / (gridSize - 1))}% ${Math.floor(piece.correctIndex / gridSize) * (100 / (gridSize - 1))}%`
+                        backgroundPosition: `${(piece.correctIndex % gridSize) * (100 / (gridSize - 1))}% ${Math.floor(piece.correctIndex / gridSize) * (100 / (gridSize - 1))}%`,
+                        ...borderStyle
                       }}
                       onTouchStart={(e) => handleTouchStart(e, piece)}
                       onTouchMove={handleTouchMove}
@@ -393,22 +424,24 @@ export default function GamePage() {
               </View>
             </View>
 
-            {/* 提示显示正确位置的边框 */}
+            {/* 提示显示需要交换的两个图块 */}
             {showHint && (
               <View className="hint-overlay">
-                {Array.from({ length: gridSize * gridSize }).map((_, index) => {
-                  const piece = pieces.find(p => p.correctIndex === index)
-                  const isCorrect = piece?.currentIndex === index
-                  const nextIncorrectPiece = getNextIncorrectPiece()
-                  const isNextTarget = nextIncorrectPiece?.correctIndex === index
+                {pieces.map((piece) => {
+                  const nextSwapPieces = getNextSwapPieces()
+                  const isPiece1Hint = nextSwapPieces?.piece1?.id === piece.id
+                  const isPiece2Hint = nextSwapPieces?.piece2?.id === piece.id
+                  const isCorrect = piece.correctIndex === piece.currentIndex
 
                   return (
                     <View
-                      key={index}
-                      className={`hint-cell ${isCorrect ? 'correct' : ''} ${isNextTarget ? 'next-target' : ''}`}
+                      key={piece.id}
+                      className={`hint-cell ${isCorrect ? 'correct' : ''} ${isPiece1Hint || isPiece2Hint ? 'swap-hint' : ''}`}
                       style={{
                         width: `${100 / gridSize}%`,
-                        height: `${100 / gridSize}%`
+                        height: `${100 / gridSize}%`,
+                        left: `${piece.x}%`,
+                        top: `${piece.y}%`
                       }}
                     />
                   )
