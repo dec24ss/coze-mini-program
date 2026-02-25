@@ -80,17 +80,26 @@ function getLevelConfig(level: number): LevelConfig {
     gridSize = 12  // 第10关及以后：12×12（最高难度）
   }
 
-  // 使用南湾湖风格风景图片（竖屏）- 湖泊、岛屿、山水
-  const nanwanLakeImages = [
-    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1080&h=1440&fit=crop', // 湖泊山水
-    'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1080&h=1440&fit=crop', // 山湖风景
-    'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=1080&h=1440&fit=crop', // 湖岛风光
-    'https://images.unsplash.com/photo-1501854140884-074cf2b21d25?w=1080&h=1440&fit=crop', // 湖泊远景
-    'https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=1080&h=1440&fit=crop'  // 湖水倒影
+  // 使用宫崎骏卡通风格图片（竖屏）- 蓝天、森林、花海、治愈系风景
+  // 每次打开小程序都会随机打乱图片顺序
+  const ghibliStyleImages = [
+    'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1080&h=1440&fit=crop', // 蓝天白云田野
+    'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1080&h=1440&fit=crop', // 迷雾森林
+    'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1080&h=1440&fit=crop', // 阳光森林小径
+    'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=1080&h=1440&fit=crop', // 蓝天草地
+    'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=1080&h=1440&fit=crop', // 田园风光
+    'https://images.unsplash.com/photo-1490750967868-58cb75069ed6?w=1080&h=1440&fit=crop', // 山间田野
+    'https://images.unsplash.com/photo-1500835556837-99ac94a94552?w=1080&h=1440&fit=crop', // 蓝天白云
+    'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1080&h=1440&fit=crop', // 绿色山坡
+    'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?w=1080&h=1440&fit=crop', // 湖畔森林
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1080&h=1440&fit=crop'  // 雪山草地
   ]
 
+  // 随机打乱图片数组，每次打开小程序图片顺序都不同
+  const shuffledImages = [...ghibliStyleImages].sort(() => Math.random() - 0.5)
+
   // 根据关卡循环使用不同的图片
-  const imageUrl = nanwanLakeImages[(level - 1) % nanwanLakeImages.length]
+  const imageUrl = shuffledImages[(level - 1) % shuffledImages.length]
 
   return {
     level,
