@@ -50,3 +50,63 @@ taro-button-core::after,
 button::after {
   border: none;
 }
+
+/* ==================== 卡通字体样式 ==================== */
+
+/* 全局卡通字体 */
+text {
+  font-family: 'Fredoka One', 'Baloo 2', 'Comic Sans MS', 'Microsoft YaHei', 'YouYuan', '幼圆', sans-serif;
+  font-weight: 800;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 卡通风格文字 - 带描边、阴影和立体感 */
+.cartoon-text {
+  font-family: 'Fredoka One', 'Baloo 2', 'Comic Sans MS', 'Microsoft YaHei', 'YouYuan', '幼圆', sans-serif;
+  font-weight: 800;
+  color: #4A5568;
+  text-shadow:
+    2px 2px 0 #FF6B6B,
+    4px 4px 0 #FF6B6B,
+    -1px -1px 0 #FF6B6B,
+    1px -1px 0 #FF6B6B,
+    -1px 1px 0 #FF6B6B,
+    1px 1px 0 #FF6B6B;
+  letter-spacing: 1px;
+}
+
+/* 卡通标题 - 更大更立体 */
+.cartoon-title {
+  font-family: 'Fredoka One', 'Baloo 2', 'Comic Sans MS', 'Microsoft YaHei', 'YouYuan', '幼圆', sans-serif;
+  font-weight: 800;
+  color: #2D3748;
+  text-shadow:
+    3px 3px 0 #FF6B6B,
+    6px 6px 0 rgba(255, 107, 107, 0.3),
+    -2px -2px 0 #FF6B6B,
+    2px -2px 0 #FF6B6B,
+    -2px 2px 0 #FF6B6B,
+    2px 2px 0 #FF6B6B;
+  letter-spacing: 2px;
+}
+
+/* 卡通副标题 */
+.cartoon-subtitle {
+  font-family: 'Fredoka One', 'Baloo 2', 'Comic Sans MS', 'Microsoft YaHei', 'YouYuan', '幼圆', sans-serif;
+  font-weight: 700;
+  color: #718096;
+  text-shadow:
+    1px 1px 0 rgba(255, 107, 107, 0.5);
+}
+
+/* 卡通按钮文字 */
+.cartoon-button {
+  font-family: 'Fredoka One', 'Baloo 2', 'Comic Sans MS', 'Microsoft YaHei', 'YouYuan', '幼圆', sans-serif;
+  font-weight: 800;
+  color: #FFFFFF;
+  text-shadow:
+    2px 2px 0 rgba(0, 0, 0, 0.2);
+  letter-spacing: 1px;
+}
+
