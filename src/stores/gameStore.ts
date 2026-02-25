@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { getRandomPaintings } from '@/config/images'
 
 // 拼图碎片类型
 export interface PuzzlePiece {
@@ -139,22 +140,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   preloadImages: async () => {
     set({ isImagesLoading: true, imagesLoaded: 0, imageList: [] })
 
-    // 世界名画风格图片（使用Unsplash CDN，加载速度快）
-    const imageUrls = [
-      'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800&h=1067&fit=crop&q=60', // 星空油画风格
-      'https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=800&h=1067&fit=crop&q=60', // 艺术油画
-      'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=800&h=1067&fit=crop&q=60', // 梵高风格向日葵
-      'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?w=800&h=1067&fit=crop&q=60', // 油画风格
-      'https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=800&h=1067&fit=crop&q=60', // 艺术风景
-      'https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?w=800&h=1067&fit=crop&q=60', // 莫奈风格
-      'https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=800&h=1067&fit=crop&q=60', // 艺术画作
-      'https://images.unsplash.com/photo-1561214115-f2f134cc4912?w=800&h=1067&fit=crop&q=60', // 古典油画
-      'https://images.unsplash.com/photo-1578926288207-a90a5366759d?w=800&h=1067&fit=crop&q=60', // 艺术油画风格
-      'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&h=1067&fit=crop&q=60' // 艺术画廊
-    ]
-
-    // 随机打乱图片顺序
-    const shuffledImages = imageUrls.sort(() => Math.random() - 0.5)
+    // 从100张世界名画中随机选择10张
+    const shuffledImages = getRandomPaintings(10)
 
     const loadedImages: string[] = []
     let loadedCount = 0

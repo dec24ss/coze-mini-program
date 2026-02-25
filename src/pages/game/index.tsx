@@ -458,7 +458,7 @@ export default function GamePage() {
                   return (
                     <View
                       key={piece.id}
-                      className="puzzle-piece-outer"
+                      className={`puzzle-piece-outer ${piece.id === draggingPiece?.id ? 'dragging' : ''}`}
                       style={{
                         width: `${pieceSize}%`,
                         height: `${pieceSize}%`,
