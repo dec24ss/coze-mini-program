@@ -140,7 +140,12 @@ export default function GamePage() {
       Taro.showToast({ title: '提示次数已用完', icon: 'none' })
       return
     }
+    // 显示提示
     toggleHint()
+    // 3秒后自动隐藏
+    setTimeout(() => {
+      toggleHint()
+    }, 3000)
   }
 
   // 查看原图

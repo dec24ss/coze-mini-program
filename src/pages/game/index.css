@@ -21,7 +21,7 @@
 /* 顶部信息栏 */
 .game-header {
   position: fixed;
-  top: 50px; /* 距离屏幕上边缘50px */
+  top: 250px; /* 距离屏幕上边缘250px */
   left: 0;
   right: 0;
   display: flex;
@@ -169,15 +169,13 @@
 /* 底部功能按钮 */
 .game-footer {
   position: fixed;
-  bottom: 0;
+  bottom: 250px; /* 距离屏幕底部250px */
   left: 0;
   right: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 16px 12px;
-  background: white;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
   z-index: 50;
 }
 
@@ -185,13 +183,12 @@
   display: flex;
   width: 100%;
   max-width: 400px;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: 24px; /* 间距与按钮宽度一致 */
+  padding: 0 12px;
 }
 
 .footer-button {
-  flex: 1;
+  flex: 1; /* 宽度自适应 */
   height: 50px;
   background: #3B82F6;
   color: white;
@@ -223,8 +220,8 @@
   width: 100%;
   max-width: 400px;
   justify-content: space-between;
-  gap: 12px;
-  padding: 0 4px;
+  gap: 24px; /* 间距与按钮宽度一致 */
+  padding: 12px 12px 0;
 }
 
 .footer-rule {
