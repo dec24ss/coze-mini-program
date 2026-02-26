@@ -80,6 +80,7 @@ interface GameState {
   checkFailed: () => boolean
   loadNextLevel: () => Promise<void>
   startFreePlayMode: (level: number) => Promise<void>
+  getLevelConfig: (level: number) => { level: number; gridSize: number; imageUrl: string }
 }
 
 // 关卡配置生成器
@@ -509,5 +510,36 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     await get().preloadImages()
     await get().startGame(1)
+  },
+
+  // 获取关卡配置
+  getLevelConfig: (level: number) => {
+    const { imageList, levelImageMap } = get()
+    let gridSize: number
+
+    if (level >= 1 && level <= 3) {
+      gridSize = 3
+    } else if (level >= 4 && level <= 6) {
+      gridSize = 4
+    } else if (level >= 7 && level <= 9) {
+      gridSize = 5
+    } else {
+      gridSize = 6
+    }
+
+    let imageUrl: string
+    if (levelImageMap[level]) {
+      imageUrl = levelImageMap[level].path
+    } else {
+      imageUrl = imageList.length > 0
+        ? imageList[(level - 1) % imageList.length]
+        : 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1440&fit=crop&q=80'
+    }
+
+    return {
+      level,
+      gridSize,
+      imageUrl
+    }
   }
 }))
