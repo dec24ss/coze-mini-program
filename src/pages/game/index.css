@@ -151,16 +151,31 @@
   -webkit-user-select: none;
 }
 
+/* 拼图板 - 增强光效 */
 .puzzle-board {
   position: relative;
   width: 100%;
   height: 100%;
-  background: white;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* 拼图板完成时的光效 */
+.puzzle-board.game-complete {
+  animation: board-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes board-glow {
+  0% {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 215, 0, 0.3);
+  }
+  100% {
+    box-shadow: 0 20px 50px -5px rgba(0, 0, 0, 0.2), 0 0 0 4px rgba(255, 215, 0, 0.6), 0 0 60px rgba(255, 215, 0, 0.3);
+  }
 }
 
 .puzzle-grid {
@@ -237,22 +252,36 @@
   border: none;
 }
 
-/* 需要交换的图块边缘持续闪烁 */
+/* 需要交换的图块边缘持续闪烁 - 更华丽的版本 */
 .hint-cell.swap-hint {
   background: transparent;
-  border: 4px solid #3B82F6;
-  animation: swap-flash 0.8s ease-in-out infinite;
+  border: 5px solid #3B82F6;
+  box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6);
+  animation: swap-flash 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  z-index: 5;
 }
 
-/* 交换提示边缘闪烁动画 */
+/* 交换提示边缘闪烁动画 - 夸张版本 */
 @keyframes swap-flash {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6), 0 0 20px rgba(59, 130, 246, 0.4);
     border-color: #2563EB;
+    transform: scale(1);
+  }
+  25% {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.9), 0 0 30px rgba(59, 130, 246, 0.6);
+    border-color: #93C5FD;
+    transform: scale(1.05);
   }
   50% {
-    box-shadow: 0 0 0 12px rgba(59, 130, 246, 0.9);
-    border-color: #93C5FD;
+    box-shadow: 0 0 0 12px rgba(59, 130, 246, 1), 0 0 40px rgba(59, 130, 246, 0.8);
+    border-color: #3B82F6;
+    transform: scale(1.08);
+  }
+  75% {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.8), 0 0 30px rgba(59, 130, 246, 0.5);
+    border-color: #60A5FA;
+    transform: scale(1.03);
   }
 }
 
@@ -331,109 +360,329 @@
   z-index: 10;
 }
 
-/* 过关弹窗 */
+/* 过关弹窗 - 更华丽的动画 */
 .victory-modal {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 100;
   padding: 16px;
+  animation: modal-appear 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes modal-appear {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .victory-content {
   width: 100%;
-  max-width: 320px;
-  background: white;
-  border-radius: 20px;
-  padding: 32px 24px;
+  max-width: 340px;
+  background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);
+  border-radius: 24px;
+  padding: 40px 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 60px rgba(255, 215, 0, 0.3);
+  border: 4px solid #ffd700;
+  animation: content-bounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s both;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 胜利内容的装饰性背景 */
+.victory-content::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(255, 215, 0, 0.1), transparent 30%);
+  animation: rotate-bg 4s linear infinite;
+}
+
+@keyframes rotate-bg {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes content-bounce {
+  0% {
+    transform: scale(0.3) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.15) rotate(5deg);
+  }
+  70% {
+    transform: scale(0.9) rotate(-3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
 }
 
 .victory-title {
-  font-size: 32px; /* 字体缩小50% */
-  font-weight: 700;
-  color: #10B981;
-  margin-bottom: 20px;
+  font-size: 36px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffd700 0%, #ff6b6b 50%, #ffd700 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 24px;
   text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  animation: title-glow 2s ease-in-out infinite alternate;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes title-glow {
+  0% {
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+  }
+  100% {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 30px rgba(255, 107, 107, 0.6));
+  }
 }
 
 .victory-time {
-  font-size: 22px; /* 字体缩小50% */
+  font-size: 24px;
   color: #6B7280;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  animation: text-pop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.4s both;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes text-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .victory-desc {
-  font-size: 20px;
+  font-size: 22px;
   color: #10B981;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   text-align: center;
+  font-weight: 700;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: text-pop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.6s both;
+  position: relative;
+  z-index: 1;
 }
 
 .victory-buttons {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  animation: text-pop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.8s both;
+  position: relative;
+  z-index: 1;
 }
 
 .victory-button {
   width: 100%;
   border-radius: 9999px;
-  padding: 16px; /* 内边距恢复 */
-  font-size: 18px; /* 字体缩小50% */
-  font-weight: 600;
+  padding: 18px;
+  font-size: 20px;
+  font-weight: 700;
   border: none;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  position: relative;
+  overflow: hidden;
+}
+
+.victory-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.victory-button:hover::before {
+  left: 100%;
 }
 
 .victory-button.primary {
-  background: #3B82F6;
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   color: white;
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+.victory-button.primary:active {
+  transform: scale(0.95);
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
 }
 
 .victory-button.secondary {
-  background: #3B82F6;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
   color: white;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
 }
 
-/* 拼图交换动画 */
+.victory-button.secondary:active {
+  transform: scale(0.95);
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+}
+
+/* 拼图交换动画 - 更夸张华丽 */
 .puzzle-piece-outer.swap-anim {
-  animation: swap-pulse 0.3s ease-in-out;
+  animation: swap-pulse 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-/* 图块交换动画（使用 state 控制） */
+/* 图块交换动画（使用 state 控制） - 夸张版本 */
 .puzzle-piece-outer.animating {
-  animation: swap-pulse 0.3s ease-in-out;
+  animation: swap-pulse 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-/* 图块位置正确（使用 state 控制） */
+/* 图块位置正确（使用 state 控制） - 金色华丽版本 */
 .puzzle-piece-outer.correct {
-  animation: correct-flash 0.6s ease-in-out;
+  animation: correct-flash 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 10;
 }
 
-/* 拼图完成动画（使用 state 控制） */
+/* 拼图完成动画（使用 state 控制） - 彩虹炫彩版本 */
 .puzzle-piece-outer.complete {
-  animation: complete-flash 0.6s ease-in-out;
+  animation: complete-flash 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 20;
 }
 
+/* 交换动画 - 夸张放大缩小 + 颜色闪烁 + 旋转 */
 @keyframes swap-pulse {
   0% {
-    transform: scale(1);
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
   }
-  50% {
-    transform: scale(1.1);
+  30% {
+    transform: scale(1.25) rotate(10deg);
+    filter: brightness(1.5) saturate(1.5);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+  60% {
+    transform: scale(0.9) rotate(-10deg);
+    filter: brightness(1.2);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
   }
   100% {
-    transform: scale(1);
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+}
+
+/* 正确位置动画 - 金色边框发光 + 放大 + 旋转 + 粒子效果 */
+@keyframes correct-flash {
+  0% {
+    transform: scale(1) rotate(0deg);
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
+    filter: brightness(1);
+    z-index: 10;
+  }
+  15% {
+    transform: scale(1.3) rotate(15deg);
+    box-shadow: 0 0 0 8px rgba(251, 191, 36, 1), 0 0 30px rgba(251, 191, 36, 0.8);
+    filter: brightness(1.8) saturate(2);
+    z-index: 10;
+  }
+  30% {
+    transform: scale(1.2) rotate(-10deg);
+    box-shadow: 0 0 0 12px rgba(251, 191, 36, 0.9), 0 0 40px rgba(251, 191, 36, 0.6);
+    filter: brightness(1.5);
+    z-index: 10;
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.7), 0 0 20px rgba(251, 191, 36, 0.4);
+    filter: brightness(1.3);
+    z-index: 10;
+  }
+  75% {
+    transform: scale(1.05) rotate(-3deg);
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.5);
+    filter: brightness(1.15);
+    z-index: 10;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
+    filter: brightness(1);
+    z-index: 10;
+  }
+}
+
+/* 完成动画 - 彩虹炫彩 + 放大缩小 + 旋转 + 粒子爆炸 */
+@keyframes complete-flash {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+    z-index: 20;
+  }
+  15% {
+    transform: scale(1.4) rotate(20deg);
+    filter: brightness(2.5) saturate(3) hue-rotate(0deg);
+    box-shadow: 0 0 40px rgba(255, 215, 0, 1), 0 0 60px rgba(255, 105, 180, 0.8);
+    z-index: 20;
+  }
+  30% {
+    transform: scale(1.2) rotate(-20deg);
+    filter: brightness(2) saturate(2.5) hue-rotate(60deg);
+    box-shadow: 0 0 50px rgba(0, 255, 255, 1), 0 0 70px rgba(255, 165, 0, 0.8);
+    z-index: 20;
+  }
+  50% {
+    transform: scale(1.3) rotate(15deg);
+    filter: brightness(2.2) saturate(2.8) hue-rotate(120deg);
+    box-shadow: 0 0 45px rgba(138, 43, 226, 1), 0 0 65px rgba(255, 0, 128, 0.8);
+    z-index: 20;
+  }
+  70% {
+    transform: scale(1.1) rotate(-10deg);
+    filter: brightness(1.8) saturate(2) hue-rotate(180deg);
+    box-shadow: 0 0 35px rgba(0, 255, 127, 1), 0 0 50px rgba(255, 215, 0, 0.8);
+    z-index: 20;
+  }
+  85% {
+    transform: scale(1.05) rotate(5deg);
+    filter: brightness(1.5) saturate(1.5) hue-rotate(240deg);
+    box-shadow: 0 0 25px rgba(0, 191, 255, 0.8);
+    z-index: 20;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1.2);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+    z-index: 20;
   }
 }
 
@@ -488,7 +737,7 @@
   }
 }
 
-/* 完成时的烟花效果 */
+/* 完成时的烟花效果 - 更华丽的版本 */
 .victory-modal::before {
   content: '';
   position: absolute;
@@ -496,9 +745,41 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, transparent 70%);
-  animation: firework 1s ease-out;
+  background: radial-gradient(circle at center, rgba(255, 215, 0, 0.4) 0%, rgba(255, 107, 107, 0.2) 30%, transparent 70%);
+  animation: firework 2s ease-out infinite;
   pointer-events: none;
+  z-index: -1;
+}
+
+/* 添加多个烟花粒子 */
+.victory-modal::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 30%;
+  width: 10px;
+  height: 10px;
+  background: #ffd700;
+  border-radius: 50%;
+  box-shadow:
+    0 0 20px #ffd700,
+    0 0 40px #ff6b6b,
+    0 0 60px #4ecdc4,
+    50px 50px 0 #ff6b6b,
+    50px 50px 20px #ff6b6b,
+    50px 50px 40px #ffd700,
+    -50px 30px 0 #4ecdc4,
+    -50px 30px 20px #4ecdc4,
+    -50px 30px 40px #ff6b6b,
+    30px -50px 0 #ffd700,
+    30px -50px 20px #ffd700,
+    30px -50px 40px #4ecdc4,
+    -30px -40px 0 #ff6b6b,
+    -30px -40px 20px #ff6b6b,
+    -30px -40px 40px #ffd700;
+  animation: particles 1.5s ease-out infinite;
+  pointer-events: none;
+  z-index: -1;
 }
 
 @keyframes firework {
@@ -506,12 +787,31 @@
     transform: scale(0);
     opacity: 1;
   }
-  50% {
-    transform: scale(1.2);
-    opacity: 0.8;
+  30% {
+    transform: scale(1.3);
+    opacity: 0.9;
+  }
+  60% {
+    transform: scale(1.5);
+    opacity: 0.7;
   }
   100% {
     transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes particles {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(20px, -30px) scale(1.5);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(40px, -60px) scale(0);
     opacity: 0;
   }
 }

@@ -747,7 +747,7 @@ export default function GamePage() {
             )}
 
             <View
-              className="puzzle-board"
+              className={`puzzle-board ${showCompleteAnimation ? 'game-complete' : ''}`}
               style={{
                 opacity: isImageLoaded ? 1 : 0,
                 transition: 'opacity 0.3s ease-in-out'
