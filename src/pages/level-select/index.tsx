@@ -8,7 +8,7 @@ import { Lock } from 'lucide-react-taro'
 import './index.css'
 
 export default function LevelSelectPage() {
-  const { levelImageMap, isImagesPreloaded, startGame } = useGameStore()
+  const { levelImageMap, isImagesPreloaded } = useGameStore()
   const { userInfo, isLoggedIn, unlockedLevels, levelImages } = useUserStore()
   const { initSettings } = useSettingsStore()
   const [displayLevels, setDisplayLevels] = useState(20)  // 默认显示20关
@@ -50,19 +50,23 @@ export default function LevelSelectPage() {
       const isCompleted = level <= userInfo.highestLevel  // 已过关
       const isChallenge = level === userInfo.highestLevel + 1  // 正在挑战
 
+      let isFreeMode = false
+
       if (isChallenge) {
         // 正在挑战的关卡：正常模式（有倒计时，记录进度）
-        await startGame(level, false)
+        isFreeMode = false
       } else if (isCompleted) {
         // 已过关的关卡：自由模式（无倒计时，不记录进度）
-        await startGame(level, true)
+        isFreeMode = true
       } else {
         // 其他情况：自由模式
-        await startGame(level, true)
+        isFreeMode = true
       }
 
+      // 跳转到游戏页面，并传递 mode 参数
+      const url = `/pages/game/index?mode=${isFreeMode ? 'free' : 'normal'}&level=${level}`
       Taro.hideLoading()
-      Taro.redirectTo({ url: '/pages/game/index' })
+      Taro.redirectTo({ url })
     } catch (error) {
       Taro.hideLoading()
       Taro.showToast({ title: '加载失败', icon: 'none' })

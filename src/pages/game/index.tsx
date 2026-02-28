@@ -147,12 +147,17 @@ export default function GamePage() {
         console.log('✅ 图片预加载完成')
       }
 
-      // 获取当前应该开始的关卡（从最后未完成关卡开始）
-      const level = getCurrentLevel()
-      console.log(`🎮 从第 ${level} 关开始游戏（正常模式）`)
+      // 从页面参数获取关卡和模式（选择关卡进入自由模式）
+      const pages = Taro.getCurrentPages()
+      const currentPage = pages[pages.length - 1]
+      const { mode, level } = currentPage.$route.options
 
-      // 开始游戏（正常模式）
-      startGame(level, false)
+      // 获取当前应该开始的关卡（从最后未完成关卡开始）
+      const startLevel = level ? parseInt(level, 10) : getCurrentLevel()
+      console.log(`🎮 从第 ${startLevel} 关开始游戏（mode=${mode || 'normal'}）`)
+
+      // 开始游戏
+      startGame(startLevel, mode === 'free')
     }
 
     initGame()
