@@ -4,7 +4,6 @@ import Taro, { useRouter } from '@tarojs/taro'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
-import { Network } from '@/network'
 import './index.css'
 
 export default function GamePage() {
@@ -27,7 +26,6 @@ export default function GamePage() {
     currentLevel,
     gridSize,
     imageUrl,
-    originalImageUrl,
     isPlaying,
     isComplete,
     isFailed,
@@ -306,67 +304,97 @@ export default function GamePage() {
 
     Taro.showLoading({ title: '生成图片中...' })
 
-    // 使用原始网络图片URL（拼完后的图就是原图）
-    const downloadUrl = originalImageUrl || imageUrl
-
-    if (!downloadUrl || downloadUrl.startsWith('wxfile://') || downloadUrl.startsWith('data:')) {
-      Taro.hideLoading()
-      Taro.showToast({ title: '无法保存此图片', icon: 'none' })
-      return
-    }
-
-    // 下载原始图片（拼完后的图片就是原始图片）
-    Network.downloadFile({
-      url: downloadUrl,
-      success: (res) => {
-        Taro.hideLoading()
+    // 获取图片信息
+    Taro.getImageInfo({
+      src: imageUrl,
+      success: (imgInfo) => {
+        const { width, height } = imgInfo
 
         // 创建 Canvas 来绘制完整的图片
         const canvasId = 'saveCanvas'
         const ctx = Taro.createCanvasContext(canvasId)
 
-        // 获取图片信息
-        Taro.getImageInfo({
-          src: res.tempFilePath,
-          success: (imgInfo) => {
-            const { width, height } = imgInfo
+        // 设置 Canvas 尺寸为图片的实际尺寸
+        // 注意：小程序 Canvas 的最大尺寸有限制，可能需要缩放
+        let canvasWidth = width
+        let canvasHeight = height
 
-            // 设置 Canvas 尺寸
-            ctx.drawImage(res.tempFilePath, 0, 0, width, height)
-            ctx.draw(false, () => {
-              // 将 Canvas 导出为临时图片
-              Taro.canvasToTempFilePath({
-                canvasId,
-                success: (canvasRes) => {
-                  // 保存到相册
-                  Taro.saveImageToPhotosAlbum({
-                    filePath: canvasRes.tempFilePath,
-                    success: () => {
-                      Taro.showToast({ title: '保存成功', icon: 'success' })
-                    },
-                    fail: (err) => {
-                      console.error('保存到相册失败:', err)
-                      Taro.showToast({ title: '保存失败，请授权相册权限', icon: 'none' })
-                    }
-                  })
-                },
-                fail: (err) => {
-                  console.error('Canvas 导出失败:', err)
-                  Taro.showToast({ title: '生成图片失败', icon: 'none' })
-                }
-              })
+        // 如果图片太大，按比例缩小（小程序 Canvas 最大尺寸限制）
+        const MAX_SIZE = 2048
+        if (canvasWidth > MAX_SIZE || canvasHeight > MAX_SIZE) {
+          const ratio = Math.min(MAX_SIZE / canvasWidth, MAX_SIZE / canvasHeight)
+          canvasWidth = Math.floor(canvasWidth * ratio)
+          canvasHeight = Math.floor(canvasHeight * ratio)
+        }
+
+        // 计算每个图块的尺寸
+        const pieceWidth = canvasWidth / gridSize
+        const pieceHeight = canvasHeight / gridSize
+
+        // 绘制每个图块（模拟拼图完成后的效果）
+        pieces.forEach((piece) => {
+          // 计算图块在当前的位置（currentIndex）
+          const currentCol = piece.currentIndex % gridSize
+          const currentRow = Math.floor(piece.currentIndex / gridSize)
+
+          // 计算图块应该在的位置（correctIndex）
+          const correctCol = piece.correctIndex % gridSize
+          const correctRow = Math.floor(piece.correctIndex / gridSize)
+
+          // 计算源图像的裁剪区域（correctIndex 对应的部分）
+          const sourceX = (correctCol * width) / gridSize
+          const sourceY = (correctRow * height) / gridSize
+          const sourceW = width / gridSize
+          const sourceH = height / gridSize
+
+          // 计算目标 Canvas 的绘制位置（currentIndex 对应的位置）
+          const destX = currentCol * pieceWidth
+          const destY = currentRow * pieceHeight
+
+          // 绘制图块到 Canvas
+          ctx.drawImage(
+            imageUrl, // 源图片
+            sourceX, sourceY, sourceW, sourceH, // 源裁剪区域
+            destX, destY, pieceWidth, pieceHeight // 目标绘制区域
+          )
+        })
+
+        // 绘制完成后导出图片
+        ctx.draw(false, () => {
+          setTimeout(() => {
+            Taro.canvasToTempFilePath({
+              canvasId,
+              x: 0,
+              y: 0,
+              width: canvasWidth,
+              height: canvasHeight,
+              success: (canvasRes) => {
+                Taro.hideLoading()
+                // 保存到相册
+                Taro.saveImageToPhotosAlbum({
+                  filePath: canvasRes.tempFilePath,
+                  success: () => {
+                    Taro.showToast({ title: '保存成功', icon: 'success' })
+                  },
+                  fail: (err) => {
+                    console.error('保存到相册失败:', err)
+                    Taro.showToast({ title: '保存失败，请授权相册权限', icon: 'none' })
+                  }
+                })
+              },
+              fail: (err) => {
+                Taro.hideLoading()
+                console.error('Canvas 导出失败:', err)
+                Taro.showToast({ title: '生成图片失败', icon: 'none' })
+              }
             })
-          },
-          fail: (err) => {
-            console.error('获取图片信息失败:', err)
-            Taro.showToast({ title: '生成图片失败', icon: 'none' })
-          }
+          }, 100)
         })
       },
       fail: (err) => {
         Taro.hideLoading()
-        console.error('下载图片失败:', err)
-        Taro.showToast({ title: '下载图片失败', icon: 'none' })
+        console.error('获取图片信息失败:', err)
+        Taro.showToast({ title: '获取图片失败', icon: 'none' })
       }
     })
   }
@@ -994,8 +1022,8 @@ export default function GamePage() {
           position: 'fixed',
           left: '-9999px',
           top: '-9999px',
-          width: '750px',
-          height: '1000px'
+          width: '2048px',
+          height: '2048px'
         }}
       />
 
