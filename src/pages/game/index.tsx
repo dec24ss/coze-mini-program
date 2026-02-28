@@ -14,6 +14,7 @@ export default function GamePage() {
     currentLevel,
     gridSize,
     imageUrl,
+    originalImageUrl,
     isPlaying,
     isComplete,
     isFailed,
@@ -227,7 +228,8 @@ export default function GamePage() {
     }
     
     // 正式模式：更新进度和积分
-    await updateHighestLevel(currentLevel)
+    // 保存当前关卡对应的图片
+    await updateHighestLevel(currentLevel, imageUrl)
     // 过关获得1积分
     addPoints(1)
     Taro.showToast({ title: '获得 1 积分！', icon: 'none' })
@@ -264,10 +266,11 @@ export default function GamePage() {
     Taro.redirectTo({ url: '/pages/level-select/index' })
   }
 
-  // 下载原图（消耗1积分）
+  // 下载原图（消耗1积分，失败不扣积分）
   const handleDownloadImage = () => {
     // 检查积分
-    if (!consumePoints(1)) {
+    const currentPoints = getPoints()
+    if (currentPoints < 1) {
       Taro.showModal({
         title: '积分不足',
         content: '下载原图需要1积分，过关可获得积分，是否继续游戏赚取积分？',
@@ -278,23 +281,37 @@ export default function GamePage() {
       return
     }
     
-    Taro.showToast({ title: '使用1积分下载原图', icon: 'none' })
+    // 使用原始网络图片URL下载
+    const downloadUrl = originalImageUrl || imageUrl
+    
+    if (!downloadUrl || downloadUrl.startsWith('wxfile://') || downloadUrl.startsWith('data:')) {
+      Taro.showToast({ title: '无法下载此图片', icon: 'none' })
+      return
+    }
+    
+    Taro.showLoading({ title: '下载中...' })
     
     Network.downloadFile({
-      url: imageUrl,
+      url: downloadUrl,
       success: (res) => {
+        Taro.hideLoading()
         Taro.saveImageToPhotosAlbum({
           filePath: res.tempFilePath,
           success: () => {
-            Taro.showToast({ title: '保存成功', icon: 'success' })
+            // 下载成功后才扣除积分
+            consumePoints(1)
+            Taro.showToast({ title: '保存成功，消耗1积分', icon: 'success' })
           },
-          fail: () => {
-            Taro.showToast({ title: '保存失败', icon: 'none' })
+          fail: (err) => {
+            console.error('保存到相册失败:', err)
+            Taro.showToast({ title: '保存失败，请授权相册权限', icon: 'none' })
           }
         })
       },
-      fail: () => {
-        Taro.showToast({ title: '下载失败', icon: 'none' })
+      fail: (err) => {
+        Taro.hideLoading()
+        console.error('下载图片失败:', err)
+        Taro.showToast({ title: '下载失败，请重试', icon: 'none' })
       }
     })
   }

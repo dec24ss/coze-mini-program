@@ -7,7 +7,7 @@ import './index.css'
 
 export default function LevelSelectPage() {
   const { levelImageMap, isImagesPreloaded, startGame, startFreePlayMode } = useGameStore()
-  const { userInfo, isLoggedIn, unlockedLevels } = useUserStore()
+  const { userInfo, isLoggedIn, unlockedLevels, levelImages } = useUserStore()
   const [displayLevels, setDisplayLevels] = useState(20)  // 默认显示20关
 
   useEffect(() => {
@@ -76,7 +76,10 @@ export default function LevelSelectPage() {
         {levels.map((level) => {
           const isLocked = level > unlockedLevels
           const isCompleted = userInfo && level <= userInfo.highestLevel
-          const levelImage = levelImageMap[level]
+          // 优先使用用户保存的关卡图片，否则使用预加载的图片
+          const savedImage = levelImages[level]
+          const preloadedImage = levelImageMap[level]
+          const levelImage = savedImage || (preloadedImage?.url)
 
           return (
             <View
@@ -92,7 +95,7 @@ export default function LevelSelectPage() {
                 <>
                   <Image
                     className="level-thumbnail"
-                    src={levelImage.url}
+                    src={levelImage}
                     mode="aspectFill"
                   />
                   <View className="level-number-overlay">{level}</View>

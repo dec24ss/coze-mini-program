@@ -17,6 +17,7 @@ interface LevelConfig {
   level: number                  // 关卡编号
   gridSize: number               // 网格大小（8×8、10×10、12×12）
   imageUrl: string               // 原图URL
+  originalUrl?: string           // 原始网络图片URL（用于下载原图）
 }
 
 // 游戏状态
@@ -24,7 +25,8 @@ interface GameState {
   // 游戏基本信息
   currentLevel: number           // 当前关卡
   gridSize: number               // 当前网格大小
-  imageUrl: string               // 当前图片URL
+  imageUrl: string               // 当前图片URL（本地路径或base64，用于显示）
+  originalImageUrl: string       // 原始图片URL（网络地址，用于下载）
   isPlaying: boolean             // 是否正在游戏
   isComplete: boolean            // 是否完成拼图
   isFailed: boolean              // 是否失败
@@ -109,22 +111,27 @@ function getLevelConfig(level: number, imageList: string[], levelImageMap: Recor
 
   // 使用预先规划的每一关的图片映射（优先使用本地路径）
   let imageUrl: string
+  let originalUrl: string  // 原始网络图片URL（用于下载）
+  
   if (levelImageMap[level]) {
-    // 优先使用本地路径（已缓存，加载更快，且下载时能保存正确的图片）
+    // 优先使用本地路径（已缓存，加载更快）
     imageUrl = levelImageMap[level].path
+    originalUrl = levelImageMap[level].url  // 保存原始URL
     console.log(`🖼️  关卡 ${level} 使用本地路径:`, imageUrl)
   } else {
     // 降级逻辑：使用预加载的图片列表
     imageUrl = imageList.length > 0
       ? imageList[(level - 1) % imageList.length]
       : 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1440&fit=crop&q=80' // 默认图片
+    originalUrl = imageUrl  // 网络图片，直接使用
     console.log(`🖼️  关卡 ${level} 使用动态计算的图片（降级逻辑）`)
   }
 
   return {
     level,
     gridSize,
-    imageUrl
+    imageUrl,
+    originalUrl
   }
 }
 
@@ -134,6 +141,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   currentLevel: 1,
   gridSize: 3,
   imageUrl: '',
+  originalImageUrl: '',  // 原始图片URL（用于下载）
   isPlaying: false,
   isComplete: false,
   isFailed: false,
@@ -302,10 +310,12 @@ export const useGameStore = create<GameState>((set, get) => ({
       currentLevel: config.level,
       gridSize: config.gridSize,
       imageUrl: finalImageUrl,  // 使用本地路径或 Base64
+      originalImageUrl: config.originalUrl,  // 保存原始URL用于下载
       isPlaying: true,
       isComplete: false,
       isFailed: false,
       isLoading: true,
+      isFreePlayMode: false,  // 正常模式（有倒计时）
       startTime: Date.now(),
       countdownTime,
       initialCountdownTime: countdownTime,  // 保存初始倒计时时长
@@ -535,12 +545,15 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     // 使用预先规划的每一关的图片映射
     let imageUrl: string
+    let originalUrl: string  // 原始网络图片URL
     if (levelImageMap[level]) {
       imageUrl = levelImageMap[level].path
+      originalUrl = levelImageMap[level].url
     } else {
       imageUrl = imageList.length > 0
         ? imageList[(level - 1) % imageList.length]
         : 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1440&fit=crop&q=80'
+      originalUrl = imageUrl
     }
 
     const finalImageUrl = imageUrl
@@ -549,6 +562,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       currentLevel: config.level,
       gridSize: config.gridSize,
       imageUrl: finalImageUrl,
+      originalImageUrl: originalUrl,  // 保存原始URL用于下载
       isPlaying: true,
       isComplete: false,
       isFailed: false,

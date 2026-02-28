@@ -33,16 +33,20 @@ interface UserState {
   // 解锁的关卡
   unlockedLevels: number  // 已解锁的最大关卡数
 
+  // 关卡图片映射（记住用户过的每一关的图片）
+  levelImages: Record<number, string>  // 关卡号 -> 图片URL
+
   // 动作方法
   login: () => Promise<void>
   logout: () => void
-  updateHighestLevel: (level: number) => Promise<void>
+  updateHighestLevel: (level: number, imageUrl?: string) => Promise<void>
   fetchRankList: () => Promise<void>
   checkUnlockedLevels: () => number
   addPoints: (points: number) => void
   consumePoints: (points: number) => boolean
   getPoints: () => number
   getCurrentLevel: () => number
+  getLevelImage: (level: number) => string | undefined
 }
 
 // 创建用户store
@@ -54,6 +58,7 @@ export const useUserStore = create<UserState>((set, get) => ({
   rankList: [],
   myRank: 0,
   unlockedLevels: 1,  // 默认解锁第1关
+  levelImages: {},  // 关卡图片映射
 
   // 微信登录
   login: async () => {
@@ -97,14 +102,20 @@ export const useUserStore = create<UserState>((set, get) => ({
           const savedUnlockedLevels = Taro.getStorageSync('unlockedLevels')
           const unlockedLevels = savedUnlockedLevels ? parseInt(savedUnlockedLevels) : 1
 
+          // 从本地存储读取关卡图片映射
+          const savedLevelImages = Taro.getStorageSync('levelImages')
+          const levelImages = savedLevelImages ? JSON.parse(savedLevelImages) : {}
+
           set({
             userInfo,
             isLoggedIn: true,
             isLoading: false,
-            unlockedLevels
+            unlockedLevels,
+            levelImages
           })
 
           console.log('用户登录成功:', userInfo)
+          console.log('已加载关卡图片映射:', Object.keys(levelImages).length, '个关卡')
         } catch (profileError) {
           // 用户拒绝授权，仍然可以登录，但使用默认信息
           console.log('获取用户信息失败:', profileError)
@@ -130,11 +141,16 @@ export const useUserStore = create<UserState>((set, get) => ({
           const savedUnlockedLevels = Taro.getStorageSync('unlockedLevels')
           const unlockedLevels = savedUnlockedLevels ? parseInt(savedUnlockedLevels) : 1
 
+          // 从本地存储读取关卡图片映射
+          const savedLevelImages = Taro.getStorageSync('levelImages')
+          const levelImages = savedLevelImages ? JSON.parse(savedLevelImages) : {}
+
           set({
             userInfo,
             isLoggedIn: true,
             isLoading: false,
-            unlockedLevels
+            unlockedLevels,
+            levelImages
           })
         }
       } else {
@@ -162,7 +178,7 @@ export const useUserStore = create<UserState>((set, get) => ({
   },
 
   // 更新最高关卡
-  updateHighestLevel: async (level: number) => {
+  updateHighestLevel: async (level: number, imageUrl?: string) => {
     const { userInfo, isLoggedIn } = get()
 
     if (!isLoggedIn || !userInfo) {
@@ -173,10 +189,21 @@ export const useUserStore = create<UserState>((set, get) => ({
     // 只有当新关卡大于当前最高关卡时才更新
     if (level > userInfo.highestLevel) {
       const newUserInfo = { ...userInfo, highestLevel: level }
-      set({ userInfo: newUserInfo })
+      
+      // 保存关卡图片映射
+      const newLevelImages = { ...get().levelImages }
+      if (imageUrl) {
+        newLevelImages[level] = imageUrl
+      }
+      
+      set({ 
+        userInfo: newUserInfo,
+        levelImages: newLevelImages
+      })
 
       // 保存到本地存储
       Taro.setStorageSync('highestLevel', level.toString())
+      Taro.setStorageSync('levelImages', JSON.stringify(newLevelImages))
 
       // 同时更新解锁的关卡（下一关）
       const newUnlockedLevels = Math.max(get().unlockedLevels, level + 1)
@@ -184,6 +211,9 @@ export const useUserStore = create<UserState>((set, get) => ({
       Taro.setStorageSync('unlockedLevels', newUnlockedLevels.toString())
 
       console.log(`用户最高关卡更新为: ${level}，解锁关卡: ${newUnlockedLevels}`)
+      if (imageUrl) {
+        console.log(`关卡 ${level} 图片已保存`)
+      }
     }
   },
 
@@ -303,5 +333,11 @@ export const useUserStore = create<UserState>((set, get) => ({
     // 从 highestLevel + 1 开始（即用户未完成的下一关），至少从第1关开始
     const nextLevel = userInfo.highestLevel + 1
     return Math.max(1, nextLevel)
+  },
+
+  // 获取指定关卡的图片
+  getLevelImage: (level: number) => {
+    const { levelImages } = get()
+    return levelImages[level]
   }
 }))

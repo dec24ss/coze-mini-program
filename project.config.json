@@ -1,5 +1,5 @@
 {
-  "miniprogramRoot": "./dist",
+  "miniprogramRoot": "./",
   "projectname": "coze-mini-program",
   "description": "test",
   "appid": "touristappid",
