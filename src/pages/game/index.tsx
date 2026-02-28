@@ -572,6 +572,15 @@ export default function GamePage() {
         (Math.abs(piece1Col - piece2Col) === 1 && piece1Row === piece2Row) ||
         (Math.abs(piece1Row - piece2Row) === 1 && piece1Col === piece2Col)
 
+      // 判断相邻图块的位置关系是否正确
+      // 正确关系：piece1 的正确位置是 piece2 当前位置，piece2 的正确位置是 piece1 当前位置
+      const isCorrectRelationship =
+        isAdjacent &&
+        latestDraggingPiece.correctIndex === targetPiece.currentIndex &&
+        targetPiece.correctIndex === latestDraggingPiece.currentIndex
+
+      console.log('位置关系检查：', { isAdjacent, isCorrectRelationship })
+
       // 如果目标位置有其他碎片，交换位置
       swapPieces(latestDraggingPiece, targetPiece)
 
@@ -594,13 +603,29 @@ export default function GamePage() {
         }, 50)
       }
 
-      // 只有相邻的图块交换才播放音效和震动
-      if (isAdjacent) {
-        playSound('swap')
+      // 播放吸附音效
+      playSound('click')
+
+      // 只有相邻且位置关系正确时才播放成功音效、震动和闪烁动画
+      if (isCorrectRelationship) {
+        // 播放成功音效
+        playSound('success')
+        // 震动反馈
         playVibration('medium')
-      } else {
-        // 非相邻交换不震动
-        playSound('click')
+
+        // 添加边框闪烁动画（通过临时修改图块的样式）
+        setTimeout(() => {
+          const piece1El = document.querySelector(`[data-piece-id="${animPiece1?.id}"]`)
+          const piece2El = document.querySelector(`[data-piece-id="${animPiece2?.id}"]`)
+          if (piece1El) {
+            piece1El.classList.add('correct-flash')
+            setTimeout(() => piece1El.classList.remove('correct-flash'), 600)
+          }
+          if (piece2El) {
+            piece2El.classList.add('correct-flash')
+            setTimeout(() => piece2El.classList.remove('correct-flash'), 600)
+          }
+        }, 100)
       }
 
       // 交换后立即隐藏提示
@@ -617,7 +642,7 @@ export default function GamePage() {
       // 更新 currentIndex
       updatePieceIndex(latestDraggingPiece.id, clampedTargetIndex)
       console.log('移动碎片到空位：', latestDraggingPiece.id, '->', clampedTargetIndex, `位置：${snapX}%, ${snapY}%`)
-      // 播放移动音效（不震动）
+      // 播放吸附音效
       playSound('click')
     }
 

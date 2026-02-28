@@ -422,6 +422,29 @@
   }
 }
 
+/* 位置正确边框闪烁动画 */
+.puzzle-piece-outer.correct-flash {
+  animation: correct-flash 0.6s ease-in-out;
+}
+
+@keyframes correct-flash {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  25% {
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0.6);
+  }
+  75% {
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
 /* 拼图完成动画 */
 .puzzle-piece-outer.complete-anim {
   animation: complete-flash 0.6s ease-in-out;
