@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
-import SettingsModal from '@/components/settings-modal'
-import { Lock, Settings } from 'lucide-react-taro'
+import { Lock } from 'lucide-react-taro'
 import './index.css'
 
 export default function LevelSelectPage() {
@@ -13,7 +12,6 @@ export default function LevelSelectPage() {
   const { userInfo, isLoggedIn, unlockedLevels, levelImages } = useUserStore()
   const { initSettings } = useSettingsStore()
   const [displayLevels, setDisplayLevels] = useState(20)  // 默认显示20关
-  const [showSettings, setShowSettings] = useState(false)
 
   useEffect(() => {
     // 如果图片未预加载，跳回首页
@@ -83,11 +81,6 @@ export default function LevelSelectPage() {
 
   return (
     <View className="level-select-page">
-      {/* 设置按钮 */}
-      <Button className="settings-button-top" onClick={() => setShowSettings(true)}>
-        <Settings size={24} color="#6B7280" />
-      </Button>
-
       <View className="level-header">
         <Text className="block level-title">选择关卡</Text>
         {isLoggedIn && userInfo && (
@@ -158,9 +151,6 @@ export default function LevelSelectPage() {
           返回首页
         </Button>
       </View>
-
-      {/* 设置弹窗 */}
-      <SettingsModal visible={showSettings} onClose={() => setShowSettings(false)} />
     </View>
   )
 }

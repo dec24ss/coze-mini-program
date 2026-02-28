@@ -1,16 +1,13 @@
 import { View, Text, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
-import SettingsModal from '@/components/settings-modal'
-import { Settings } from 'lucide-react-taro'
 import './index.css'
 
 export default function RankPage() {
   const { userInfo, rankList, myRank, isLoggedIn, fetchRankList } = useUserStore()
   const { initSettings } = useSettingsStore()
-  const [showSettings, setShowSettings] = useState(false)
 
   // 隐藏昵称（显示第一个字后面用*）
   const hideNickname = (nickname: string) => {
@@ -47,11 +44,6 @@ export default function RankPage() {
 
   return (
     <View className="rank-page">
-      {/* 设置按钮 */}
-      <Button className="settings-button-top" onClick={() => setShowSettings(true)}>
-        <Settings size={24} color="#6B7280" />
-      </Button>
-
       <View className="rank-header">
         <Text className="block rank-title">排行榜</Text>
         {userInfo && (
@@ -103,9 +95,6 @@ export default function RankPage() {
           返回首页
         </Button>
       </View>
-
-      {/* 设置弹窗 */}
-      <SettingsModal visible={showSettings} onClose={() => setShowSettings(false)} />
     </View>
   )
 }

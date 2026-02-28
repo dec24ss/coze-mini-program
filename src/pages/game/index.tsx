@@ -4,8 +4,6 @@ import Taro from '@tarojs/taro'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
-import SettingsModal from '@/components/settings-modal'
-import { Settings } from 'lucide-react-taro'
 import { Network } from '@/network'
 import './index.css'
 
@@ -58,7 +56,6 @@ export default function GamePage() {
   const [containerRect, setContainerRect] = useState<{ left: number; top: number; width: number; height: number }>({ left: 0, top: 0, width: 0, height: 0 })
   const [isImageLoaded, setIsImageLoaded] = useState(true)  // 默认为 true，避免一直显示加载中
   const [showFreePlayComplete, setShowFreePlayComplete] = useState(false)  // 自由模式完成弹窗
-  const [showSettings, setShowSettings] = useState(false)  // 设置弹窗
   const timerRef = useRef<ReturnType<typeof setTimeout>>()  // 原图查看定时器
   const countdownRef = useRef<ReturnType<typeof setInterval>>()  // 游戏倒计时器
   const isMountedRef = useRef(false)
@@ -564,11 +561,47 @@ export default function GamePage() {
         piece1OldIndex: latestDraggingPiece.currentIndex,
         piece2OldIndex: targetPiece.currentIndex
       })
+
+      // 判断两个图块是否相邻
+      const piece1Col = latestDraggingPiece.currentIndex % gridSize
+      const piece1Row = Math.floor(latestDraggingPiece.currentIndex / gridSize)
+      const piece2Col = targetPiece.currentIndex % gridSize
+      const piece2Row = Math.floor(targetPiece.currentIndex / gridSize)
+
+      const isAdjacent =
+        (Math.abs(piece1Col - piece2Col) === 1 && piece1Row === piece2Row) ||
+        (Math.abs(piece1Row - piece2Row) === 1 && piece1Col === piece2Col)
+
       // 如果目标位置有其他碎片，交换位置
       swapPieces(latestDraggingPiece, targetPiece)
-      // 播放交换音效和震动
-      playSound('swap')
-      playVibration('medium')
+
+      // 添加交换动画（通过临时修改图块的样式）
+      const animPiece1 = pieces.find(p => p.id === latestDraggingPiece.id)
+      const animPiece2 = pieces.find(p => p.id === targetPiece.id)
+      if (animPiece1 && animPiece2) {
+        // 使用 setTimeout 在 DOM 更新后添加动画类
+        setTimeout(() => {
+          const piece1El = document.querySelector(`[data-piece-id="${animPiece1.id}"]`)
+          const piece2El = document.querySelector(`[data-piece-id="${animPiece2.id}"]`)
+          if (piece1El) {
+            piece1El.classList.add('swap-anim')
+            setTimeout(() => piece1El.classList.remove('swap-anim'), 300)
+          }
+          if (piece2El) {
+            piece2El.classList.add('swap-anim')
+            setTimeout(() => piece2El.classList.remove('swap-anim'), 300)
+          }
+        }, 50)
+      }
+
+      // 只有相邻的图块交换才播放音效和震动
+      if (isAdjacent) {
+        playSound('swap')
+        playVibration('medium')
+      } else {
+        // 非相邻交换不震动
+        playSound('click')
+      }
 
       // 交换后立即隐藏提示
       if (showHint) {
@@ -584,9 +617,8 @@ export default function GamePage() {
       // 更新 currentIndex
       updatePieceIndex(latestDraggingPiece.id, clampedTargetIndex)
       console.log('移动碎片到空位：', latestDraggingPiece.id, '->', clampedTargetIndex, `位置：${snapX}%, ${snapY}%`)
-      // 播放移动音效和轻微震动
+      // 播放移动音效（不震动）
       playSound('click')
-      playVibration('light')
     }
 
     setDraggingPiece(null)
@@ -600,6 +632,17 @@ export default function GamePage() {
         // 播放成功音效和震动
         playSound('success')
         playVibration('success')
+
+        // 添加完成动画（所有图块闪烁）
+        pieces.forEach((piece) => {
+          setTimeout(() => {
+            const pieceEl = document.querySelector(`[data-piece-id="${piece.id}"]`)
+            if (pieceEl) {
+              pieceEl.classList.add('complete-anim')
+              setTimeout(() => pieceEl.classList.remove('complete-anim'), 600)
+            }
+          }, piece.id * 50) // 每个图块延迟 50ms，形成波浪效果
+        })
       }
     }, 200)
   }
@@ -616,11 +659,6 @@ export default function GamePage() {
 
   return (
     <View className="game-page">
-      {/* 设置按钮 */}
-      <Button className="settings-button-top" onClick={() => setShowSettings(true)}>
-        <Settings size={24} color="#6B7280" />
-      </Button>
-
       {/* 顶部信息栏 */}
       <View className="game-header">
         <Text className="block header-text">
@@ -720,6 +758,7 @@ export default function GamePage() {
                   return (
                     <View
                       key={piece.id}
+                      data-piece-id={piece.id}
                       className={`puzzle-piece-outer ${piece.id === draggingPiece?.id ? 'dragging' : ''}`}
                       style={{
                         width: `${pieceSize}%`,
@@ -872,8 +911,6 @@ export default function GamePage() {
         </View>
       )}
 
-      {/* 设置弹窗 */}
-      <SettingsModal visible={showSettings} onClose={() => setShowSettings(false)} />
     </View>
   )
 }

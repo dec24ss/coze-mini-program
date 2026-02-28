@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import SettingsModal from '@/components/settings-modal'
-import { Settings } from 'lucide-react-taro'
 import './index.css'
 
 export default function IndexPage() {
@@ -103,11 +102,6 @@ export default function IndexPage() {
 
   return (
     <View className="home-page">
-      {/* 设置按钮 */}
-      <Button className="settings-button-top" onClick={() => setShowSettings(true)}>
-        <Settings size={24} color="#6B7280" />
-      </Button>
-
       <View className="home-content">
         <Text className="block home-title">海海拼图大作战</Text>
         <Text className="block home-subtitle">拖拽碎片，完成拼图</Text>
@@ -139,6 +133,13 @@ export default function IndexPage() {
             onClick={handleRankList}
           >
             排行榜
+          </Button>
+          {/* 设置按钮 - 在排行榜下面 */}
+          <Button
+            className="home-button"
+            onClick={() => setShowSettings(true)}
+          >
+            设置
           </Button>
           {isLoggedIn && (
             <Button
