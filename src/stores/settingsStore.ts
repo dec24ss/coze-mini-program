@@ -10,7 +10,7 @@ interface SettingsState {
   initSettings: () => void
   toggleSound: () => void
   toggleVibration: () => void
-  playSound: (type: 'success' | 'error' | 'click' | 'swap' | 'whoosh' | 'snap' | 'levelComplete') => void
+  playSound: (type: 'success' | 'error' | 'click' | 'swap' | 'whoosh' | 'snap') => void
   playVibration: (type: 'light' | 'medium' | 'heavy' | 'success' | 'error') => void
 }
 
@@ -45,19 +45,18 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   },
 
   // 播放音效（使用在线音效文件）
-  playSound: (type: 'success' | 'error' | 'click' | 'swap' | 'whoosh' | 'snap' | 'levelComplete') => {
+  playSound: (type: 'success' | 'error' | 'click' | 'swap' | 'whoosh' | 'snap') => {
     const { soundEnabled } = get()
     if (!soundEnabled) return
 
     // 使用在线音效文件
     const soundUrls: Record<string, string> = {
       click: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
-      success: 'https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2Fmixkit-fairy-arcade-sparkle-866.wav&nonce=fd6aa4ef-0466-48f6-8e3a-d7a0cc8bd53e&project_id=7609528567227056143&sign=2c9f2927fd4ca62932b37657c25537fad4183e2f0bac3bdd59dfdd278cb87c3a', // 位置正确音效（仙子闪光声）
+      success: 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3',
       error: 'https://assets.mixkit.co/active_storage/sfx/1436/1436-preview.mp3',
       swap: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
       whoosh: 'https://assets.mixkit.co/active_storage/sfx/2577/2577-preview.mp3', // 嗖的声音（类似翻牌）
-      snap: 'https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2Fmixkit-arcade-game-jump-coin-216.wav&nonce=9a0fd158-da10-41b8-b499-a45b578a4d07&project_id=7609528567227056143&sign=78195543683867f65a338c1d5f27cefca9cb241cbcd22958f11b8a1498ac50a0', // 吸附音效（金币声）
-      levelComplete: 'https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2Fmixkit-game-level-completed-2059.wav&nonce=b10d5197-7fde-4f4e-8156-0b4dd69c9b17&project_id=7609528567227056143&sign=f6fd70b40c3291a3a45c2ff4d630dbcc7f869bfd6a0c6b9a00bea42e25ec875d' // 过关庆祝音效
+      snap: 'https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3' // 啪嗒的声音（吸附）
     }
 
     const soundUrl = soundUrls[type] || soundUrls.click
