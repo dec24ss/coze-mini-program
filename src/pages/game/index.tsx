@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { Network } from '@/network'
 import { useGameStore } from '@/stores/gameStore'
+import { useUserStore } from '@/stores/userStore'
 import './index.css'
 
 export default function GamePage() {
@@ -42,6 +43,8 @@ export default function GamePage() {
     checkFailed,
     loadNextLevel
   } = useGameStore()
+
+  const { updateHighestLevel } = useUserStore()
 
   const [draggingPiece, setDraggingPiece] = useState<any>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
@@ -258,7 +261,9 @@ export default function GamePage() {
   }
 
   // 下一关
-  const handleNextLevel = () => {
+  const handleNextLevel = async () => {
+    // 更新用户最高关卡
+    await updateHighestLevel(currentLevel)
     loadNextLevel()
   }
 
@@ -779,7 +784,6 @@ export default function GamePage() {
         <View className="victory-modal">
           <View className="victory-content">
             <Text className="block victory-title">恭喜过关！</Text>
-            <Text className="block victory-time">花费时间：{formatTime(180 - countdownTime)}</Text>
             <View className="victory-buttons">
               {isWeapp && (
                 <Button className="victory-button secondary" onClick={handleDownloadImage}>
@@ -799,7 +803,6 @@ export default function GamePage() {
         <View className="victory-modal">
           <View className="victory-content">
             <Text className="block victory-title" style={{ color: '#F59E0B' }}>🎉 恭喜通关！</Text>
-            <Text className="block victory-time">总花费时间：{formatTime(totalTimeSpent)}</Text>
             <Text className="block victory-desc">你真是个拼图高手！</Text>
             <View className="victory-buttons">
               {isWeapp && (

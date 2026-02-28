@@ -1,0 +1,167 @@
+.rank-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
+  padding: 20px;
+}
+
+.rank-header {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.rank-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1F2937;
+  margin-bottom: 16px;
+}
+
+.my-rank {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.my-rank-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #3B82F6;
+  margin-bottom: 4px;
+}
+
+.my-level {
+  font-size: 14px;
+  color: #6B7280;
+}
+
+.rank-list {
+  flex: 1;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.rank-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.rank-item.header {
+  background: #F9FAFB;
+  font-weight: 600;
+  color: #6B7280;
+}
+
+.rank-item.my-item {
+  background: #EFF6FF;
+}
+
+.rank-col {
+  flex: 1;
+  text-align: center;
+}
+
+.rank-col.rank-number {
+  flex: 0.8;
+}
+
+.rank-col.user-info {
+  flex: 1.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.rank-badge {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  border-radius: 50%;
+  font-weight: 700;
+  color: white;
+}
+
+.rank-badge.rank-1 {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+}
+
+.rank-badge.rank-2 {
+  background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+}
+
+.rank-badge.rank-3 {
+  background: linear-gradient(135deg, #CD7F32, #B87333);
+}
+
+.user-avatar-small {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.user-avatar-placeholder {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #3B82F6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.user-name {
+  font-size: 14px;
+  color: #1F2937;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.level-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #3B82F6;
+}
+
+.rank-footer {
+  margin-top: 24px;
+}
+
+.back-button {
+  width: 100%;
+  background: white;
+  color: #6B7280;
+  border: 1px solid #E5E7EB;
+  border-radius: 25px;
+  padding: 14px;
+  font-size: 16px;
+}
+
+.back-button::after {
+  border: none;
+}
+
+.rank-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.rank-empty text {
+  font-size: 18px;
+  color: #6B7280;
+  margin-bottom: 24px;
+}

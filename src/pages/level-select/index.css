@@ -19,21 +19,21 @@
 }
 
 .level-subtitle {
-  font-size: 18px;
+  font-size: 16px;
   color: #6B7280;
 }
 
 .level-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
   flex: 1;
 }
 
 .level-item {
   aspect-ratio: 1;
   background: white;
-  border-radius: 16px;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -55,22 +55,78 @@
   background: linear-gradient(90deg, #3B82F6, #8B5CF6);
 }
 
-.level-item:active {
+.level-item:active:not(.locked) {
   transform: scale(0.95);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
+.level-item.locked {
+  background: #F3F4F6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.level-item.locked::before {
+  background: #D1D5DB;
+}
+
+.level-item.completed {
+  background: #ECFDF5;
+}
+
+.level-item.completed::before {
+  background: linear-gradient(90deg, #10B981, #34D399);
+}
+
 .level-number {
-  font-size: 48px;
+  font-size: 28px;
   font-weight: 700;
   color: #3B82F6;
   line-height: 1;
 }
 
-.level-hint {
-  font-size: 14px;
+.level-item.locked .level-number {
   color: #9CA3AF;
-  margin-top: 8px;
+}
+
+.level-item.completed .level-number {
+  color: #10B981;
+}
+
+.level-hint {
+  font-size: 12px;
+  color: #9CA3AF;
+  margin-top: 6px;
+}
+
+.lock-icon {
+  font-size: 16px;
+  margin-top: 4px;
+}
+
+.completed-icon {
+  font-size: 14px;
+  color: #10B981;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.load-more {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.load-more-button {
+  background: white;
+  color: #6B7280;
+  border: 1px solid #E5E7EB;
+  border-radius: 20px;
+  padding: 10px 24px;
+  font-size: 14px;
+}
+
+.load-more-button::after {
+  border: none;
 }
 
 .level-footer {

@@ -90,15 +90,18 @@ function getLevelConfig(level: number, imageList: string[], levelImageMap: Recor
   // 第1-3关：3×3
   // 第4-6关：4×4
   // 第7-9关：5×5
-  // 第10关：6×6（最终挑战）
+  // 第10-12关：6×6
+  // 第13关开始：7×7（无限关卡）
   if (level >= 1 && level <= 3) {
     gridSize = 3   // 第1-3关：3×3（入门）
   } else if (level >= 4 && level <= 6) {
     gridSize = 4   // 第4-6关：4×4（进阶）
   } else if (level >= 7 && level <= 9) {
     gridSize = 5   // 第7-9关：5×5（挑战）
+  } else if (level >= 10 && level <= 12) {
+    gridSize = 6   // 第10-12关：6×6（大师）
   } else {
-    gridSize = 6   // 第10关：6×6（最终挑战）
+    gridSize = 7   // 第13关开始：7×7（无限关卡）
   }
 
   // 使用预先规划的每一关的图片映射（优先使用本地路径）
