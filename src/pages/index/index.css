@@ -5,6 +5,16 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
+  position: relative;
+}
+
+.settings-icon {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 8px;
+  cursor: pointer;
+  z-index: 10;
 }
 
 .home-content {
