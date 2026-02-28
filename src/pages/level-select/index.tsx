@@ -3,12 +3,17 @@ import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
+import { useSettingsStore } from '@/stores/settingsStore'
+import SettingsModal from '@/components/settings-modal'
+import { Lock, Settings } from 'lucide-react-taro'
 import './index.css'
 
 export default function LevelSelectPage() {
   const { levelImageMap, isImagesPreloaded, startGame } = useGameStore()
   const { userInfo, isLoggedIn, unlockedLevels, levelImages } = useUserStore()
+  const { initSettings } = useSettingsStore()
   const [displayLevels, setDisplayLevels] = useState(20)  // 默认显示20关
+  const [showSettings, setShowSettings] = useState(false)
 
   useEffect(() => {
     // 如果图片未预加载，跳回首页
@@ -18,6 +23,9 @@ export default function LevelSelectPage() {
         Taro.redirectTo({ url: '/pages/index/index' })
       }, 1500)
     }
+    // 初始化设置
+    initSettings()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isImagesPreloaded, levelImageMap])
 
   // 开始指定关卡
@@ -75,6 +83,11 @@ export default function LevelSelectPage() {
 
   return (
     <View className="level-select-page">
+      {/* 设置按钮 */}
+      <Button className="settings-button-top" onClick={() => setShowSettings(true)}>
+        <Settings size={24} color="#6B7280" />
+      </Button>
+
       <View className="level-header">
         <Text className="block level-title">选择关卡</Text>
         {isLoggedIn && userInfo && (
@@ -101,8 +114,10 @@ export default function LevelSelectPage() {
               onClick={() => !isLocked && handleStartLevel(level)}
             >
               {isLocked ? (
-                // 锁定关卡显示蓝色色块
-                <View className="locked-block" />
+                // 锁定关卡显示锁图标
+                <View className="locked-icon">
+                  <Lock size={28} color="#9CA3AF" />
+                </View>
               ) : isCompleted && levelImage ? (
                 // 已过关显示缩略图（自由模式）
                 <>
@@ -143,6 +158,9 @@ export default function LevelSelectPage() {
           返回首页
         </Button>
       </View>
+
+      {/* 设置弹窗 */}
+      <SettingsModal visible={showSettings} onClose={() => setShowSettings(false)} />
     </View>
   )
 }

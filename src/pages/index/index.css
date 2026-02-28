@@ -5,6 +5,27 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
+  position: relative;
+}
+
+.settings-button-top {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: none;
+  z-index: 100;
+}
+
+.settings-button-top::after {
+  border: none;
 }
 
 .home-content {

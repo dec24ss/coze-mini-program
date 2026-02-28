@@ -3,12 +3,21 @@ import { useEffect, useRef, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
+import { useSettingsStore } from '@/stores/settingsStore'
+import SettingsModal from '@/components/settings-modal'
+import { Settings } from 'lucide-react-taro'
 import { Network } from '@/network'
 import './index.css'
 
 export default function GamePage() {
   // 平台检测
   const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
+  const { playSound, playVibration, initSettings } = useSettingsStore()
+
+  // 初始化设置
+  useEffect(() => {
+    initSettings()
+  }, [initSettings])
 
   const {
     currentLevel,
@@ -49,6 +58,7 @@ export default function GamePage() {
   const [containerRect, setContainerRect] = useState<{ left: number; top: number; width: number; height: number }>({ left: 0, top: 0, width: 0, height: 0 })
   const [isImageLoaded, setIsImageLoaded] = useState(true)  // 默认为 true，避免一直显示加载中
   const [showFreePlayComplete, setShowFreePlayComplete] = useState(false)  // 自由模式完成弹窗
+  const [showSettings, setShowSettings] = useState(false)  // 设置弹窗
   const timerRef = useRef<ReturnType<typeof setTimeout>>()  // 原图查看定时器
   const countdownRef = useRef<ReturnType<typeof setInterval>>()  // 游戏倒计时器
   const isMountedRef = useRef(false)
@@ -226,8 +236,11 @@ export default function GamePage() {
 
   // 自动进入下一关
   const handleNextLevelAuto = async () => {
-    // 自由模式不记录进度，不获得积分
+    // 自由模式不记录进度，但也要获得积分
     if (isFreePlayMode) {
+      // 过关获得1积分
+      addPoints(1)
+      Taro.showToast({ title: '获得 1 积分！', icon: 'none' })
       setShowFreePlayComplete(true)
       return
     }
@@ -553,6 +566,9 @@ export default function GamePage() {
       })
       // 如果目标位置有其他碎片，交换位置
       swapPieces(latestDraggingPiece, targetPiece)
+      // 播放交换音效和震动
+      playSound('swap')
+      playVibration('medium')
 
       // 交换后立即隐藏提示
       if (showHint) {
@@ -568,6 +584,9 @@ export default function GamePage() {
       // 更新 currentIndex
       updatePieceIndex(latestDraggingPiece.id, clampedTargetIndex)
       console.log('移动碎片到空位：', latestDraggingPiece.id, '->', clampedTargetIndex, `位置：${snapX}%, ${snapY}%`)
+      // 播放移动音效和轻微震动
+      playSound('click')
+      playVibration('light')
     }
 
     setDraggingPiece(null)
@@ -578,9 +597,9 @@ export default function GamePage() {
     setTimeout(() => {
       const complete = checkComplete()
       if (complete) {
-        if (isWeapp) {
-          Taro.vibrateShort()
-        }
+        // 播放成功音效和震动
+        playSound('success')
+        playVibration('success')
       }
     }, 200)
   }
@@ -597,12 +616,21 @@ export default function GamePage() {
 
   return (
     <View className="game-page">
+      {/* 设置按钮 */}
+      <Button className="settings-button-top" onClick={() => setShowSettings(true)}>
+        <Settings size={24} color="#6B7280" />
+      </Button>
+
       {/* 顶部信息栏 */}
       <View className="game-header">
         <Text className="block header-text">
           第{currentLevel}关
         </Text>
-        {isFreePlayMode ? (
+        {showOriginalImage ? (
+          <Text className="block header-text" style={{ color: '#10B981' }}>
+            原图查看 {originalImageTimeRemaining}s
+          </Text>
+        ) : isFreePlayMode ? (
           <Text className="block header-text" style={{ color: '#F59E0B' }}>
             自由模式
           </Text>
@@ -788,7 +816,7 @@ export default function GamePage() {
               className={`footer-button ${showOriginalImage ? 'active' : ''}`}
               onClick={handleToggleOriginal}
             >
-              {showOriginalImage ? '隐藏' : '原图'}
+              {showOriginalImage ? `${originalImageTimeRemaining}s` : '原图'}
             </Button>
             <View className="points-badge">{getPoints()}</View>
           </View>
@@ -843,6 +871,9 @@ export default function GamePage() {
           </View>
         </View>
       )}
+
+      {/* 设置弹窗 */}
+      <SettingsModal visible={showSettings} onClose={() => setShowSettings(false)} />
     </View>
   )
 }

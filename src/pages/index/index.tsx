@@ -1,15 +1,22 @@
 import { View, Text, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useUserStore } from '@/stores/userStore'
+import { useSettingsStore } from '@/stores/settingsStore'
+import SettingsModal from '@/components/settings-modal'
+import { Settings } from 'lucide-react-taro'
 import './index.css'
 
 export default function IndexPage() {
   const { userInfo, isLoggedIn, login, logout, checkUnlockedLevels, getCurrentLevel } = useUserStore()
+  const { initSettings } = useSettingsStore()
+  const [showSettings, setShowSettings] = useState(false)
 
   useEffect(() => {
     // 检查已解锁的关卡
     checkUnlockedLevels()
+    // 初始化设置
+    initSettings()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn])
 
@@ -96,6 +103,11 @@ export default function IndexPage() {
 
   return (
     <View className="home-page">
+      {/* 设置按钮 */}
+      <Button className="settings-button-top" onClick={() => setShowSettings(true)}>
+        <Settings size={24} color="#6B7280" />
+      </Button>
+
       <View className="home-content">
         <Text className="block home-title">海海拼图大作战</Text>
         <Text className="block home-subtitle">拖拽碎片，完成拼图</Text>
@@ -138,6 +150,9 @@ export default function IndexPage() {
           )}
         </View>
       </View>
+
+      {/* 设置弹窗 */}
+      <SettingsModal visible={showSettings} onClose={() => setShowSettings(false)} />
     </View>
   )
 }
