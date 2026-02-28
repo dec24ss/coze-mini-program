@@ -1,7 +1,7 @@
 {
   "miniprogramRoot": "./",
   "projectname": "coze-mini-program",
-  "description": "test",
+  "description": "拼图游戏",
   "appid": "touristappid",
   "setting": {
     "urlCheck": true,
