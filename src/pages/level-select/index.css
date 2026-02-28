@@ -140,6 +140,11 @@
   margin-top: 6px;
 }
 
+.level-hint.challenge {
+  color: #F59E0B;
+  font-weight: 600;
+}
+
 .lock-icon {
   font-size: 16px;
   margin-top: 4px;
