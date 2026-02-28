@@ -56,7 +56,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       error: 'https://assets.mixkit.co/active_storage/sfx/1436/1436-preview.mp3',
       swap: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
       whoosh: 'https://assets.mixkit.co/active_storage/sfx/2577/2577-preview.mp3', // 嗖的声音（类似翻牌）
-      snap: 'https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3' // 啪嗒的声音（吸附）
+      snap: 'https://code.coze.cn/api/sandbox/coze_coding/file/proxy?expire_time=-1&file_path=assets%2Fmixkit-arcade-game-jump-coin-216.wav&nonce=9a0fd158-da10-41b8-b499-a45b578a4d07&project_id=7609528567227056143&sign=78195543683867f65a338c1d5f27cefca9cb241cbcd22958f11b8a1498ac50a0' // 吸附音效（金币声）
     }
 
     const soundUrl = soundUrls[type] || soundUrls.click
