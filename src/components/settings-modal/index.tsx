@@ -9,7 +9,7 @@ interface SettingsModalProps {
 }
 
 export default function SettingsModal({ visible, onClose }: SettingsModalProps) {
-  const { soundEnabled, vibrationEnabled, toggleSound, toggleVibration } = useSettingsStore()
+  const { soundEnabled, vibrationEnabled, toggleSound, toggleVibration, playVibration } = useSettingsStore()
 
   if (!visible) return null
 
@@ -18,7 +18,7 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
       <View className="settings-modal" onClick={(e) => e.stopPropagation()}>
         <View className="settings-header">
           <Text className="block settings-title">设置</Text>
-          <Button className="settings-close" onClick={onClose}>
+          <Button className="settings-close" onClick={() => { playVibration('light'); onClose(); }}>
             <X size={24} color="#6B7280" />
           </Button>
         </View>
@@ -36,7 +36,7 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
             </View>
             <Switch
               checked={soundEnabled}
-              onChange={() => toggleSound()}
+              onChange={() => { playVibration('light'); toggleSound(); }}
               color="#3B82F6"
             />
           </View>
@@ -53,14 +53,14 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
             </View>
             <Switch
               checked={vibrationEnabled}
-              onChange={() => toggleVibration()}
+              onChange={() => { playVibration('light'); toggleVibration(); }}
               color="#3B82F6"
             />
           </View>
         </View>
 
         <View className="settings-footer">
-          <Button className="settings-button" onClick={onClose}>
+          <Button className="settings-button" onClick={() => { playVibration('light'); onClose(); }}>
             关闭
           </Button>
         </View>

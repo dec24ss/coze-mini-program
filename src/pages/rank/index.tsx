@@ -26,6 +26,9 @@ export default function RankPage() {
   }, [isLoggedIn])
 
   const handleBack = () => {
+    // 播放轻微震动
+    const { playVibration } = useSettingsStore.getState()
+    playVibration('light')
     Taro.navigateBack()
   }
 

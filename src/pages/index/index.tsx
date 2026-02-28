@@ -20,6 +20,10 @@ export default function IndexPage() {
   }, [isLoggedIn])
 
   const handleStartGame = async () => {
+    // 播放轻微震动
+    const { playVibration } = useSettingsStore.getState()
+    playVibration('light')
+
     if (!isLoggedIn) {
       Taro.showModal({
         title: '提示',
@@ -46,6 +50,10 @@ export default function IndexPage() {
   }
 
   const handleLevelSelect = () => {
+    // 播放轻微震动
+    const { playVibration } = useSettingsStore.getState()
+    playVibration('light')
+
     if (!isLoggedIn) {
       Taro.showModal({
         title: '提示',
@@ -64,6 +72,10 @@ export default function IndexPage() {
   }
 
   const handleRankList = () => {
+    // 播放轻微震动
+    const { playVibration } = useSettingsStore.getState()
+    playVibration('light')
+
     if (!isLoggedIn) {
       Taro.showModal({
         title: '提示',
@@ -82,10 +94,17 @@ export default function IndexPage() {
   }
 
   const handleLogin = async () => {
+    // 播放轻微震动
+    const { playVibration } = useSettingsStore.getState()
+    playVibration('light')
     await login()
   }
 
   const handleLogout = () => {
+    // 播放轻微震动
+    const { playVibration } = useSettingsStore.getState()
+    playVibration('light')
+
     Taro.showModal({
       title: '确认退出',
       content: '退出登录后将清除游戏进度，是否继续？',

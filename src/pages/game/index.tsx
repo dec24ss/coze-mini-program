@@ -273,11 +273,15 @@ export default function GamePage() {
 
   // 返回首页
   const handleBackHome = () => {
+    // 播放轻微震动
+    playVibration('light')
     Taro.redirectTo({ url: '/pages/index/index' })
   }
 
   // 返回关卡选择页面
   const handleBackToLevels = () => {
+    // 播放轻微震动
+    playVibration('light')
     Taro.redirectTo({ url: '/pages/level-select/index' })
   }
 
@@ -333,6 +337,9 @@ export default function GamePage() {
 
   // 提示功能
   const handleHint = () => {
+    // 播放轻微震动
+    playVibration('light')
+
     // 检查是否已显示提示，如果是则关闭
     if (showHint) {
       toggleHint()
@@ -356,6 +363,9 @@ export default function GamePage() {
 
   // 原图查看
   const handleToggleOriginal = () => {
+    // 播放轻微震动
+    playVibration('light')
+
     // 如果正在显示原图，直接关闭（不消耗积分）
     if (showOriginalImage) {
       toggleOriginalImage()
@@ -378,6 +388,9 @@ export default function GamePage() {
 
   // 冻结时间
   const handleFreezeTime = () => {
+    // 播放轻微震动
+    playVibration('light')
+
     // 使用时间已经冻结，则不允许再次使用
     if (isTimeFrozen) {
       return
@@ -399,6 +412,8 @@ export default function GamePage() {
 
   // 重新开始当前关卡
   const handleRestart = () => {
+    // 播放轻微震动
+    playVibration('light')
     startGame(currentLevel)
   }
 
@@ -655,8 +670,8 @@ export default function GamePage() {
         }, 50)
       }
 
-      // 播放吸附音效
-      playSound('click')
+      // 播放吸附震动（中等震动），不播放音效
+      playVibration('medium')
 
       // 检查交换后的图块是否在正确位置（基于四周白线是否消除）
       setTimeout(() => {
@@ -667,8 +682,8 @@ export default function GamePage() {
             console.log('图块', animPiece1.id, '四周白线已消除')
             // 播放成功音效
             playSound('success')
-            // 震动反馈
-            playVibration('medium')
+            // 震动反馈（重震动）
+            playVibration('heavy')
 
             // 添加边框闪烁动画
             const piece1El = document.querySelector(`[data-piece-id="${animPiece1.id}"]`)
@@ -686,8 +701,8 @@ export default function GamePage() {
             console.log('图块', animPiece2.id, '四周白线已消除')
             // 播放成功音效
             playSound('success')
-            // 震动反馈
-            playVibration('medium')
+            // 震动反馈（重震动）
+            playVibration('heavy')
 
             // 添加边框闪烁动画
             const piece2El = document.querySelector(`[data-piece-id="${animPiece2.id}"]`)
@@ -713,8 +728,8 @@ export default function GamePage() {
       // 更新 currentIndex
       updatePieceIndex(latestDraggingPiece.id, clampedTargetIndex)
       console.log('移动碎片到空位：', latestDraggingPiece.id, '->', clampedTargetIndex, `位置：${snapX}%, ${snapY}%`)
-      // 播放吸附音效
-      playSound('click')
+      // 播放吸附震动（中等震动），不播放音效
+      playVibration('medium')
     }
 
     setDraggingPiece(null)
@@ -725,9 +740,9 @@ export default function GamePage() {
     setTimeout(() => {
       const complete = checkComplete()
       if (complete) {
-        // 播放成功音效和震动
+        // 播放成功音效和重震动
         playSound('success')
-        playVibration('success')
+        playVibration('heavy')
 
         // 添加完成动画（所有图块闪烁）
         pieces.forEach((piece) => {

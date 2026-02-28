@@ -28,6 +28,10 @@ export default function LevelSelectPage() {
 
   // 开始指定关卡
   const handleStartLevel = async (level: number) => {
+    // 播放轻微震动
+    const { playVibration } = useSettingsStore.getState()
+    playVibration('light')
+
     if (!userInfo) {
       Taro.showToast({ title: '请先登录', icon: 'none' })
       return
@@ -68,11 +72,17 @@ export default function LevelSelectPage() {
 
   // 返回首页
   const handleBackHome = () => {
+    // 播放轻微震动
+    const { playVibration } = useSettingsStore.getState()
+    playVibration('light')
     Taro.redirectTo({ url: '/pages/index/index' })
   }
 
   // 加载更多关卡
   const handleLoadMore = () => {
+    // 播放轻微震动
+    const { playVibration } = useSettingsStore.getState()
+    playVibration('light')
     setDisplayLevels(prev => prev + 10)
   }
 
