@@ -1,6 +1,6 @@
 import { View, Text, Button, Image } from '@tarojs/components'
 import { useEffect, useRef, useState } from 'react'
-import Taro from '@tarojs/taro'
+import Taro, { useRouter } from '@tarojs/taro'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
@@ -8,6 +8,12 @@ import { Network } from '@/network'
 import './index.css'
 
 export default function GamePage() {
+  // 获取路由参数
+  const router = useRouter()
+  const routeParams = {
+    mode: router.params.mode,
+    level: router.params.level
+  }
   // 平台检测
   const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
   const { playSound, playVibration, initSettings } = useSettingsStore()
@@ -132,6 +138,8 @@ export default function GamePage() {
   // 页面加载时开始游戏
   useEffect(() => {
     console.log('🎮 GamePage 挂载')
+    console.log('📋 router 对象:', router)
+    console.log('📋 router.params:', router.params)
 
     const initGame = async () => {
       const { isImagesPreloaded, levelImageMap, preloadImages } = useGameStore.getState()
@@ -148,9 +156,7 @@ export default function GamePage() {
       }
 
       // 从页面参数获取关卡和模式（选择关卡进入自由模式）
-      const pages = Taro.getCurrentPages()
-      const currentPage = pages[pages.length - 1]
-      const { mode, level } = currentPage.$route.options
+      const { mode, level } = routeParams
 
       // 获取当前应该开始的关卡（从最后未完成关卡开始）
       const startLevel = level ? parseInt(level, 10) : getCurrentLevel()
