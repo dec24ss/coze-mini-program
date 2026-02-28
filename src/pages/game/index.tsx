@@ -730,6 +730,9 @@ export default function GamePage() {
         // 显示完成动画
         setShowCompleteAnimation(true)
 
+        // 清除正确位置集合，避免显示绿色边框动画
+        setCorrectPieces(new Set())
+
         // 波浪式动画
         pieces.forEach((piece, index) => {
           setTimeout(() => {
