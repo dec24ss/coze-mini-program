@@ -746,8 +746,8 @@ export default function GamePage() {
     setTimeout(() => {
       const complete = checkComplete()
       if (complete) {
-        // 播放成功音效和重震动
-        playSound('success')
+        // 播放过关庆祝音效和重震动
+        playSound('levelComplete')
         playVibration('heavy')
 
         // 添加完成动画（所有图块闪烁）
