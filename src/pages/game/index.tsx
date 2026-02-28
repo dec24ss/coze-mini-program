@@ -246,22 +246,13 @@ export default function GamePage() {
   // 过关后自动进入下一关（延迟1.5秒，让玩家看到完成效果）
   useEffect(() => {
     if (isComplete) {
-      // 判断是正常模式还是自由模式
-      if (isFreePlayMode) {
-        // 自由模式：显示完成弹窗，添加积分奖励
-        addPoints(1)  // 自由模式过关奖励1积分
-        Taro.showToast({ title: '获得 1 积分！', icon: 'success' })
-        setShowFreePlayComplete(true)  // 显示自由模式完成弹窗
-      } else {
-        // 正常模式：自动进入下一关
-        const timer = setTimeout(() => {
-          handleNextLevelAuto()
-        }, 1500)
-        return () => clearTimeout(timer)
-      }
+      const timer = setTimeout(() => {
+        handleNextLevelAuto()
+      }, 1500)
+      return () => clearTimeout(timer)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isComplete, isFreePlayMode])
+  }, [isComplete])
 
   // 格式化时间
   const formatTime = (seconds: number): string => {
@@ -615,16 +606,12 @@ export default function GamePage() {
           <Text className="block header-text" style={{ color: '#F59E0B' }}>
             自由模式
           </Text>
-        ) : showOriginalImage ? (
-          <Text className="block header-text" style={{ color: '#8B5CF6' }}>
-            原图 {originalImageTimeRemaining}s
-          </Text>
         ) : (
           <Text className="block header-text">
             {formatTime(countdownTime)}
           </Text>
         )}
-        {isTimeFrozen && !isFreePlayMode && !showOriginalImage && (
+        {isTimeFrozen && !isFreePlayMode && (
           <Text className="block header-text">
             {freezeTimeRemaining}秒后恢复
           </Text>
@@ -801,7 +788,7 @@ export default function GamePage() {
               className={`footer-button ${showOriginalImage ? 'active' : ''}`}
               onClick={handleToggleOriginal}
             >
-              {showOriginalImage ? `${originalImageTimeRemaining}s` : '原图'}
+              {showOriginalImage ? '隐藏' : '原图'}
             </Button>
             <View className="points-badge">{getPoints()}</View>
           </View>

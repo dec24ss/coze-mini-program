@@ -1,7 +1,6 @@
 import { View, Text, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
-import { Lock } from 'lucide-react'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
 import './index.css'
@@ -21,7 +20,7 @@ export default function LevelSelectPage() {
     }
   }, [isImagesPreloaded, levelImageMap])
 
-  // 开始指定关卡（所有关卡都是自由模式，无倒计时）
+  // 开始指定关卡
   const handleStartLevel = async (level: number) => {
     if (!userInfo) {
       Taro.showToast({ title: '请先登录', icon: 'none' })
@@ -37,8 +36,20 @@ export default function LevelSelectPage() {
     try {
       Taro.showLoading({ title: '加载中...' })
 
-      // 从关卡选择页面进入的所有关卡都是自由模式（无倒计时，不记录进度）
-      await startGame(level, true)
+      // 判断关卡类型
+      const isCompleted = level <= userInfo.highestLevel  // 已过关
+      const isChallenge = level === userInfo.highestLevel + 1  // 正在挑战
+
+      if (isChallenge) {
+        // 正在挑战的关卡：正常模式（有倒计时，记录进度）
+        await startGame(level, false)
+      } else if (isCompleted) {
+        // 已过关的关卡：自由模式（无倒计时，不记录进度）
+        await startGame(level, true)
+      } else {
+        // 其他情况：自由模式
+        await startGame(level, true)
+      }
 
       Taro.hideLoading()
       Taro.redirectTo({ url: '/pages/game/index' })
@@ -77,6 +88,7 @@ export default function LevelSelectPage() {
         {levels.map((level) => {
           const isLocked = level > unlockedLevels
           const isCompleted = userInfo && level <= userInfo.highestLevel  // 已过关
+          const isChallenge = userInfo && level === userInfo.highestLevel + 1  // 正在挑战
           // 优先使用用户保存的关卡图片，否则使用预加载的图片
           const savedImage = levelImages[level]
           const preloadedImage = levelImageMap[level]
@@ -89,10 +101,8 @@ export default function LevelSelectPage() {
               onClick={() => !isLocked && handleStartLevel(level)}
             >
               {isLocked ? (
-                // 锁定关卡显示锁图标
-                <View className="locked-content">
-                  <Lock size={32} color="#60A5FA" />
-                </View>
+                // 锁定关卡显示蓝色色块
+                <View className="locked-block" />
               ) : isCompleted && levelImage ? (
                 // 已过关显示缩略图（自由模式）
                 <>
@@ -103,8 +113,14 @@ export default function LevelSelectPage() {
                   />
                   <View className="level-number-overlay">{level}</View>
                 </>
+              ) : isChallenge ? (
+                // 正在挑战的关卡（正常模式，可挑战）
+                <>
+                  <Text className="block level-number">{level}</Text>
+                  <Text className="block level-hint challenge">可挑战</Text>
+                </>
               ) : (
-                // 已解锁但未过关（自由模式）
+                // 其他情况（自由模式）
                 <>
                   <Text className="block level-number">{level}</Text>
                   <Text className="block level-hint">自由模式</Text>
