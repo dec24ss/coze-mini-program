@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
+import { Network } from '@/network'
 import './index.css'
 
 export default function GamePage() {
@@ -24,6 +25,7 @@ export default function GamePage() {
     pieces,
     showHint,
     showOriginalImage,
+    originalImageTimeRemaining,
     startGame,
     movePiece,
     updatePieceIndex,
@@ -32,6 +34,7 @@ export default function GamePage() {
     toggleOriginalImage,
     updateCountdown,
     updateFreezeCountdown,
+    updateOriginalImageCountdown,
     freezeTime,
     checkComplete,
     checkFailed,
@@ -44,6 +47,7 @@ export default function GamePage() {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [containerRect, setContainerRect] = useState<{ left: number; top: number; width: number; height: number }>({ left: 0, top: 0, width: 0, height: 0 })
   const [isImageLoaded, setIsImageLoaded] = useState(true)  // 默认为 true，避免一直显示加载中
+  const [showFreePlayComplete, setShowFreePlayComplete] = useState(false)  // 自由模式完成弹窗
   const timerRef = useRef<ReturnType<typeof setTimeout>>()  // 原图查看定时器
   const countdownRef = useRef<ReturnType<typeof setInterval>>()  // 游戏倒计时器
   const isMountedRef = useRef(false)
@@ -183,15 +187,28 @@ export default function GamePage() {
     }
   }, [isTimeFrozen, freezeTimeRemaining, updateFreezeCountdown])
 
-  // 原图查看定时器 - 打开原图时10秒自动关闭
+  // 原图查看定时器 - 打开原图时5秒自动关闭
   useEffect(() => {
-    // 如果正在显示原图，设置10秒定时器
+    // 如果正在显示原图，设置每秒更新倒计时的定时器
     if (showOriginalImage) {
+      const intervalTimer = setInterval(() => {
+        updateOriginalImageCountdown()
+      }, 1000)
+
+      // 5秒后自动关闭的定时器
       timerRef.current = setTimeout(() => {
         toggleOriginalImage()
         Taro.showToast({ title: '原图查看时间已到', icon: 'none' })
         timerRef.current = undefined
-      }, 10000)
+      }, 5000)
+
+      return () => {
+        clearInterval(intervalTimer)
+        if (timerRef.current) {
+          clearTimeout(timerRef.current)
+          timerRef.current = undefined
+        }
+      }
     } else {
       // 如果原图被关闭，清除定时器
       if (timerRef.current) {
@@ -199,15 +216,7 @@ export default function GamePage() {
         timerRef.current = undefined
       }
     }
-
-    // 组件卸载时清理定时器
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current)
-        timerRef.current = undefined
-      }
-    }
-  }, [showOriginalImage, toggleOriginalImage])
+  }, [showOriginalImage, toggleOriginalImage, updateOriginalImageCountdown])
 
   // 自动进入下一关
   const handleNextLevelAuto = async () => {
@@ -215,7 +224,13 @@ export default function GamePage() {
     // 过关获得1积分
     addPoints(1)
     Taro.showToast({ title: '获得 1 积分！', icon: 'none' })
-    loadNextLevel()
+    
+    // 自由模式显示完成弹窗，非自由模式自动进入下一关
+    if (isFreePlayMode) {
+      setShowFreePlayComplete(true)
+    } else {
+      loadNextLevel()
+    }
   }
 
   // 过关后自动进入下一关（延迟1.5秒，让玩家看到完成效果）
@@ -239,6 +254,32 @@ export default function GamePage() {
   // 返回首页
   const handleBackHome = () => {
     Taro.redirectTo({ url: '/pages/index/index' })
+  }
+
+  // 返回关卡选择页面
+  const handleBackToLevels = () => {
+    Taro.redirectTo({ url: '/pages/levels/index' })
+  }
+
+  // 下载原图
+  const handleDownloadImage = () => {
+    Network.downloadFile({
+      url: imageUrl,
+      success: (res) => {
+        Taro.saveImageToPhotosAlbum({
+          filePath: res.tempFilePath,
+          success: () => {
+            Taro.showToast({ title: '保存成功', icon: 'success' })
+          },
+          fail: () => {
+            Taro.showToast({ title: '保存失败', icon: 'none' })
+          }
+        })
+      },
+      fail: () => {
+        Taro.showToast({ title: '下载失败', icon: 'none' })
+      }
+    })
   }
 
   // 提示功能
@@ -542,6 +583,9 @@ export default function GamePage() {
       <View className="game-container">
         {showOriginalImage ? (
           <View className="original-image-container">
+            <View className="original-image-timer">
+              <Text className="block timer-text">{originalImageTimeRemaining}s</Text>
+            </View>
             <Image
               className="original-image"
               src={imageUrl}
@@ -721,6 +765,24 @@ export default function GamePage() {
           </View>
         </View>
       </View>
+
+      {/* 自由模式完成弹窗 */}
+      {showFreePlayComplete && (
+        <View className="victory-modal">
+          <View className="victory-content">
+            <Text className="block victory-title">拼图完成！</Text>
+            <Text className="block victory-time">恭喜你完成了自由模式拼图</Text>
+            <View className="victory-buttons">
+              <Button className="victory-button secondary" onClick={handleBackToLevels}>
+                返回关卡选择
+              </Button>
+              <Button className="victory-button primary" onClick={handleDownloadImage}>
+                下载原图
+              </Button>
+            </View>
+          </View>
+        </View>
+      )}
 
       {/* 失败弹窗 */}
       {isFailed && (

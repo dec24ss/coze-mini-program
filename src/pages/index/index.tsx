@@ -2,10 +2,12 @@ import { View, Text, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useEffect } from 'react'
 import { useUserStore } from '@/stores/userStore'
+import { useGameStore } from '@/stores/gameStore'
 import './index.css'
 
 export default function IndexPage() {
-  const { userInfo, isLoggedIn, login, checkUnlockedLevels } = useUserStore()
+  const { userInfo, isLoggedIn, login, checkUnlockedLevels, getCurrentLevel } = useUserStore()
+  const { startGame } = useGameStore()
 
   useEffect(() => {
     // 检查已解锁的关卡
@@ -13,7 +15,7 @@ export default function IndexPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn])
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
     if (!isLoggedIn) {
       Taro.showModal({
         title: '提示',
@@ -30,6 +32,15 @@ export default function IndexPage() {
       })
       return
     }
+    
+    // 获取当前应该开始的关卡（从上次未完成的关卡开始）
+    const level = getCurrentLevel()
+    console.log(`从第 ${level} 关开始游戏`)
+    
+    // 先设置当前关卡
+    await startGame(level)
+    
+    // 跳转到游戏页面
     Taro.navigateTo({ url: '/pages/game/index' })
   }
 

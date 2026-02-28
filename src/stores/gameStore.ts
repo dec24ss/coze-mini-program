@@ -56,6 +56,8 @@ interface GameState {
   // 功能状态
   showHint: boolean              // 是否显示提示
   showOriginalImage: boolean     // 是否显示原图
+  originalImageTimeRemaining: number  // 查看原图剩余时间（秒）
+  isCountdownPaused: boolean     // 游戏倒计时是否暂停（查看原图时暂停）
 
   // 使用次数限制
   hintCount: number              // 提示使用次数（最多3次）
@@ -75,6 +77,7 @@ interface GameState {
   toggleOriginalImage: () => void
   updateCountdown: () => void
   updateFreezeCountdown: () => void
+  updateOriginalImageCountdown: () => void
   freezeTime: () => void
   checkComplete: () => boolean
   checkFailed: () => boolean
@@ -154,6 +157,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   selectedPiece: null,
   showHint: false,
   showOriginalImage: false,
+  originalImageTimeRemaining: 0,
+  isCountdownPaused: false,
   hintCount: 0,
   originalImageCount: 0,
   freezeCount: 0,
@@ -417,22 +422,40 @@ export const useGameStore = create<GameState>((set, get) => ({
     set(state => {
       // 如果当前显示原图，则关闭
       if (state.showOriginalImage) {
-        return { showOriginalImage: false }
+        return { showOriginalImage: false, originalImageTimeRemaining: 0, isCountdownPaused: false }
       }
       // 如果未显示原图，检查使用次数
       if (state.originalImageCount >= 3) {
         return { showOriginalImage: false }
       }
-      // 增加使用次数并显示原图
-      return { showOriginalImage: true, originalImageCount: state.originalImageCount + 1 }
+      // 增加使用次数并显示原图，设置5秒倒计时，暂停游戏倒计时
+      return {
+        showOriginalImage: true,
+        originalImageCount: state.originalImageCount + 1,
+        originalImageTimeRemaining: 5,
+        isCountdownPaused: true
+      }
     })
+  },
+
+  // 更新查看原图倒计时
+  updateOriginalImageCountdown: () => {
+    const { showOriginalImage, originalImageTimeRemaining } = get()
+    if (showOriginalImage && originalImageTimeRemaining > 0) {
+      const newRemaining = originalImageTimeRemaining - 1
+      set({ originalImageTimeRemaining: newRemaining })
+      // 查看原图时间结束，关闭原图显示并恢复游戏倒计时
+      if (newRemaining <= 0) {
+        set({ showOriginalImage: false, isCountdownPaused: false })
+      }
+    }
   },
 
   // 更新倒计时
   updateCountdown: () => {
-    const { startTime, isPlaying, isComplete, isFailed, isTimeFrozen, isFreePlayMode, initialCountdownTime } = get()
-    // 自由游玩模式下不倒计时
-    if (!isFreePlayMode && isPlaying && !isComplete && !isFailed && !isTimeFrozen) {
+    const { startTime, isPlaying, isComplete, isFailed, isTimeFrozen, isFreePlayMode, initialCountdownTime, isCountdownPaused } = get()
+    // 自由游玩模式下不倒计时，查看原图时暂停倒计时，冻结时间时暂停倒计时
+    if (!isFreePlayMode && isPlaying && !isComplete && !isFailed && !isTimeFrozen && !isCountdownPaused) {
       const elapsed = Math.floor((Date.now() - startTime) / 1000)
       const remaining = Math.max(0, initialCountdownTime - elapsed)
       set({ countdownTime: remaining })
@@ -443,7 +466,12 @@ export const useGameStore = create<GameState>((set, get) => ({
   updateFreezeCountdown: () => {
     const { isTimeFrozen, freezeTimeRemaining } = get()
     if (isTimeFrozen && freezeTimeRemaining > 0) {
-      set({ freezeTimeRemaining: freezeTimeRemaining - 1 })
+      const newRemaining = freezeTimeRemaining - 1
+      set({ freezeTimeRemaining: newRemaining })
+      // 冻结时间结束，恢复倒计时
+      if (newRemaining <= 0) {
+        set({ isTimeFrozen: false })
+      }
     }
   },
 

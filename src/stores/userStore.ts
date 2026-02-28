@@ -42,6 +42,7 @@ interface UserState {
   addPoints: (points: number) => void
   consumePoints: (points: number) => boolean
   getPoints: () => number
+  getCurrentLevel: () => number
 }
 
 // 创建用户store
@@ -290,5 +291,17 @@ export const useUserStore = create<UserState>((set, get) => ({
   getPoints: () => {
     const { userInfo } = get()
     return userInfo?.points || 0
+  },
+
+  // 获取当前应该开始的关卡（从上次未完成的关卡开始）
+  getCurrentLevel: () => {
+    const { userInfo, isLoggedIn } = get()
+    if (!isLoggedIn || !userInfo) {
+      return 1  // 未登录从第1关开始
+    }
+    
+    // 从 highestLevel + 1 开始（即用户未完成的下一关），至少从第1关开始
+    const nextLevel = userInfo.highestLevel + 1
+    return Math.max(1, nextLevel)
   }
 }))
