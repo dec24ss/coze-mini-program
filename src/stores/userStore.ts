@@ -7,6 +7,7 @@ export interface UserInfo {
   nickname: string
   avatarUrl: string
   highestLevel: number  // 最高过关关卡
+  points: number        // 积分
 }
 
 // 排行榜条目
@@ -38,6 +39,9 @@ interface UserState {
   updateHighestLevel: (level: number) => Promise<void>
   fetchRankList: () => Promise<void>
   checkUnlockedLevels: () => number
+  addPoints: (points: number) => void
+  consumePoints: (points: number) => boolean
+  getPoints: () => number
 }
 
 // 创建用户store
@@ -72,13 +76,20 @@ export const useUserStore = create<UserState>((set, get) => ({
             openid: loginRes.code,  // 实际应该用code换取openid
             nickname: userProfile.userInfo.nickName,
             avatarUrl: userProfile.userInfo.avatarUrl,
-            highestLevel: 0
+            highestLevel: 0,
+            points: 0
           }
 
           // 从本地存储读取最高关卡
           const savedHighestLevel = Taro.getStorageSync('highestLevel')
           if (savedHighestLevel) {
             userInfo.highestLevel = parseInt(savedHighestLevel)
+          }
+
+          // 从本地存储读取积分
+          const savedPoints = Taro.getStorageSync('points')
+          if (savedPoints) {
+            userInfo.points = parseInt(savedPoints)
           }
 
           // 从本地存储读取解锁的关卡
@@ -101,12 +112,18 @@ export const useUserStore = create<UserState>((set, get) => ({
             openid: loginRes.code,
             nickname: '匿名用户',
             avatarUrl: '',
-            highestLevel: 0
+            highestLevel: 0,
+            points: 0
           }
 
           const savedHighestLevel = Taro.getStorageSync('highestLevel')
           if (savedHighestLevel) {
             userInfo.highestLevel = parseInt(savedHighestLevel)
+          }
+
+          const savedPoints = Taro.getStorageSync('points')
+          if (savedPoints) {
+            userInfo.points = parseInt(savedPoints)
           }
 
           const savedUnlockedLevels = Taro.getStorageSync('unlockedLevels')
@@ -139,6 +156,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     })
     Taro.removeStorageSync('highestLevel')
     Taro.removeStorageSync('unlockedLevels')
+    Taro.removeStorageSync('points')
     console.log('用户退出登录')
   },
 
@@ -226,5 +244,51 @@ export const useUserStore = create<UserState>((set, get) => ({
       return levels
     }
     return 1
+  },
+
+  // 添加积分
+  addPoints: (points: number) => {
+    const { userInfo, isLoggedIn } = get()
+    if (!isLoggedIn || !userInfo) {
+      console.log('用户未登录，无法添加积分')
+      return
+    }
+
+    const newPoints = userInfo.points + points
+    const newUserInfo = { ...userInfo, points: newPoints }
+    set({ userInfo: newUserInfo })
+
+    // 保存到本地存储
+    Taro.setStorageSync('points', newPoints.toString())
+    console.log(`用户积分增加 ${points}，当前积分: ${newPoints}`)
+  },
+
+  // 使用积分（扣除积分）
+  consumePoints: (points: number) => {
+    const { userInfo, isLoggedIn } = get()
+    if (!isLoggedIn || !userInfo) {
+      console.log('用户未登录，无法使用积分')
+      return false
+    }
+
+    if (userInfo.points < points) {
+      console.log('积分不足')
+      return false
+    }
+
+    const newPoints = userInfo.points - points
+    const newUserInfo = { ...userInfo, points: newPoints }
+    set({ userInfo: newUserInfo })
+
+    // 保存到本地存储
+    Taro.setStorageSync('points', newPoints.toString())
+    console.log(`用户使用积分 ${points}，当前积分: ${newPoints}`)
+    return true
+  },
+
+  // 获取当前积分
+  getPoints: () => {
+    const { userInfo } = get()
+    return userInfo?.points || 0
   }
 }))

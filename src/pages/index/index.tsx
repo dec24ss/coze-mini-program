@@ -5,7 +5,7 @@ import { useUserStore } from '@/stores/userStore'
 import './index.css'
 
 export default function IndexPage() {
-  const { userInfo, isLoggedIn, isLoading, login, logout, checkUnlockedLevels } = useUserStore()
+  const { userInfo, isLoggedIn, login, logout, checkUnlockedLevels } = useUserStore()
 
   useEffect(() => {
     // 检查已解锁的关卡
@@ -14,12 +14,38 @@ export default function IndexPage() {
   }, [isLoggedIn])
 
   const handleStartGame = () => {
+    if (!isLoggedIn) {
+      Taro.showModal({
+        title: '提示',
+        content: '微信登录后可赢取积分、使用道具工具、查看排行榜，是否立即登录？',
+        confirmText: '去登录',
+        cancelText: '先玩玩',
+        success: (res) => {
+          if (res.confirm) {
+            handleLogin()
+          } else {
+            Taro.navigateTo({ url: '/pages/game/index' })
+          }
+        }
+      })
+      return
+    }
     Taro.navigateTo({ url: '/pages/game/index' })
   }
 
   const handleLevelSelect = () => {
     if (!isLoggedIn) {
-      Taro.showToast({ title: '请先登录', icon: 'none' })
+      Taro.showModal({
+        title: '提示',
+        content: '微信登录后可记录关卡进度，是否立即登录？',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            handleLogin()
+          }
+        }
+      })
       return
     }
     Taro.navigateTo({ url: '/pages/level-select/index' })
@@ -27,7 +53,17 @@ export default function IndexPage() {
 
   const handleRankList = () => {
     if (!isLoggedIn) {
-      Taro.showToast({ title: '请先登录', icon: 'none' })
+      Taro.showModal({
+        title: '提示',
+        content: '微信登录后可查看排行榜，是否立即登录？',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            handleLogin()
+          }
+        }
+      })
       return
     }
     Taro.navigateTo({ url: '/pages/rank/index' })
@@ -55,8 +91,8 @@ export default function IndexPage() {
         <Text className="block home-title">海海拼图大作战</Text>
         <Text className="block home-subtitle">拖拽碎片，完成拼图</Text>
 
-        {/* 用户信息区域 */}
-        {isLoggedIn && userInfo ? (
+        {/* 用户信息区域 - 仅登录后显示 */}
+        {isLoggedIn && userInfo && (
           <View className="user-info">
             {userInfo.avatarUrl && (
               <Image className="user-avatar" src={userInfo.avatarUrl} mode="aspectFill" />
@@ -67,10 +103,6 @@ export default function IndexPage() {
               退出登录
             </Button>
           </View>
-        ) : (
-          <Button className="login-button" onClick={handleLogin} loading={isLoading}>
-            微信登录
-          </Button>
         )}
 
         {/* 功能按钮 */}
@@ -79,18 +111,16 @@ export default function IndexPage() {
             开始游戏
           </Button>
           <Button
-            className={`home-button ${isLoggedIn ? '' : 'disabled'}`}
+            className="home-button"
             onClick={handleLevelSelect}
           >
             关卡选择
-            {!isLoggedIn && <Text className="block lock-hint">（需登录）</Text>}
           </Button>
           <Button
-            className={`home-button ${isLoggedIn ? '' : 'disabled'}`}
+            className="home-button"
             onClick={handleRankList}
           >
             排行榜
-            {!isLoggedIn && <Text className="block lock-hint">（需登录）</Text>}
           </Button>
         </View>
       </View>

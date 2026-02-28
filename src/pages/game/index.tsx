@@ -1,7 +1,6 @@
 import { View, Text, Button, Image } from '@tarojs/components'
 import { useEffect, useRef, useState } from 'react'
 import Taro from '@tarojs/taro'
-import { Network } from '@/network'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
 import './index.css'
@@ -18,18 +17,13 @@ export default function GamePage() {
     isComplete,
     isFailed,
     isLoading,
-    isGameCompleted,
     countdownTime,
-    totalTimeSpent,
     isFreePlayMode,
     isTimeFrozen,
     freezeTimeRemaining,
     pieces,
     showHint,
     showOriginalImage,
-    hintCount,
-    originalImageCount,
-    freezeCount,
     startGame,
     movePiece,
     updatePieceIndex,
@@ -44,7 +38,7 @@ export default function GamePage() {
     loadNextLevel
   } = useGameStore()
 
-  const { updateHighestLevel } = useUserStore()
+  const { updateHighestLevel, addPoints, consumePoints, getPoints } = useUserStore()
 
   const [draggingPiece, setDraggingPiece] = useState<any>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
@@ -215,6 +209,26 @@ export default function GamePage() {
     }
   }, [showOriginalImage, toggleOriginalImage])
 
+  // 自动进入下一关
+  const handleNextLevelAuto = async () => {
+    await updateHighestLevel(currentLevel)
+    // 过关获得1积分
+    addPoints(1)
+    Taro.showToast({ title: '获得 1 积分！', icon: 'none' })
+    loadNextLevel()
+  }
+
+  // 过关后自动进入下一关（延迟1.5秒，让玩家看到完成效果）
+  useEffect(() => {
+    if (isComplete) {
+      const timer = setTimeout(() => {
+        handleNextLevelAuto()
+      }, 1500)
+      return () => clearTimeout(timer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isComplete])
+
   // 格式化时间
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60)
@@ -229,127 +243,73 @@ export default function GamePage() {
 
   // 提示功能
   const handleHint = () => {
-    if (hintCount >= 3) {
-      Taro.showToast({ title: '提示次数已用完', icon: 'none' })
+    // 检查是否已显示提示，如果是则关闭
+    if (showHint) {
+      toggleHint()
+      return
+    }
+    // 使用1积分兑换提示
+    if (!consumePoints(1)) {
+      Taro.showModal({
+        title: '积分不足',
+        content: '提示需要1积分，过关可获得积分，是否继续游戏赚取积分？',
+        showCancel: true,
+        confirmText: '继续游戏',
+        cancelText: '取消'
+      })
       return
     }
     // 显示提示
     toggleHint()
+    Taro.showToast({ title: '使用1积分兑换提示', icon: 'none' })
   }
 
   // 原图查看
   const handleToggleOriginal = () => {
-    if (originalImageCount >= 3 && !showOriginalImage) {
-      Taro.showToast({ title: '原图查看次数已用完', icon: 'none' })
+    // 如果正在显示原图，直接关闭（不消耗积分）
+    if (showOriginalImage) {
+      toggleOriginalImage()
+      return
+    }
+    // 使用1积分兑换原图查看
+    if (!consumePoints(1)) {
+      Taro.showModal({
+        title: '积分不足',
+        content: '查看原图需要1积分，过关可获得积分，是否继续游戏赚取积分？',
+        showCancel: true,
+        confirmText: '继续游戏',
+        cancelText: '取消'
+      })
       return
     }
     toggleOriginalImage()
+    Taro.showToast({ title: '使用1积分兑换原图查看', icon: 'none' })
   }
 
   // 冻结时间
   const handleFreezeTime = () => {
-    if (freezeCount >= 1) {
-      Taro.showToast({ title: '冻结次数已用完', icon: 'none' })
+    // 使用时间已经冻结，则不允许再次使用
+    if (isTimeFrozen) {
+      return
+    }
+    // 使用1积分兑换冻结时间
+    if (!consumePoints(1)) {
+      Taro.showModal({
+        title: '积分不足',
+        content: '冻结时间需要1积分，过关可获得积分，是否继续游戏赚取积分？',
+        showCancel: true,
+        confirmText: '继续游戏',
+        cancelText: '取消'
+      })
       return
     }
     freezeTime()
+    Taro.showToast({ title: '使用1积分兑换冻结时间', icon: 'none' })
   }
 
   // 重新开始当前关卡
   const handleRestart = () => {
     startGame(currentLevel)
-  }
-
-  // 下一关
-  const handleNextLevel = async () => {
-    // 更新用户最高关卡
-    await updateHighestLevel(currentLevel)
-    loadNextLevel()
-  }
-
-  // 通关后重新开始游戏（跳转到关卡选择页面）
-  const handleRestartAll = () => {
-    // 保存总花费时间到本地存储
-    Taro.setStorageSync('totalTimeSpent', totalTimeSpent.toString())
-    Taro.navigateTo({ url: '/pages/level-select/index' })
-  }
-
-  // 下载原图到相册
-  const handleDownloadImage = async () => {
-    if (!isWeapp) {
-      Taro.showToast({ title: '仅小程序支持保存图片', icon: 'none' })
-      return
-    }
-
-    try {
-      Taro.showLoading({ title: '保存中...' })
-
-      // 请求相册权限
-      const authResult = await Taro.authorize({
-        scope: 'scope.writePhotosAlbum'
-      }).catch(() => {
-        // 权限被拒绝，引导用户去设置
-        Taro.showModal({
-          title: '提示',
-          content: '需要您授权保存图片到相册',
-          confirmText: '去授权',
-          success: (res) => {
-            if (res.confirm) {
-              Taro.openSetting()
-            }
-          }
-        })
-        return null
-      })
-
-      if (authResult === null) {
-        Taro.hideLoading()
-        return
-      }
-
-      let filePath: string
-
-      // 检查图片类型
-      if (imageUrl.startsWith('wxfile://')) {
-        // 小程序本地路径，直接使用
-        filePath = imageUrl
-        console.log('📥 使用本地路径保存:', filePath)
-      } else if (imageUrl.startsWith('data:image')) {
-        // Base64 数据，需要先下载
-        console.log('📥 Base64 数据，先下载到临时文件')
-        const downloadRes = await Network.downloadFile({
-          url: imageUrl
-        })
-        if (!downloadRes.tempFilePath) {
-          throw new Error('Base64 图片下载失败')
-        }
-        filePath = downloadRes.tempFilePath
-      } else if (imageUrl.startsWith('http')) {
-        // 网络路径，先下载
-        console.log('📥 网络路径，先下载到临时文件')
-        const downloadRes = await Network.downloadFile({
-          url: imageUrl
-        })
-        if (!downloadRes.tempFilePath) {
-          throw new Error('网络图片下载失败')
-        }
-        filePath = downloadRes.tempFilePath
-      } else {
-        throw new Error('不支持的图片路径格式')
-      }
-
-      // 保存到相册
-      await Taro.saveImageToPhotosAlbum({
-        filePath: filePath
-      })
-
-      Taro.hideLoading()
-      Taro.showToast({ title: '已保存到相册', icon: 'success' })
-    } catch (error) {
-      Taro.hideLoading()
-      console.error('保存图片失败:', error)
-      Taro.showToast({ title: '保存失败，请重试', icon: 'none' })
-    }
   }
 
   // 获取需要交换的两个图块
@@ -729,35 +689,36 @@ export default function GamePage() {
       {/* 底部功能按钮 */}
       <View className="game-footer">
         <View className="footer-buttons-row">
-          <Button
-            className={`footer-button ${hintCount >= 3 ? 'used' : ''}`}
-            onClick={handleHint}
-          >
-            提示
-          </Button>
-          <Button
-            className={`footer-button ${originalImageCount >= 3 ? 'used' : ''}`}
-            onClick={handleToggleOriginal}
-          >
-            {showOriginalImage ? '隐藏' : '原图'}
-          </Button>
-          <Button
-            className={`footer-button ${freezeCount >= 1 || isFailed ? 'used' : ''}`}
-            onClick={handleFreezeTime}
-          >
-            {isTimeFrozen ? `${freezeTimeRemaining}s` : '冻结'}
-          </Button>
-        </View>
-        <View className="footer-rules">
-          <Text className="block footer-rule">
-            已用 {hintCount}/3 次
-          </Text>
-          <Text className="block footer-rule">
-            已用 {originalImageCount}/3 次
-          </Text>
-          <Text className="block footer-rule">
-            {freezeCount >= 1 ? '已用 1/1 次' : '可用 1 次'}
-          </Text>
+          {/* 提示按钮 */}
+          <View className="footer-button-wrapper">
+            <Button
+              className={`footer-button ${showHint ? 'active' : ''}`}
+              onClick={handleHint}
+            >
+              提示
+            </Button>
+            <View className="points-badge">{getPoints()}</View>
+          </View>
+          {/* 原图按钮 */}
+          <View className="footer-button-wrapper">
+            <Button
+              className={`footer-button ${showOriginalImage ? 'active' : ''}`}
+              onClick={handleToggleOriginal}
+            >
+              {showOriginalImage ? '隐藏' : '原图'}
+            </Button>
+            <View className="points-badge">{getPoints()}</View>
+          </View>
+          {/* 冻结按钮 */}
+          <View className="footer-button-wrapper">
+            <Button
+              className={`footer-button ${isTimeFrozen ? 'active' : ''}`}
+              onClick={handleFreezeTime}
+            >
+              {isTimeFrozen ? `${freezeTimeRemaining}s` : '冻结'}
+            </Button>
+            <View className="points-badge">{getPoints()}</View>
+          </View>
         </View>
       </View>
 
@@ -773,45 +734,6 @@ export default function GamePage() {
               </Button>
               <Button className="victory-button primary" onClick={handleRestart}>
                 重新开始
-              </Button>
-            </View>
-          </View>
-        </View>
-      )}
-
-      {/* 过关弹窗（1-9关） */}
-      {isComplete && !isGameCompleted && (
-        <View className="victory-modal">
-          <View className="victory-content">
-            <Text className="block victory-title">恭喜过关！</Text>
-            <View className="victory-buttons">
-              {isWeapp && (
-                <Button className="victory-button secondary" onClick={handleDownloadImage}>
-                  下载原图
-                </Button>
-              )}
-              <Button className="victory-button primary" onClick={handleNextLevel}>
-                下一关
-              </Button>
-            </View>
-          </View>
-        </View>
-      )}
-
-      {/* 通关弹窗（完成所有关卡） */}
-      {isGameCompleted && (
-        <View className="victory-modal">
-          <View className="victory-content">
-            <Text className="block victory-title" style={{ color: '#F59E0B' }}>🎉 恭喜通关！</Text>
-            <Text className="block victory-desc">你真是个拼图高手！</Text>
-            <View className="victory-buttons">
-              {isWeapp && (
-                <Button className="victory-button secondary" onClick={handleDownloadImage}>
-                  下载原图
-                </Button>
-              )}
-              <Button className="victory-button primary" onClick={handleRestartAll}>
-                重新来过
               </Button>
             </View>
           </View>
