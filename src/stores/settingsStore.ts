@@ -10,7 +10,7 @@ interface SettingsState {
   initSettings: () => void
   toggleSound: () => void
   toggleVibration: () => void
-  playSound: (type: 'success' | 'error' | 'click' | 'swap') => void
+  playSound: (type: 'success' | 'error' | 'click' | 'swap' | 'whoosh' | 'snap') => void
   playVibration: (type: 'light' | 'medium' | 'heavy' | 'success' | 'error') => void
 }
 
@@ -45,7 +45,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   },
 
   // 播放音效（使用在线音效文件）
-  playSound: (type: 'success' | 'error' | 'click' | 'swap') => {
+  playSound: (type: 'success' | 'error' | 'click' | 'swap' | 'whoosh' | 'snap') => {
     const { soundEnabled } = get()
     if (!soundEnabled) return
 
@@ -54,7 +54,9 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       click: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
       success: 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3',
       error: 'https://assets.mixkit.co/active_storage/sfx/1436/1436-preview.mp3',
-      swap: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'
+      swap: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
+      whoosh: 'https://assets.mixkit.co/active_storage/sfx/2577/2577-preview.mp3', // 嗖的声音（类似翻牌）
+      snap: 'https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3' // 啪嗒的声音（吸附）
     }
 
     const soundUrl = soundUrls[type] || soundUrls.click

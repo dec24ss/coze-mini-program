@@ -510,6 +510,12 @@ export default function GamePage() {
       return
     }
 
+    // 播放轻微震动
+    playVibration('light')
+
+    // 播放嗖的声音
+    playSound('whoosh')
+
     // 获取触摸点位置（兼容 H5 和小程序）
     const touch = e.touches ? e.touches[0] : e.detail.touches[0]
     console.log('触摸点位置:', touch)
@@ -670,8 +676,8 @@ export default function GamePage() {
         }, 50)
       }
 
-      // 播放吸附震动（中等震动），不播放音效
-      playVibration('medium')
+      // 播放啪嗒的声音（吸附音效）
+      playSound('snap')
 
       // 检查交换后的图块是否在正确位置（基于四周白线是否消除）
       setTimeout(() => {
@@ -728,8 +734,8 @@ export default function GamePage() {
       // 更新 currentIndex
       updatePieceIndex(latestDraggingPiece.id, clampedTargetIndex)
       console.log('移动碎片到空位：', latestDraggingPiece.id, '->', clampedTargetIndex, `位置：${snapX}%, ${snapY}%`)
-      // 播放吸附震动（中等震动），不播放音效
-      playVibration('medium')
+      // 播放啪嗒的声音（吸附音效）
+      playSound('snap')
     }
 
     setDraggingPiece(null)
