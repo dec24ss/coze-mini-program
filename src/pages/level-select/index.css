@@ -84,15 +84,14 @@
 
 .level-number-overlay {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  background: rgba(0, 0, 0, 0.6);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   color: white;
-  font-size: 14px;
+  font-size: 28px;
   font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 12px;
   z-index: 10;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .completed-overlay {
@@ -136,7 +135,7 @@
 }
 
 .level-hint {
-  font-size: 12px;
+  font-size: 24px;
   color: #9CA3AF;
   margin-top: 6px;
 }
