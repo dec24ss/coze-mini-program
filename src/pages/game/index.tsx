@@ -298,29 +298,16 @@ export default function GamePage() {
 
   // 下载原图（消耗1积分，失败不扣积分）
   const handleDownloadImage = () => {
-    // 检查积分
-    const currentPoints = getPoints()
-    if (currentPoints < 1) {
-      Taro.showModal({
-        title: '积分不足',
-        content: '下载原图需要1积分，过关可获得积分，是否继续游戏赚取积分？',
-        showCancel: true,
-        confirmText: '继续游戏',
-        cancelText: '取消'
-      })
-      return
-    }
-    
     // 使用原始网络图片URL下载
     const downloadUrl = originalImageUrl || imageUrl
-    
+
     if (!downloadUrl || downloadUrl.startsWith('wxfile://') || downloadUrl.startsWith('data:')) {
       Taro.showToast({ title: '无法下载此图片', icon: 'none' })
       return
     }
-    
+
     Taro.showLoading({ title: '下载中...' })
-    
+
     Network.downloadFile({
       url: downloadUrl,
       success: (res) => {
@@ -328,9 +315,7 @@ export default function GamePage() {
         Taro.saveImageToPhotosAlbum({
           filePath: res.tempFilePath,
           success: () => {
-            // 下载成功后才扣除积分
-            consumePoints(1)
-            Taro.showToast({ title: '保存成功，消耗1积分', icon: 'success' })
+            Taro.showToast({ title: '保存成功', icon: 'success' })
           },
           fail: (err) => {
             console.error('保存到相册失败:', err)
@@ -1014,7 +999,6 @@ export default function GamePage() {
                 <Button className="victory-button primary" onClick={handleDownloadImage}>
                   下载原图
                 </Button>
-                <View className="points-badge">1</View>
               </View>
             </View>
           </View>
