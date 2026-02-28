@@ -417,6 +417,73 @@ export default function GamePage() {
     return null
   }
 
+  // 检查图块是否在正确位置（基于四周白线是否消除）
+  const isPieceInCorrectPosition = (piece: any, allPieces: any[]): boolean => {
+    const { currentIndex, correctIndex } = piece
+    const currentRow = Math.floor(currentIndex / gridSize)
+    const currentCol = currentIndex % gridSize
+
+    // 检查四个方向的白线是否消除
+
+    // 上方
+    if (currentRow > 0) {
+      const aboveIndex = currentIndex - gridSize
+      const abovePiece = allPieces.find(p => p.currentIndex === aboveIndex)
+      if (abovePiece) {
+        // 上方邻居在原图中是否在正确位置的上方
+        const isAboveCorrect = abovePiece.correctIndex === correctIndex - gridSize
+        if (!isAboveCorrect) {
+          return false // 上方白线未消除
+        }
+      }
+    }
+
+    // 下方
+    if (currentRow < gridSize - 1) {
+      const belowIndex = currentIndex + gridSize
+      const belowPiece = allPieces.find(p => p.currentIndex === belowIndex)
+      if (belowPiece) {
+        // 下方邻居在原图中是否在正确位置的下方
+        const isBelowCorrect = belowPiece.correctIndex === correctIndex + gridSize
+        if (!isBelowCorrect) {
+          return false // 下方白线未消除
+        }
+      }
+    }
+
+    // 左侧
+    if (currentCol > 0) {
+      const leftIndex = currentIndex - 1
+      const leftPiece = allPieces.find(p => p.currentIndex === leftIndex)
+      if (leftPiece) {
+        // 左侧邻居在原图中是否在正确位置的左侧
+        const isLeftCorrect = leftPiece.correctIndex === correctIndex - 1
+        // 还要检查它们是否在同一行
+        const isSameRow = Math.floor(leftPiece.currentIndex / gridSize) === currentRow
+        if (!isLeftCorrect || !isSameRow) {
+          return false // 左侧白线未消除
+        }
+      }
+    }
+
+    // 右侧
+    if (currentCol < gridSize - 1) {
+      const rightIndex = currentIndex + 1
+      const rightPiece = allPieces.find(p => p.currentIndex === rightIndex)
+      if (rightPiece) {
+        // 右侧邻居在原图中是否在正确位置的右侧
+        const isRightCorrect = rightPiece.correctIndex === correctIndex + 1
+        // 还要检查它们是否在同一行
+        const isSameRow = Math.floor(rightPiece.currentIndex / gridSize) === currentRow
+        if (!isRightCorrect || !isSameRow) {
+          return false // 右侧白线未消除
+        }
+      }
+    }
+
+    return true // 所有白线都消除
+  }
+
   // 开始拖拽
   const handleTouchStart = async (e: any, piece: any) => {
     console.log('handleTouchStart 被调用', { e, piece, isWeapp, isComplete, showOriginalImage })
@@ -562,31 +629,16 @@ export default function GamePage() {
         piece2OldIndex: targetPiece.currentIndex
       })
 
-      // 判断两个图块是否相邻
-      const piece1Col = latestDraggingPiece.currentIndex % gridSize
-      const piece1Row = Math.floor(latestDraggingPiece.currentIndex / gridSize)
-      const piece2Col = targetPiece.currentIndex % gridSize
-      const piece2Row = Math.floor(targetPiece.currentIndex / gridSize)
-
-      const isAdjacent =
-        (Math.abs(piece1Col - piece2Col) === 1 && piece1Row === piece2Row) ||
-        (Math.abs(piece1Row - piece2Row) === 1 && piece1Col === piece2Col)
-
-      // 判断相邻图块的位置关系是否正确
-      // 正确关系：piece1 的正确位置是 piece2 当前位置，piece2 的正确位置是 piece1 当前位置
-      const isCorrectRelationship =
-        isAdjacent &&
-        latestDraggingPiece.correctIndex === targetPiece.currentIndex &&
-        targetPiece.correctIndex === latestDraggingPiece.currentIndex
-
-      console.log('位置关系检查：', { isAdjacent, isCorrectRelationship })
-
       // 如果目标位置有其他碎片，交换位置
       swapPieces(latestDraggingPiece, targetPiece)
 
+      // 获取最新的 pieces 数据（交换后的）
+      const latestPieces = useGameStore.getState().pieces
+
       // 添加交换动画（通过临时修改图块的样式）
-      const animPiece1 = pieces.find(p => p.id === latestDraggingPiece.id)
-      const animPiece2 = pieces.find(p => p.id === targetPiece.id)
+      const animPiece1 = latestPieces.find(p => p.id === latestDraggingPiece.id)
+      const animPiece2 = latestPieces.find(p => p.id === targetPiece.id)
+
       if (animPiece1 && animPiece2) {
         // 使用 setTimeout 在 DOM 更新后添加动画类
         setTimeout(() => {
@@ -606,27 +658,46 @@ export default function GamePage() {
       // 播放吸附音效
       playSound('click')
 
-      // 只有相邻且位置关系正确时才播放成功音效、震动和闪烁动画
-      if (isCorrectRelationship) {
-        // 播放成功音效
-        playSound('success')
-        // 震动反馈
-        playVibration('medium')
+      // 检查交换后的图块是否在正确位置（基于四周白线是否消除）
+      setTimeout(() => {
+        // 检查 piece1 是否在正确位置
+        if (animPiece1) {
+          const isPiece1Correct = isPieceInCorrectPosition(animPiece1, latestPieces)
+          if (isPiece1Correct) {
+            console.log('图块', animPiece1.id, '四周白线已消除')
+            // 播放成功音效
+            playSound('success')
+            // 震动反馈
+            playVibration('medium')
 
-        // 添加边框闪烁动画（通过临时修改图块的样式）
-        setTimeout(() => {
-          const piece1El = document.querySelector(`[data-piece-id="${animPiece1?.id}"]`)
-          const piece2El = document.querySelector(`[data-piece-id="${animPiece2?.id}"]`)
-          if (piece1El) {
-            piece1El.classList.add('correct-flash')
-            setTimeout(() => piece1El.classList.remove('correct-flash'), 600)
+            // 添加边框闪烁动画
+            const piece1El = document.querySelector(`[data-piece-id="${animPiece1.id}"]`)
+            if (piece1El) {
+              piece1El.classList.add('correct-flash')
+              setTimeout(() => piece1El.classList.remove('correct-flash'), 600)
+            }
           }
-          if (piece2El) {
-            piece2El.classList.add('correct-flash')
-            setTimeout(() => piece2El.classList.remove('correct-flash'), 600)
+        }
+
+        // 检查 piece2 是否在正确位置
+        if (animPiece2) {
+          const isPiece2Correct = isPieceInCorrectPosition(animPiece2, latestPieces)
+          if (isPiece2Correct) {
+            console.log('图块', animPiece2.id, '四周白线已消除')
+            // 播放成功音效
+            playSound('success')
+            // 震动反馈
+            playVibration('medium')
+
+            // 添加边框闪烁动画
+            const piece2El = document.querySelector(`[data-piece-id="${animPiece2.id}"]`)
+            if (piece2El) {
+              piece2El.classList.add('correct-flash')
+              setTimeout(() => piece2El.classList.remove('correct-flash'), 600)
+            }
           }
-        }, 100)
-      }
+        }
+      }, 50)
 
       // 交换后立即隐藏提示
       if (showHint) {
