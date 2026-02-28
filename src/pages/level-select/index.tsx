@@ -6,7 +6,7 @@ import { useUserStore } from '@/stores/userStore'
 import './index.css'
 
 export default function LevelSelectPage() {
-  const { levelImageMap, isImagesPreloaded, startFreePlayMode } = useGameStore()
+  const { levelImageMap, isImagesPreloaded, startGame, startFreePlayMode } = useGameStore()
   const { userInfo, isLoggedIn, unlockedLevels } = useUserStore()
   const [displayLevels, setDisplayLevels] = useState(20)  // 默认显示20关
 
@@ -21,7 +21,7 @@ export default function LevelSelectPage() {
   }, [isImagesPreloaded, levelImageMap])
 
   // 开始指定关卡
-  const handleStartLevel = async (level: number) => {
+  const handleStartLevel = async (level: number, isCompleted: boolean) => {
     // 检查关卡是否已解锁
     if (level > unlockedLevels) {
       Taro.showToast({ title: '该关卡尚未解锁', icon: 'none' })
@@ -30,7 +30,15 @@ export default function LevelSelectPage() {
 
     try {
       Taro.showLoading({ title: '加载中...' })
-      await startFreePlayMode(level)
+      
+      if (isCompleted) {
+        // 已过关卡：自由模式（无倒计时，不记录进度）
+        await startFreePlayMode(level)
+      } else {
+        // 可挑战关卡：正常模式（有倒计时，记录进度）
+        await startGame(level)
+      }
+      
       Taro.hideLoading()
       Taro.redirectTo({ url: '/pages/game/index' })
     } catch (error) {
@@ -74,7 +82,7 @@ export default function LevelSelectPage() {
             <View
               key={level}
               className={`level-item ${isLocked ? 'locked' : ''} ${isCompleted ? 'completed' : ''}`}
-              onClick={() => !isLocked && handleStartLevel(level)}
+              onClick={() => !isLocked && handleStartLevel(level, !!isCompleted)}
             >
               {isLocked ? (
                 // 锁定关卡显示蓝色色块
