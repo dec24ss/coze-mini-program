@@ -255,47 +255,38 @@
 .hint-cell {
   position: absolute;
   box-sizing: border-box;
+  pointer-events: none;
 }
 
 .hint-cell.correct {
   border: none;
 }
 
-/* 需要交换的图块边缘持续闪烁 - 华丽版本 */
+/* 需要交换的图块提示 - 全屏脉冲光晕效果 */
 .hint-cell.swap-hint {
   background: transparent;
-  border: 5px solid #3B82F6;
-  box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6);
-  animation: swap-hint-glow 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  border: none;
+  animation: swap-pulse-glow 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
   z-index: 5;
 }
 
-/* 交换提示动画 - 夸张华丽版本（彩虹炫彩） */
-@keyframes swap-hint-glow {
+/* 交换提示 - 全屏脉冲光晕动画 */
+@keyframes swap-pulse-glow {
   0%, 100% {
-    border-color: #3B82F6;
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6), 0 0 20px rgba(59, 130, 246, 0.4);
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.1) 40%, transparent 70%);
     transform: scale(1);
   }
-  20% {
-    border-color: #93C5FD;
-    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.9), 0 0 30px rgba(59, 130, 246, 0.6);
-    transform: scale(1.05);
+  25% {
+    background: radial-gradient(circle, rgba(147, 197, 253, 0.5) 0%, rgba(147, 197, 253, 0.2) 50%, transparent 80%);
+    transform: scale(1.15);
   }
-  40% {
-    border-color: #3B82F6;
-    box-shadow: 0 0 0 12px rgba(59, 130, 246, 1), 0 0 40px rgba(59, 130, 246, 0.8);
-    transform: scale(1.08);
+  50% {
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.6) 0%, rgba(59, 130, 246, 0.3) 60%, transparent 90%);
+    transform: scale(1.25);
   }
-  60% {
-    border-color: #60A5FA;
-    box-shadow: 0 0 0 8px rgba(147, 197, 253, 0.9), 0 0 35px rgba(147, 197, 253, 0.6);
-    transform: scale(1.06);
-  }
-  80% {
-    border-color: #93C5FD;
-    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.8), 0 0 25px rgba(96, 165, 250, 0.4);
-    transform: scale(1.03);
+  75% {
+    background: radial-gradient(circle, rgba(96, 165, 250, 0.5) 0%, rgba(96, 165, 250, 0.2) 50%, transparent 80%);
+    transform: scale(1.1);
   }
 }
 
@@ -581,10 +572,89 @@
   animation: swap-pulse 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-/* 图块位置正确（使用 state 控制） - 金色华丽版本 */
+/* 图块位置正确 - 烟花爆炸效果 */
 .puzzle-piece-outer.correct {
-  animation: correct-flash 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  z-index: 10;
+  animation: correct-fireworks 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 15;
+}
+
+/* 图块位置正确 - 烟花爆炸动画 */
+.puzzle-piece-outer.correct::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.8) 0%, rgba(255, 105, 180, 0.6) 40%, rgba(0, 255, 255, 0.4) 70%, transparent 100%);
+  transform: translate(-50%, -50%);
+  animation: fireworks-expand 0.8s ease-out forwards;
+  pointer-events: none;
+}
+
+/* 图块位置正确 - 星星粒子 */
+.puzzle-piece-outer.correct::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  box-shadow:
+    0 0 10px 2px rgba(255, 215, 0, 0.9),
+    0 0 20px 4px rgba(255, 105, 180, 0.7),
+    0 0 30px 6px rgba(0, 255, 255, 0.5);
+  animation: fireworks-particles 0.8s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes fireworks-expand {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  30% {
+    width: 200%;
+    height: 200%;
+    opacity: 0.9;
+  }
+  60% {
+    width: 300%;
+    height: 300%;
+    opacity: 0.6;
+  }
+  100% {
+    width: 400%;
+    height: 400%;
+    opacity: 0;
+  }
+}
+
+@keyframes fireworks-particles {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+  }
+  25% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.5) rotate(90deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(2) rotate(180deg);
+  }
+  75% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(2.5) rotate(270deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(3) rotate(360deg);
+  }
 }
 
 /* 拼图完成动画（使用 state 控制） - 彩虹炫彩版本 */
@@ -612,46 +682,6 @@
   100% {
     transform: scale(1) rotate(0deg);
     filter: brightness(1);
-  }
-}
-
-/* 正确位置动画 - 金色边框发光 + 放大 + 旋转 + 粒子效果 */
-@keyframes correct-flash {
-  0% {
-    transform: scale(1) rotate(0deg);
-    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
-    filter: brightness(1);
-    z-index: 10;
-  }
-  15% {
-    transform: scale(1.3) rotate(15deg);
-    box-shadow: 0 0 0 8px rgba(251, 191, 36, 1), 0 0 30px rgba(251, 191, 36, 0.8);
-    filter: brightness(1.8) saturate(2);
-    z-index: 10;
-  }
-  30% {
-    transform: scale(1.2) rotate(-10deg);
-    box-shadow: 0 0 0 12px rgba(251, 191, 36, 0.9), 0 0 40px rgba(251, 191, 36, 0.6);
-    filter: brightness(1.5);
-    z-index: 10;
-  }
-  50% {
-    transform: scale(1.1) rotate(5deg);
-    box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.7), 0 0 20px rgba(251, 191, 36, 0.4);
-    filter: brightness(1.3);
-    z-index: 10;
-  }
-  75% {
-    transform: scale(1.05) rotate(-3deg);
-    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.5);
-    filter: brightness(1.15);
-    z-index: 10;
-  }
-  100% {
-    transform: scale(1) rotate(0deg);
-    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
-    filter: brightness(1);
-    z-index: 10;
   }
 }
 
@@ -697,29 +727,6 @@
     filter: brightness(1.2);
     box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
     z-index: 20;
-  }
-}
-
-/* 位置正确边框闪烁动画 */
-.puzzle-piece-outer.correct-flash {
-  animation: correct-flash 0.6s ease-in-out;
-}
-
-@keyframes correct-flash {
-  0% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-  }
-  25% {
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.8);
-  }
-  50% {
-    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0.6);
-  }
-  75% {
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.4);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
   }
 }
 
