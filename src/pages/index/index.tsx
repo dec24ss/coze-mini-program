@@ -5,7 +5,7 @@ import { useUserStore } from '@/stores/userStore'
 import './index.css'
 
 export default function IndexPage() {
-  const { userInfo, isLoggedIn, login, logout, checkUnlockedLevels } = useUserStore()
+  const { userInfo, isLoggedIn, login, checkUnlockedLevels } = useUserStore()
 
   useEffect(() => {
     // 检查已解锁的关卡
@@ -17,7 +17,7 @@ export default function IndexPage() {
     if (!isLoggedIn) {
       Taro.showModal({
         title: '提示',
-        content: '微信登录后可赢取积分、使用道具工具、查看排行榜，是否立即登录？',
+        content: '微信登录后可赢取积分、使用道具、查看排行榜，是否立即登录？',
         confirmText: '去登录',
         cancelText: '先玩玩',
         success: (res) => {
@@ -73,18 +73,6 @@ export default function IndexPage() {
     await login()
   }
 
-  const handleLogout = () => {
-    Taro.showModal({
-      title: '提示',
-      content: '确定要退出登录吗？',
-      success: (res) => {
-        if (res.confirm) {
-          logout()
-        }
-      }
-    })
-  }
-
   return (
     <View className="home-page">
       <View className="home-content">
@@ -99,9 +87,6 @@ export default function IndexPage() {
             )}
             <Text className="block user-name">{userInfo.nickname}</Text>
             <Text className="block user-level">最高关卡：第{userInfo.highestLevel}关</Text>
-            <Button className="logout-button" onClick={handleLogout}>
-              退出登录
-            </Button>
           </View>
         )}
 

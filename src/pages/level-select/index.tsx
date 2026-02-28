@@ -1,4 +1,4 @@
-import { View, Text, Button } from '@tarojs/components'
+import { View, Text, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { useGameStore } from '@/stores/gameStore'
@@ -68,6 +68,7 @@ export default function LevelSelectPage() {
         {levels.map((level) => {
           const isLocked = level > unlockedLevels
           const isCompleted = userInfo && level <= userInfo.highestLevel
+          const levelImage = levelImageMap[level]
 
           return (
             <View
@@ -75,14 +76,24 @@ export default function LevelSelectPage() {
               className={`level-item ${isLocked ? 'locked' : ''} ${isCompleted ? 'completed' : ''}`}
               onClick={() => !isLocked && handleStartLevel(level)}
             >
-              <Text className="block level-number">{level}</Text>
               {isLocked ? (
-                <Text className="block lock-icon">🔒</Text>
-              ) : isCompleted ? (
-                <Text className="block completed-icon">✓</Text>
+                // 锁定关卡显示蓝色色块
+                <View className="locked-block" />
+              ) : isCompleted && levelImage ? (
+                // 已过关显示缩略图
+                <Image
+                  className="level-thumbnail"
+                  src={levelImage.url}
+                  mode="aspectFill"
+                />
               ) : (
-                <Text className="block level-hint">可挑战</Text>
+                // 未过关但已解锁显示关卡号
+                <>
+                  <Text className="block level-number">{level}</Text>
+                  <Text className="block level-hint">可挑战</Text>
+                </>
               )}
+              {isCompleted && <View className="completed-overlay">✓</View>}
             </View>
           )
         })}

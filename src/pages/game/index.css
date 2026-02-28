@@ -272,20 +272,20 @@
 /* 积分角标 */
 .points-badge {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
+  top: -12px;
+  right: -12px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 10px;
   background: #EF4444;
   color: white;
-  border-radius: 11px;
-  font-size: 12px;
+  border-radius: 22px;
+  font-size: 20px;
   font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
   z-index: 10;
 }
 

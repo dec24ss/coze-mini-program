@@ -58,25 +58,6 @@
   margin-bottom: 4px;
 }
 
-.user-level {
-  font-size: 14px;
-  color: #6B7280;
-  margin-bottom: 12px;
-}
-
-.logout-button {
-  background: transparent;
-  color: #EF4444;
-  border: 1px solid #EF4444;
-  border-radius: 20px;
-  padding: 6px 16px;
-  font-size: 12px;
-}
-
-.logout-button::after {
-  border: none;
-}
-
 /* 登录按钮 */
 .login-button {
   width: 100%;

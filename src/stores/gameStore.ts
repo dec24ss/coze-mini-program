@@ -451,7 +451,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   freezeTime: () => {
     const { isTimeFrozen, freezeTimeRemaining, freezeCount } = get()
     if (!isTimeFrozen && freezeTimeRemaining <= 0 && freezeCount < 1) {
-      set({ isTimeFrozen: true, freezeTimeRemaining: 30, freezeCount: 1 })
+      set({ isTimeFrozen: true, freezeTimeRemaining: 10, freezeCount: 1 })
     }
   },
 
