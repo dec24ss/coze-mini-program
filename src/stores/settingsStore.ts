@@ -44,19 +44,19 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     Taro.setStorageSync('vibrationEnabled', newValue.toString())
   },
 
-  // 播放音效（使用在线音效文件）
+  // 播放音效（使用在线音效文件 - 活泼风格）
   playSound: (type: 'success' | 'error' | 'click' | 'swap' | 'whoosh' | 'snap') => {
     const { soundEnabled } = get()
     if (!soundEnabled) return
 
-    // 使用在线音效文件
+    // 使用在线音效文件（更活泼的风格）
     const soundUrls: Record<string, string> = {
-      click: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
-      success: 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3',
-      error: 'https://assets.mixkit.co/active_storage/sfx/1436/1436-preview.mp3',
-      swap: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
-      whoosh: 'https://assets.mixkit.co/active_storage/sfx/2577/2577-preview.mp3', // 嗖的声音（类似翻牌）
-      snap: 'https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3' // 啪嗒的声音（吸附）
+      click: 'https://assets.mixkit.co/active_storage/sfx/2821/2821-preview.mp3', // 清脆的点击声
+      success: 'https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3', // 活泼的成功音效
+      error: 'https://assets.mixkit.co/active_storage/sfx/2573/2573-preview.mp3', // 可爱的错误音效
+      swap: 'https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3', // 轻快的交换音效
+      whoosh: 'https://assets.mixkit.co/active_storage/sfx/2574/2574-preview.mp3', // 活泼的嗖声
+      snap: 'https://assets.mixkit.co/active_storage/sfx/2575/2575-preview.mp3' // 可爱的啪嗒声
     }
 
     const soundUrl = soundUrls[type] || soundUrls.click
@@ -64,7 +64,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     try {
       const audioContext = Taro.createInnerAudioContext()
       audioContext.src = soundUrl
-      audioContext.volume = 0.5
+      audioContext.volume = 0.6
 
       audioContext.onEnded(() => {
         audioContext.destroy()

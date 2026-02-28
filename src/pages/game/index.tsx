@@ -62,6 +62,9 @@ export default function GamePage() {
   const [containerRect, setContainerRect] = useState<{ left: number; top: number; width: number; height: number }>({ left: 0, top: 0, width: 0, height: 0 })
   const [isImageLoaded, setIsImageLoaded] = useState(true)  // 默认为 true，避免一直显示加载中
   const [showFreePlayComplete, setShowFreePlayComplete] = useState(false)  // 自由模式完成弹窗
+  const [animatingPieces, setAnimatingPieces] = useState<Set<number>>(new Set())  // 正在播放动画的图块ID
+  const [correctPieces, setCorrectPieces] = useState<Set<number>>(new Set())  // 已放置到正确位置的图块ID
+  const [showCompleteAnimation, setShowCompleteAnimation] = useState(false)  // 显示完成动画
   const timerRef = useRef<ReturnType<typeof setTimeout>>()  // 原图查看定时器
   const countdownRef = useRef<ReturnType<typeof setInterval>>()  // 游戏倒计时器
   const isMountedRef = useRef(false)
@@ -428,71 +431,9 @@ export default function GamePage() {
     return null
   }
 
-  // 检查图块是否在正确位置（基于四周白线是否消除）
-  const isPieceInCorrectPosition = (piece: any, allPieces: any[]): boolean => {
-    const { currentIndex, correctIndex } = piece
-    const currentRow = Math.floor(currentIndex / gridSize)
-    const currentCol = currentIndex % gridSize
-
-    // 检查四个方向的白线是否消除
-
-    // 上方
-    if (currentRow > 0) {
-      const aboveIndex = currentIndex - gridSize
-      const abovePiece = allPieces.find(p => p.currentIndex === aboveIndex)
-      if (abovePiece) {
-        // 上方邻居在原图中是否在正确位置的上方
-        const isAboveCorrect = abovePiece.correctIndex === correctIndex - gridSize
-        if (!isAboveCorrect) {
-          return false // 上方白线未消除
-        }
-      }
-    }
-
-    // 下方
-    if (currentRow < gridSize - 1) {
-      const belowIndex = currentIndex + gridSize
-      const belowPiece = allPieces.find(p => p.currentIndex === belowIndex)
-      if (belowPiece) {
-        // 下方邻居在原图中是否在正确位置的下方
-        const isBelowCorrect = belowPiece.correctIndex === correctIndex + gridSize
-        if (!isBelowCorrect) {
-          return false // 下方白线未消除
-        }
-      }
-    }
-
-    // 左侧
-    if (currentCol > 0) {
-      const leftIndex = currentIndex - 1
-      const leftPiece = allPieces.find(p => p.currentIndex === leftIndex)
-      if (leftPiece) {
-        // 左侧邻居在原图中是否在正确位置的左侧
-        const isLeftCorrect = leftPiece.correctIndex === correctIndex - 1
-        // 还要检查它们是否在同一行
-        const isSameRow = Math.floor(leftPiece.currentIndex / gridSize) === currentRow
-        if (!isLeftCorrect || !isSameRow) {
-          return false // 左侧白线未消除
-        }
-      }
-    }
-
-    // 右侧
-    if (currentCol < gridSize - 1) {
-      const rightIndex = currentIndex + 1
-      const rightPiece = allPieces.find(p => p.currentIndex === rightIndex)
-      if (rightPiece) {
-        // 右侧邻居在原图中是否在正确位置的右侧
-        const isRightCorrect = rightPiece.correctIndex === correctIndex + 1
-        // 还要检查它们是否在同一行
-        const isSameRow = Math.floor(rightPiece.currentIndex / gridSize) === currentRow
-        if (!isRightCorrect || !isSameRow) {
-          return false // 右侧白线未消除
-        }
-      }
-    }
-
-    return true // 所有白线都消除
+  // 检查图块是否在正确位置（简化逻辑：只要currentIndex === correctIndex即为正确）
+  const isPieceInCorrectPosition = (piece: any): boolean => {
+    return piece.currentIndex === piece.correctIndex
   }
 
   // 开始拖拽
@@ -652,69 +593,43 @@ export default function GamePage() {
       // 获取最新的 pieces 数据（交换后的）
       const latestPieces = useGameStore.getState().pieces
 
-      // 添加交换动画（通过临时修改图块的样式）
-      const animPiece1 = latestPieces.find(p => p.id === latestDraggingPiece.id)
-      const animPiece2 = latestPieces.find(p => p.id === targetPiece.id)
-
-      if (animPiece1 && animPiece2) {
-        // 使用 setTimeout 在 DOM 更新后添加动画类
-        setTimeout(() => {
-          const piece1El = document.querySelector(`[data-piece-id="${animPiece1.id}"]`)
-          const piece2El = document.querySelector(`[data-piece-id="${animPiece2.id}"]`)
-          if (piece1El) {
-            piece1El.classList.add('swap-anim')
-            setTimeout(() => piece1El.classList.remove('swap-anim'), 300)
-          }
-          if (piece2El) {
-            piece2El.classList.add('swap-anim')
-            setTimeout(() => piece2El.classList.remove('swap-anim'), 300)
-          }
-        }, 50)
-      }
+      // 使用 state 控制动画
+      setAnimatingPieces(new Set([latestDraggingPiece.id, targetPiece.id]))
 
       // 播放啪嗒的声音（吸附音效）
       playSound('snap')
 
-      // 检查交换后的图块是否在正确位置（基于四周白线是否消除）
+      // 检查交换后的图块是否在正确位置
       setTimeout(() => {
         // 检查 piece1 是否在正确位置
-        if (animPiece1) {
-          const isPiece1Correct = isPieceInCorrectPosition(animPiece1, latestPieces)
-          if (isPiece1Correct) {
-            console.log('图块', animPiece1.id, '四周白线已消除')
-            // 播放成功音效
-            playSound('success')
-            // 震动反馈（重震动）
-            playVibration('heavy')
-
-            // 添加边框闪烁动画
-            const piece1El = document.querySelector(`[data-piece-id="${animPiece1.id}"]`)
-            if (piece1El) {
-              piece1El.classList.add('correct-flash')
-              setTimeout(() => piece1El.classList.remove('correct-flash'), 600)
-            }
-          }
+        const animPiece1 = latestPieces.find(p => p.id === latestDraggingPiece.id)
+        if (animPiece1 && isPieceInCorrectPosition(animPiece1)) {
+          console.log('图块', animPiece1.id, '已放置到正确位置')
+          // 播放成功音效
+          playSound('success')
+          // 震动反馈（重震动）
+          playVibration('heavy')
+          // 添加到正确位置集合
+          setCorrectPieces(prev => new Set([...prev, animPiece1.id]))
         }
 
         // 检查 piece2 是否在正确位置
-        if (animPiece2) {
-          const isPiece2Correct = isPieceInCorrectPosition(animPiece2, latestPieces)
-          if (isPiece2Correct) {
-            console.log('图块', animPiece2.id, '四周白线已消除')
-            // 播放成功音效
-            playSound('success')
-            // 震动反馈（重震动）
-            playVibration('heavy')
-
-            // 添加边框闪烁动画
-            const piece2El = document.querySelector(`[data-piece-id="${animPiece2.id}"]`)
-            if (piece2El) {
-              piece2El.classList.add('correct-flash')
-              setTimeout(() => piece2El.classList.remove('correct-flash'), 600)
-            }
-          }
+        const animPiece2 = latestPieces.find(p => p.id === targetPiece.id)
+        if (animPiece2 && isPieceInCorrectPosition(animPiece2)) {
+          console.log('图块', animPiece2.id, '已放置到正确位置')
+          // 播放成功音效
+          playSound('success')
+          // 震动反馈（重震动）
+          playVibration('heavy')
+          // 添加到正确位置集合
+          setCorrectPieces(prev => new Set([...prev, animPiece2.id]))
         }
-      }, 50)
+
+        // 清除动画状态
+        setTimeout(() => {
+          setAnimatingPieces(new Set())
+        }, 300)
+      }, 100)
 
       // 交换后立即隐藏提示
       if (showHint) {
@@ -742,20 +657,32 @@ export default function GamePage() {
     setTimeout(() => {
       const complete = checkComplete()
       if (complete) {
+        console.log('🎉 拼图完成！')
         // 播放成功音效和重震动
         playSound('success')
         playVibration('heavy')
 
-        // 添加完成动画（所有图块闪烁）
-        pieces.forEach((piece) => {
+        // 显示完成动画
+        setShowCompleteAnimation(true)
+
+        // 波浪式动画
+        pieces.forEach((piece, index) => {
           setTimeout(() => {
-            const pieceEl = document.querySelector(`[data-piece-id="${piece.id}"]`)
-            if (pieceEl) {
-              pieceEl.classList.add('complete-anim')
-              setTimeout(() => pieceEl.classList.remove('complete-anim'), 600)
-            }
-          }, piece.id * 50) // 每个图块延迟 50ms，形成波浪效果
+            setAnimatingPieces(prev => new Set([...prev, piece.id]))
+            setTimeout(() => {
+              setAnimatingPieces(prev => {
+                const newSet = new Set(prev)
+                newSet.delete(piece.id)
+                return newSet
+              })
+            }, 300)
+          }, index * 50) // 每个图块延迟 50ms，形成波浪效果
         })
+
+        // 动画结束后隐藏
+        setTimeout(() => {
+          setShowCompleteAnimation(false)
+        }, pieces.length * 50 + 300)
       }
     }, 200)
   }
@@ -872,7 +799,7 @@ export default function GamePage() {
                     <View
                       key={piece.id}
                       data-piece-id={piece.id}
-                      className={`puzzle-piece-outer ${piece.id === draggingPiece?.id ? 'dragging' : ''}`}
+                      className={`puzzle-piece-outer ${piece.id === draggingPiece?.id ? 'dragging' : ''} ${animatingPieces.has(piece.id) ? 'animating' : ''} ${correctPieces.has(piece.id) ? 'correct' : ''} ${showCompleteAnimation ? 'complete' : ''}`}
                       style={{
                         width: `${pieceSize}%`,
                         height: `${pieceSize}%`,

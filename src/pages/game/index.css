@@ -410,6 +410,21 @@
   animation: swap-pulse 0.3s ease-in-out;
 }
 
+/* 图块交换动画（使用 state 控制） */
+.puzzle-piece-outer.animating {
+  animation: swap-pulse 0.3s ease-in-out;
+}
+
+/* 图块位置正确（使用 state 控制） */
+.puzzle-piece-outer.correct {
+  animation: correct-flash 0.6s ease-in-out;
+}
+
+/* 拼图完成动画（使用 state 控制） */
+.puzzle-piece-outer.complete {
+  animation: complete-flash 0.6s ease-in-out;
+}
+
 @keyframes swap-pulse {
   0% {
     transform: scale(1);
