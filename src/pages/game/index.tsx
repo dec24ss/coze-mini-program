@@ -1,4 +1,4 @@
-import { View, Text, Button, Image } from '@tarojs/components'
+import { View, Text, Button, Image, Canvas } from '@tarojs/components'
 import { useEffect, useRef, useState } from 'react'
 import Taro, { useRouter } from '@tarojs/taro'
 import { useGameStore } from '@/stores/gameStore'
@@ -299,37 +299,74 @@ export default function GamePage() {
     Taro.redirectTo({ url: '/pages/level-select/index' })
   }
 
-  // 下载原图（消耗1积分，失败不扣积分）
+  // 下载图片（保存拼完的完整图片）
   const handleDownloadImage = () => {
-    // 使用原始网络图片URL下载
+    // 播放轻微震动
+    playVibration('light')
+
+    Taro.showLoading({ title: '生成图片中...' })
+
+    // 使用原始网络图片URL（拼完后的图就是原图）
     const downloadUrl = originalImageUrl || imageUrl
 
     if (!downloadUrl || downloadUrl.startsWith('wxfile://') || downloadUrl.startsWith('data:')) {
-      Taro.showToast({ title: '无法下载此图片', icon: 'none' })
+      Taro.hideLoading()
+      Taro.showToast({ title: '无法保存此图片', icon: 'none' })
       return
     }
 
-    Taro.showLoading({ title: '下载中...' })
-
+    // 下载原始图片（拼完后的图片就是原始图片）
     Network.downloadFile({
       url: downloadUrl,
       success: (res) => {
         Taro.hideLoading()
-        Taro.saveImageToPhotosAlbum({
-          filePath: res.tempFilePath,
-          success: () => {
-            Taro.showToast({ title: '保存成功', icon: 'success' })
+
+        // 创建 Canvas 来绘制完整的图片
+        const canvasId = 'saveCanvas'
+        const ctx = Taro.createCanvasContext(canvasId)
+
+        // 获取图片信息
+        Taro.getImageInfo({
+          src: res.tempFilePath,
+          success: (imgInfo) => {
+            const { width, height } = imgInfo
+
+            // 设置 Canvas 尺寸
+            ctx.drawImage(res.tempFilePath, 0, 0, width, height)
+            ctx.draw(false, () => {
+              // 将 Canvas 导出为临时图片
+              Taro.canvasToTempFilePath({
+                canvasId,
+                success: (canvasRes) => {
+                  // 保存到相册
+                  Taro.saveImageToPhotosAlbum({
+                    filePath: canvasRes.tempFilePath,
+                    success: () => {
+                      Taro.showToast({ title: '保存成功', icon: 'success' })
+                    },
+                    fail: (err) => {
+                      console.error('保存到相册失败:', err)
+                      Taro.showToast({ title: '保存失败，请授权相册权限', icon: 'none' })
+                    }
+                  })
+                },
+                fail: (err) => {
+                  console.error('Canvas 导出失败:', err)
+                  Taro.showToast({ title: '生成图片失败', icon: 'none' })
+                }
+              })
+            })
           },
           fail: (err) => {
-            console.error('保存到相册失败:', err)
-            Taro.showToast({ title: '保存失败，请授权相册权限', icon: 'none' })
+            console.error('获取图片信息失败:', err)
+            Taro.showToast({ title: '生成图片失败', icon: 'none' })
           }
         })
       },
       fail: (err) => {
         Taro.hideLoading()
         console.error('下载图片失败:', err)
-        Taro.showToast({ title: '下载失败，请重试', icon: 'none' })
+        Taro.showToast({ title: '下载图片失败', icon: 'none' })
       }
     })
   }
@@ -949,6 +986,18 @@ export default function GamePage() {
           </View>
         </View>
       )}
+
+      {/* 隐藏的 Canvas，用于生成拼完后的图片 */}
+      <Canvas
+        canvasId="saveCanvas"
+        style={{
+          position: 'fixed',
+          left: '-9999px',
+          top: '-9999px',
+          width: '750px',
+          height: '1000px'
+        }}
+      />
 
     </View>
   )
