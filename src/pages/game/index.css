@@ -33,13 +33,6 @@
   z-index: 50;
 }
 
-.settings-icon {
-  position: absolute;
-  left: 20px;
-  padding: 8px;
-  cursor: pointer;
-}
-
 .header-text {
   font-size: 24px; /* 字体缩小50% */
   font-weight: 700;

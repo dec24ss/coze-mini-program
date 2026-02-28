@@ -1,16 +1,11 @@
 import { View, Text, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useEffect } from 'react'
-import { Settings } from 'lucide-react-taro'
 import { useUserStore } from '@/stores/userStore'
 import './index.css'
 
 export default function RankPage() {
   const { userInfo, rankList, myRank, isLoggedIn, fetchRankList } = useUserStore()
-
-  const handleSettings = () => {
-    Taro.navigateTo({ url: '/pages/settings/index' })
-  }
 
   // 隐藏昵称（显示第一个字后面用*）
   const hideNickname = (nickname: string) => {
@@ -45,11 +40,6 @@ export default function RankPage() {
 
   return (
     <View className="rank-page">
-      {/* 设置按钮 */}
-      <View className="settings-icon" onClick={handleSettings}>
-        <Settings size={28} color="#3B82F6" />
-      </View>
-
       <View className="rank-header">
         <Text className="block rank-title">排行榜</Text>
         {userInfo && (

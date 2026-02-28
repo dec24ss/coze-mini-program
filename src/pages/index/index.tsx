@@ -1,16 +1,11 @@
 import { View, Text, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useEffect } from 'react'
-import { Settings } from 'lucide-react-taro'
 import { useUserStore } from '@/stores/userStore'
 import './index.css'
 
 export default function IndexPage() {
   const { userInfo, isLoggedIn, login, logout, checkUnlockedLevels, getCurrentLevel } = useUserStore()
-
-  const handleSettings = () => {
-    Taro.navigateTo({ url: '/pages/settings/index' })
-  }
 
   useEffect(() => {
     // 检查已解锁的关卡
@@ -101,11 +96,6 @@ export default function IndexPage() {
 
   return (
     <View className="home-page">
-      {/* 设置按钮 */}
-      <View className="settings-icon" onClick={handleSettings}>
-        <Settings size={28} color="#3B82F6" />
-      </View>
-
       <View className="home-content">
         <Text className="block home-title">海海拼图大作战</Text>
         <Text className="block home-subtitle">拖拽碎片，完成拼图</Text>

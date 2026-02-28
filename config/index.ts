@@ -60,9 +60,7 @@ export default defineConfig<'vite'>(async (merge, _env) => {
       TARO_ENV: JSON.stringify(process.env.TARO_ENV),
     },
     copy: {
-      patterns: [
-        { from: 'project.config.json', to: 'dist/project.config.json' }
-      ],
+      patterns: [],
       options: {},
     },
     framework: 'react',

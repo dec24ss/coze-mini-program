@@ -4,16 +4,6 @@
   flex-direction: column;
   background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
   padding: 40px 20px;
-  position: relative;
-}
-
-.settings-icon {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  padding: 8px;
-  cursor: pointer;
-  z-index: 10;
 }
 
 .level-header {
@@ -84,18 +74,6 @@
   width: 100%;
   height: 100%;
   background: #3B82F6;
-}
-
-.level-item.locked {
-  position: relative;
-}
-
-.locked-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
 }
 
 .level-thumbnail {

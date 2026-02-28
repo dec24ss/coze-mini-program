@@ -1,11 +1,8 @@
 import { View, Text, Button, Image } from '@tarojs/components'
 import { useEffect, useRef, useState } from 'react'
 import Taro from '@tarojs/taro'
-import { Settings } from 'lucide-react-taro'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
-import { useSettingsStore } from '@/stores/settingsStore'
-import { soundManager } from '@/utils/soundManager'
 import { Network } from '@/network'
 import './index.css'
 
@@ -46,7 +43,6 @@ export default function GamePage() {
   } = useGameStore()
 
   const { updateHighestLevel, addPoints, consumePoints, getPoints } = useUserStore()
-  const { soundEnabled, vibrationEnabled } = useSettingsStore()
 
   const [draggingPiece, setDraggingPiece] = useState<any>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
@@ -56,10 +52,6 @@ export default function GamePage() {
   const timerRef = useRef<ReturnType<typeof setTimeout>>()  // 原图查看定时器
   const countdownRef = useRef<ReturnType<typeof setInterval>>()  // 游戏倒计时器
   const isMountedRef = useRef(false)
-
-  const handleSettings = () => {
-    Taro.navigateTo({ url: '/pages/settings/index' })
-  }
 
   // 组件挂载后获取容器位置
   useEffect(() => {
@@ -234,22 +226,19 @@ export default function GamePage() {
 
   // 自动进入下一关
   const handleNextLevelAuto = async () => {
-    // 自由模式：显示完成弹窗，获得积分
+    // 自由模式不记录进度，不获得积分
     if (isFreePlayMode) {
-      // 自由模式过关也获得1积分
-      addPoints(1)
-      Taro.showToast({ title: '获得 1 积分！', icon: 'none' })
       setShowFreePlayComplete(true)
       return
     }
-
+    
     // 正式模式：更新进度和积分
     // 保存当前关卡对应的图片
     await updateHighestLevel(currentLevel, imageUrl)
     // 过关获得1积分
     addPoints(1)
     Taro.showToast({ title: '获得 1 积分！', icon: 'none' })
-
+    
     // 自动进入下一关
     loadNextLevel()
   }
@@ -334,9 +323,6 @@ export default function GamePage() {
 
   // 提示功能
   const handleHint = () => {
-    if (soundEnabled) {
-      soundManager.play('click')
-    }
     // 检查是否已显示提示，如果是则关闭
     if (showHint) {
       toggleHint()
@@ -360,9 +346,6 @@ export default function GamePage() {
 
   // 原图查看
   const handleToggleOriginal = () => {
-    if (soundEnabled) {
-      soundManager.play('click')
-    }
     // 如果正在显示原图，直接关闭（不消耗积分）
     if (showOriginalImage) {
       toggleOriginalImage()
@@ -385,9 +368,6 @@ export default function GamePage() {
 
   // 冻结时间
   const handleFreezeTime = () => {
-    if (soundEnabled) {
-      soundManager.play('click')
-    }
     // 使用时间已经冻结，则不允许再次使用
     if (isTimeFrozen) {
       return
@@ -574,14 +554,6 @@ export default function GamePage() {
       // 如果目标位置有其他碎片，交换位置
       swapPieces(latestDraggingPiece, targetPiece)
 
-      // 播放交换音效
-      if (soundEnabled) {
-        soundManager.play('swap')
-      }
-      if (vibrationEnabled && isWeapp) {
-        Taro.vibrateShort()
-      }
-
       // 交换后立即隐藏提示
       if (showHint) {
         setTimeout(() => {
@@ -596,14 +568,6 @@ export default function GamePage() {
       // 更新 currentIndex
       updatePieceIndex(latestDraggingPiece.id, clampedTargetIndex)
       console.log('移动碎片到空位：', latestDraggingPiece.id, '->', clampedTargetIndex, `位置：${snapX}%, ${snapY}%`)
-
-      // 播放移动音效
-      if (soundEnabled) {
-        soundManager.play('move')
-      }
-      if (vibrationEnabled && isWeapp) {
-        Taro.vibrateShort()
-      }
     }
 
     setDraggingPiece(null)
@@ -614,11 +578,7 @@ export default function GamePage() {
     setTimeout(() => {
       const complete = checkComplete()
       if (complete) {
-        // 播放完成音效
-        if (soundEnabled) {
-          soundManager.play('complete')
-        }
-        if (vibrationEnabled && isWeapp) {
+        if (isWeapp) {
           Taro.vibrateShort()
         }
       }
@@ -639,9 +599,6 @@ export default function GamePage() {
     <View className="game-page">
       {/* 顶部信息栏 */}
       <View className="game-header">
-        <View className="settings-icon" onClick={handleSettings}>
-          <Settings size={24} color="#3B82F6" />
-        </View>
         <Text className="block header-text">
           第{currentLevel}关
         </Text>
@@ -649,22 +606,14 @@ export default function GamePage() {
           <Text className="block header-text" style={{ color: '#F59E0B' }}>
             自由模式
           </Text>
-        ) : showOriginalImage ? (
-          <Text className="block header-text" style={{ color: '#8B5CF6' }}>
-            原图 {originalImageTimeRemaining}s
-          </Text>
-        ) : isTimeFrozen ? (
-          <>
-            <Text className="block header-text">
-              {formatTime(countdownTime)}
-            </Text>
-            <Text className="block header-text" style={{ color: '#3B82F6' }}>
-              {freezeTimeRemaining}秒后恢复
-            </Text>
-          </>
         ) : (
           <Text className="block header-text">
             {formatTime(countdownTime)}
+          </Text>
+        )}
+        {isTimeFrozen && !isFreePlayMode && (
+          <Text className="block header-text">
+            {freezeTimeRemaining}秒后恢复
           </Text>
         )}
       </View>
@@ -839,7 +788,7 @@ export default function GamePage() {
               className={`footer-button ${showOriginalImage ? 'active' : ''}`}
               onClick={handleToggleOriginal}
             >
-              {showOriginalImage ? `${originalImageTimeRemaining}s` : '原图'}
+              {showOriginalImage ? '隐藏' : '原图'}
             </Button>
             <View className="points-badge">{getPoints()}</View>
           </View>

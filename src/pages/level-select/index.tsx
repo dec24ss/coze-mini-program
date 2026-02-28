@@ -1,7 +1,6 @@
 import { View, Text, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
-import { Lock, Settings } from 'lucide-react-taro'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
 import './index.css'
@@ -10,10 +9,6 @@ export default function LevelSelectPage() {
   const { levelImageMap, isImagesPreloaded, startGame } = useGameStore()
   const { userInfo, isLoggedIn, unlockedLevels, levelImages } = useUserStore()
   const [displayLevels, setDisplayLevels] = useState(20)  // 默认显示20关
-
-  const handleSettings = () => {
-    Taro.navigateTo({ url: '/pages/settings/index' })
-  }
 
   useEffect(() => {
     // 如果图片未预加载，跳回首页
@@ -80,11 +75,6 @@ export default function LevelSelectPage() {
 
   return (
     <View className="level-select-page">
-      {/* 设置按钮 */}
-      <View className="settings-icon" onClick={handleSettings}>
-        <Settings size={28} color="#3B82F6" />
-      </View>
-
       <View className="level-header">
         <Text className="block level-title">选择关卡</Text>
         {isLoggedIn && userInfo && (
@@ -111,11 +101,8 @@ export default function LevelSelectPage() {
               onClick={() => !isLocked && handleStartLevel(level)}
             >
               {isLocked ? (
-                // 锁定关卡显示蓝色色块和锁图标
-                <>
-                  <View className="locked-block" />
-                  <Lock size={28} color="white" className="locked-icon" />
-                </>
+                // 锁定关卡显示蓝色色块
+                <View className="locked-block" />
               ) : isCompleted && levelImage ? (
                 // 已过关显示缩略图（自由模式）
                 <>
