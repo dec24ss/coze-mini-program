@@ -36,7 +36,7 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
             </View>
             <Switch
               checked={soundEnabled}
-              onChange={toggleSound}
+              onChange={() => toggleSound()}
               color="#3B82F6"
             />
           </View>
@@ -53,7 +53,7 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
             </View>
             <Switch
               checked={vibrationEnabled}
-              onChange={toggleVibration}
+              onChange={() => toggleVibration()}
               color="#3B82F6"
             />
           </View>

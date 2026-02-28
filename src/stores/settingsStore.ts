@@ -44,29 +44,36 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     Taro.setStorageSync('vibrationEnabled', newValue.toString())
   },
 
-  // 播放音效（使用系统提示音模拟）
+  // 播放音效（使用在线音效文件）
   playSound: (type: 'success' | 'error' | 'click' | 'swap') => {
     const { soundEnabled } = get()
     if (!soundEnabled) return
 
-    // 尝试播放系统音效
+    // 使用在线音效文件
+    const soundUrls: Record<string, string> = {
+      click: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
+      success: 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3',
+      error: 'https://assets.mixkit.co/active_storage/sfx/1436/1436-preview.mp3',
+      swap: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'
+    }
+
+    const soundUrl = soundUrls[type] || soundUrls.click
+
     try {
-      // 使用小程序震动反馈作为音效替代
-      // 实际项目中可以使用 Taro.createInnerAudioContext 播放自定义音效
-      switch (type) {
-        case 'success':
-          Taro.vibrateShort({ type: 'light' })
-          break
-        case 'error':
-          Taro.vibrateShort({ type: 'heavy' })
-          break
-        case 'click':
-          Taro.vibrateShort({ type: 'light' })
-          break
-        case 'swap':
-          Taro.vibrateShort({ type: 'medium' })
-          break
-      }
+      const audioContext = Taro.createInnerAudioContext()
+      audioContext.src = soundUrl
+      audioContext.volume = 0.5
+
+      audioContext.onEnded(() => {
+        audioContext.destroy()
+      })
+
+      audioContext.onError((err) => {
+        console.log('播放音效失败:', err)
+        audioContext.destroy()
+      })
+
+      audioContext.play()
     } catch (e) {
       console.log('播放音效失败:', e)
     }
