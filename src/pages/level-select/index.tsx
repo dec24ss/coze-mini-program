@@ -1,6 +1,7 @@
 import { View, Text, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
+import { Lock } from 'lucide-react'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
 import './index.css'
@@ -101,8 +102,10 @@ export default function LevelSelectPage() {
               onClick={() => !isLocked && handleStartLevel(level)}
             >
               {isLocked ? (
-                // 锁定关卡显示蓝色色块
-                <View className="locked-block" />
+                // 锁定关卡显示锁图标
+                <View className="locked-content">
+                  <Lock size={32} color="#60A5FA" />
+                </View>
               ) : isCompleted && levelImage ? (
                 // 已过关显示缩略图（自由模式）
                 <>
