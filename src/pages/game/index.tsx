@@ -128,6 +128,7 @@ export default function GamePage() {
 
     const initGame = async () => {
       const { isImagesPreloaded, levelImageMap, preloadImages } = useGameStore.getState()
+      const { getCurrentLevel } = useUserStore.getState()
 
       console.log('📋 isImagesPreloaded:', isImagesPreloaded)
       console.log('📋 levelImageMap 长度:', Object.keys(levelImageMap).length)
@@ -139,8 +140,12 @@ export default function GamePage() {
         console.log('✅ 图片预加载完成')
       }
 
-      // 开始游戏
-      startGame(1)
+      // 获取当前应该开始的关卡（从最后未完成关卡开始）
+      const level = getCurrentLevel()
+      console.log(`🎮 从第 ${level} 关开始游戏（正常模式）`)
+
+      // 开始游戏（正常模式）
+      startGame(level, false)
     }
 
     initGame()

@@ -6,7 +6,7 @@ import { useUserStore } from '@/stores/userStore'
 import './index.css'
 
 export default function LevelSelectPage() {
-  const { levelImageMap, isImagesPreloaded, startGame, startFreePlayMode } = useGameStore()
+  const { levelImageMap, isImagesPreloaded, startGame } = useGameStore()
   const { userInfo, isLoggedIn, unlockedLevels, levelImages } = useUserStore()
   const [displayLevels, setDisplayLevels] = useState(20)  // 默认显示20关
 
@@ -20,8 +20,8 @@ export default function LevelSelectPage() {
     }
   }, [isImagesPreloaded, levelImageMap])
 
-  // 开始指定关卡
-  const handleStartLevel = async (level: number, isCompleted: boolean) => {
+  // 开始指定关卡（自由模式）
+  const handleStartLevel = async (level: number) => {
     // 检查关卡是否已解锁
     if (level > unlockedLevels) {
       Taro.showToast({ title: '该关卡尚未解锁', icon: 'none' })
@@ -30,15 +30,10 @@ export default function LevelSelectPage() {
 
     try {
       Taro.showLoading({ title: '加载中...' })
-      
-      if (isCompleted) {
-        // 已过关卡：自由模式（无倒计时，不记录进度）
-        await startFreePlayMode(level)
-      } else {
-        // 可挑战关卡：正常模式（有倒计时，记录进度）
-        await startGame(level)
-      }
-      
+
+      // 从关卡选择进入的游戏都是自由模式（无倒计时，不记录进度）
+      await startGame(level, true)
+
       Taro.hideLoading()
       Taro.redirectTo({ url: '/pages/game/index' })
     } catch (error) {
@@ -85,7 +80,7 @@ export default function LevelSelectPage() {
             <View
               key={level}
               className={`level-item ${isLocked ? 'locked' : ''} ${isCompleted ? 'completed' : ''}`}
-              onClick={() => !isLocked && handleStartLevel(level, !!isCompleted)}
+              onClick={() => !isLocked && handleStartLevel(level)}
             >
               {isLocked ? (
                 // 锁定关卡显示蓝色色块
@@ -101,10 +96,10 @@ export default function LevelSelectPage() {
                   <View className="level-number-overlay">{level}</View>
                 </>
               ) : (
-                // 未过关但已解锁显示关卡号
+                // 已解锁但未过关（自由模式）
                 <>
                   <Text className="block level-number">{level}</Text>
-                  <Text className="block level-hint">可挑战</Text>
+                  <Text className="block level-hint">自由模式</Text>
                 </>
               )}
               {isCompleted && <View className="completed-overlay">✓</View>}

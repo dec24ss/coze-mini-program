@@ -68,7 +68,7 @@ interface GameState {
 
   // 动作方法
   preloadImages: () => Promise<void>
-  startGame: (level: number) => Promise<void>
+  startGame: (level: number, isFreePlay?: boolean) => Promise<void>
   resetGame: () => void
   restartGame: () => Promise<void>  // 重新开始游戏（重新加载图片）
   selectPiece: (piece: PuzzlePiece) => void
@@ -265,14 +265,14 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   // 开始游戏
-  startGame: async (level: number) => {
+  startGame: async (level: number, isFreePlay: boolean = false) => {
     const { imageList, levelImageMap } = get()
     const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
 
     const config = getLevelConfig(level, imageList, levelImageMap)
 
     console.log('==========================================')
-    console.log('🎮 startGame 被调用，关卡:', level)
+    console.log('🎮 startGame 被调用，关卡:', level, '模式:', isFreePlay ? '自由模式' : '正常模式')
     console.log('📋 imageList 长度:', imageList.length)
     console.log('📋 levelImageMap 长度:', Object.keys(levelImageMap).length)
     console.log('📋 当前平台:', isWeapp ? '小程序' : 'H5')
@@ -315,7 +315,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       isComplete: false,
       isFailed: false,
       isLoading: true,
-      isFreePlayMode: false,  // 正常模式（有倒计时）
+      isFreePlayMode: isFreePlay,  // 根据参数设置游戏模式
       startTime: Date.now(),
       countdownTime,
       initialCountdownTime: countdownTime,  // 保存初始倒计时时长
