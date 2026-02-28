@@ -81,11 +81,14 @@ export default function LevelSelectPage() {
                 <View className="locked-block" />
               ) : isCompleted && levelImage ? (
                 // 已过关显示缩略图
-                <Image
-                  className="level-thumbnail"
-                  src={levelImage.url}
-                  mode="aspectFill"
-                />
+                <>
+                  <Image
+                    className="level-thumbnail"
+                    src={levelImage.url}
+                    mode="aspectFill"
+                  />
+                  <View className="level-number-overlay">{level}</View>
+                </>
               ) : (
                 // 未过关但已解锁显示关卡号
                 <>

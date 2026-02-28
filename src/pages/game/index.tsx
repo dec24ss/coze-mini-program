@@ -220,17 +220,20 @@ export default function GamePage() {
 
   // 自动进入下一关
   const handleNextLevelAuto = async () => {
+    // 自由模式不记录进度，不获得积分
+    if (isFreePlayMode) {
+      setShowFreePlayComplete(true)
+      return
+    }
+    
+    // 正式模式：更新进度和积分
     await updateHighestLevel(currentLevel)
     // 过关获得1积分
     addPoints(1)
     Taro.showToast({ title: '获得 1 积分！', icon: 'none' })
     
-    // 自由模式显示完成弹窗，非自由模式自动进入下一关
-    if (isFreePlayMode) {
-      setShowFreePlayComplete(true)
-    } else {
-      loadNextLevel()
-    }
+    // 自动进入下一关
+    loadNextLevel()
   }
 
   // 过关后自动进入下一关（延迟1.5秒，让玩家看到完成效果）
@@ -258,11 +261,25 @@ export default function GamePage() {
 
   // 返回关卡选择页面
   const handleBackToLevels = () => {
-    Taro.redirectTo({ url: '/pages/levels/index' })
+    Taro.redirectTo({ url: '/pages/level-select/index' })
   }
 
-  // 下载原图
+  // 下载原图（消耗1积分）
   const handleDownloadImage = () => {
+    // 检查积分
+    if (!consumePoints(1)) {
+      Taro.showModal({
+        title: '积分不足',
+        content: '下载原图需要1积分，过关可获得积分，是否继续游戏赚取积分？',
+        showCancel: true,
+        confirmText: '继续游戏',
+        cancelText: '取消'
+      })
+      return
+    }
+    
+    Taro.showToast({ title: '使用1积分下载原图', icon: 'none' })
+    
     Network.downloadFile({
       url: imageUrl,
       success: (res) => {
@@ -776,9 +793,12 @@ export default function GamePage() {
               <Button className="victory-button secondary" onClick={handleBackToLevels}>
                 返回关卡选择
               </Button>
-              <Button className="victory-button primary" onClick={handleDownloadImage}>
-                下载原图
-              </Button>
+              <View className="footer-button-wrapper" style={{ flex: 1 }}>
+                <Button className="victory-button primary" onClick={handleDownloadImage}>
+                  下载原图
+                </Button>
+                <View className="points-badge">1</View>
+              </View>
             </View>
           </View>
         </View>

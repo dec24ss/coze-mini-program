@@ -37,9 +37,6 @@
   align-items: center;
   margin-bottom: 24px;
   padding: 20px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   width: 100%;
 }
 
@@ -106,6 +103,15 @@
 
 .home-button.primary {
   background: #3B82F6;
+}
+
+.home-button.logout {
+  background: transparent;
+  color: #6B7280;
+  border: 1px solid #E5E7EB;
+  box-shadow: none;
+  font-size: 16px;
+  padding: 14px;
 }
 
 .home-button.disabled {

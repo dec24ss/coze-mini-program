@@ -6,7 +6,7 @@ import { useGameStore } from '@/stores/gameStore'
 import './index.css'
 
 export default function IndexPage() {
-  const { userInfo, isLoggedIn, login, checkUnlockedLevels, getCurrentLevel } = useUserStore()
+  const { userInfo, isLoggedIn, login, logout, checkUnlockedLevels, getCurrentLevel } = useUserStore()
   const { startGame } = useGameStore()
 
   useEffect(() => {
@@ -84,6 +84,21 @@ export default function IndexPage() {
     await login()
   }
 
+  const handleLogout = () => {
+    Taro.showModal({
+      title: '确认退出',
+      content: '退出登录后将清除游戏进度，是否继续？',
+      confirmText: '退出',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          logout()
+          Taro.showToast({ title: '已退出登录', icon: 'success' })
+        }
+      }
+    })
+  }
+
   return (
     <View className="home-page">
       <View className="home-content">
@@ -118,6 +133,14 @@ export default function IndexPage() {
           >
             排行榜
           </Button>
+          {isLoggedIn && (
+            <Button
+              className="home-button logout"
+              onClick={handleLogout}
+            >
+              退出登录
+            </Button>
+          )}
         </View>
       </View>
     </View>
