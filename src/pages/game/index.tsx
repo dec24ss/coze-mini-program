@@ -252,6 +252,10 @@ export default function GamePage() {
       // 过关获得1积分
       addPoints(1)
       Taro.showToast({ title: '获得 1 积分！', icon: 'none' })
+
+      // 自由模式：更新关卡图片（即使已经过关，也要保存当前图片URL）
+      await updateHighestLevel(currentLevel, originalImageUrl)
+
       setShowFreePlayComplete(true)
       return
     }
