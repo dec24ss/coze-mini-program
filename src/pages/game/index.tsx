@@ -332,8 +332,21 @@ export default function GamePage() {
                 width: canvasWidth,
                 height: canvasHeight,
                 success: (canvasRes) => {
-                  console.log('拼图完成图片生成成功:', canvasRes.tempFilePath)
-                  resolve(canvasRes.tempFilePath)
+                  console.log('拼图完成图片生成成功（临时路径）:', canvasRes.tempFilePath)
+
+                  // 将临时路径保存为永久路径
+                  Taro.saveFile({
+                    tempFilePath: canvasRes.tempFilePath,
+                    success: (saveRes) => {
+                      console.log('拼图完成图片保存为永久路径:', saveRes.savedFilePath)
+                      resolve(saveRes.savedFilePath)
+                    },
+                    fail: (err) => {
+                      console.error('保存文件失败，使用临时路径:', err)
+                      // 如果保存失败，使用临时路径
+                      resolve(canvasRes.tempFilePath)
+                    }
+                  })
                 },
                 fail: (err) => {
                   console.error('Canvas 导出失败:', err)

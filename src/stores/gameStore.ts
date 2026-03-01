@@ -526,13 +526,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     // 更新总花费时间
     set({ totalTimeSpent: newTotalTimeSpent })
 
-    // 检查是否完成第10关（通关）
-    if (currentLevel >= 10) {
-      console.log('🎉 恭喜通关！')
-      set({ isGameCompleted: true, isComplete: false })
-    } else {
-      await get().startGame(currentLevel + 1)
-    }
+    // 进入下一关（移除10关限制，支持无限关卡）
+    await get().startGame(currentLevel + 1)
   },
 
   // 自由游玩模式（不倒计时）
