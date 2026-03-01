@@ -101,13 +101,23 @@ export default function IndexPage() {
     const { playVibration } = useSettingsStore.getState()
     playVibration('light')
 
+    console.log('开始登录...')
+
     // 先调用微信登录
     await login()
 
-    // 登录成功后显示用户信息设置弹窗
-    const { isLoggedIn: isNowLoggedIn } = useUserStore.getState()
-    if (isNowLoggedIn) {
-      setShowUserProfile(true)
+    // 登录成功后检查是否需要设置用户信息
+    const { isLoggedIn: isNowLoggedIn, userInfo: currentUser } = useUserStore.getState()
+    console.log('登录结果:', { isLoggedIn: isNowLoggedIn, userInfo: currentUser })
+
+    if (isNowLoggedIn && currentUser) {
+      // 如果用户没有设置头像和昵称，或者使用默认值，则显示设置弹窗
+      if (!currentUser.avatarUrl || currentUser.nickname === '拼图玩家' || currentUser.nickname === '微信用户') {
+        console.log('用户未设置头像和昵称，显示设置弹窗')
+        setShowUserProfile(true)
+      } else {
+        console.log('用户已设置头像和昵称:', currentUser)
+      }
     }
   }
 

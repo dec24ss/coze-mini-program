@@ -9,6 +9,7 @@ export interface UserInfo {
   avatarUrl: string
   highestLevel: number  // 最高过关关卡
   points: number        // 积分
+  hasSetProfile?: boolean  // 是否已设置头像和昵称
 }
 
 // 排行榜条目
@@ -66,37 +67,11 @@ export const useUserStore = create<UserState>((set, get) => ({
   login: async (nickname?: string, avatarUrl?: string) => {
     set({ isLoading: true })
     try {
-      // 如果没有传入昵称和头像，尝试获取用户信息
-      let userNickname = nickname
-      let userAvatarUrl = avatarUrl
+      // 使用传入的昵称和头像，或使用默认值
+      const userNickname = nickname || '拼图玩家'
+      const userAvatarUrl = avatarUrl || ''
 
-      if (!userNickname || !userAvatarUrl) {
-        // 检查是否在小程序环境
-        const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
-
-        if (isWeapp) {
-          try {
-            // 获取用户信息（需要用户授权）
-            const profileRes = await Taro.getUserProfile({
-              desc: '用于完善用户资料'
-            })
-
-            if (profileRes.userInfo) {
-              userNickname = profileRes.userInfo.nickName || '拼图玩家'
-              userAvatarUrl = profileRes.userInfo.avatarUrl || ''
-              console.log('获取用户信息成功:', userNickname, userAvatarUrl)
-            }
-          } catch (error) {
-            console.warn('获取用户信息失败，使用默认值:', error)
-            userNickname = userNickname || '拼图玩家'
-            userAvatarUrl = userAvatarUrl || ''
-          }
-        } else {
-          // H5 环境，使用默认值或传入的值
-          userNickname = userNickname || '拼图玩家'
-          userAvatarUrl = userAvatarUrl || ''
-        }
-      }
+      console.log('登录参数:', { nickname: userNickname, avatarUrl: userAvatarUrl })
 
       // 调用微信登录接口
       const loginRes = await Taro.login({
@@ -169,10 +144,28 @@ export const useUserStore = create<UserState>((set, get) => ({
     const newUserInfo = {
       ...userInfo,
       nickname,
-      avatarUrl
+      avatarUrl,
+      hasSetProfile: true
     }
 
     set({ userInfo: newUserInfo })
+
+    // 同步更新到后端
+    try {
+      await Network.request({
+        url: '/api/users/update',
+        method: 'POST',
+        data: {
+          openid: userInfo.openid,
+          nickname: nickname,
+          avatar_url: avatarUrl
+        }
+      })
+      console.log('用户信息已同步到数据库')
+    } catch (error) {
+      console.error('同步用户信息失败:', error)
+    }
+
     console.log('用户信息已更新:', newUserInfo)
   },
 
