@@ -166,11 +166,11 @@
 
 /* 拼图板完成时的光效 */
 .puzzle-board.game-complete {
-  animation: board-glow 2s ease-in-out infinite alternate;
+  animation: board-glow 1.5s ease-in-out infinite alternate;
   position: relative;
 }
 
-/* 拼图板完成时的烟花背景效果 - 夸张华丽版 */
+/* 拼图板完成时的烟花背景效果 - 超级夸张华丽版 */
 .puzzle-board.game-complete::before {
   content: '';
   position: absolute;
@@ -178,81 +178,321 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
-    radial-gradient(circle at 15% 25%, rgba(255, 215, 0, 0.3) 0%, transparent 40%),
-    radial-gradient(circle at 85% 15%, rgba(255, 107, 107, 0.3) 0%, transparent 40%),
-    radial-gradient(circle at 50% 75%, rgba(78, 205, 196, 0.3) 0%, transparent 40%),
-    radial-gradient(circle at 25% 75%, rgba(255, 215, 0, 0.2) 0%, transparent 35%),
-    radial-gradient(circle at 75% 75%, rgba(255, 107, 107, 0.2) 0%, transparent 35%),
-    radial-gradient(circle at 50% 50%, rgba(78, 205, 196, 0.25) 0%, transparent 50%),
-    radial-gradient(circle at 10% 50%, rgba(255, 215, 0, 0.15) 0%, transparent 30%),
-    radial-gradient(circle at 90% 50%, rgba(255, 107, 107, 0.15) 0%, transparent 30%);
-  animation: board-firework-bg 2.5s ease-in-out infinite;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(255, 215, 0, 0.4) 0%, transparent 45%),
+    radial-gradient(circle at 90% 10%, rgba(255, 107, 107, 0.4) 0%, transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(78, 205, 196, 0.4) 0%, transparent 45%),
+    radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.35) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(255, 107, 107, 0.35) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(78, 205, 196, 0.3) 0%, transparent 55%),
+    radial-gradient(circle at 5% 50%, rgba(255, 215, 0, 0.25) 0%, transparent 35%),
+    radial-gradient(circle at 95% 50%, rgba(255, 107, 107, 0.25) 0%, transparent 35%),
+    radial-gradient(circle at 50% 10%, rgba(255, 215, 0, 0.2) 0%, transparent 30%),
+    radial-gradient(circle at 50% 90%, rgba(78, 205, 196, 0.2) 0%, transparent 30%),
+    radial-gradient(circle at 30% 40%, rgba(255, 107, 107, 0.3) 0%, transparent 40%),
+    radial-gradient(circle at 70% 60%, rgba(255, 215, 0, 0.3) 0%, transparent 40%);
+  animation: board-firework-bg 2s ease-in-out infinite;
   pointer-events: none;
   z-index: 10;
 }
 
 @keyframes board-firework-bg {
   0%, 100% {
-    opacity: 0.6;
-    transform: scale(1);
+    opacity: 0.7;
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    opacity: 0.9;
+    transform: scale(1.03) rotate(1deg);
   }
   50% {
     opacity: 1;
-    transform: scale(1.08);
+    transform: scale(1.06) rotate(0deg);
+  }
+  75% {
+    opacity: 0.9;
+    transform: scale(1.03) rotate(-1deg);
   }
 }
 
-/* 拼图板完成时的烟花粒子 - 夸张华丽版 */
-.puzzle-board.game-complete::after {
-  content: '';
+/* 第一个烟花爆炸点 - 左上角 */
+.puzzle-board.game-complete .firework-1 {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 16px;
-  height: 16px;
-  background: #ffd700;
+  top: 25%;
+  left: 20%;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, #ffd700 0%, #ff6b6b 100%);
   border-radius: 50%;
   box-shadow:
-    0 0 40px 15px rgba(255, 215, 0, 0.8),
-    0 0 80px 30px rgba(255, 107, 107, 0.6),
-    0 0 120px 45px rgba(78, 205, 196, 0.4),
-    -150px 0 0 10px #ff6b6b,
-    150px 0 0 10px #4ecdc4,
-    0 -150px 0 10px #ffd700,
-    0 150px 0 10px #ff6b6b,
-    -100px -100px 0 8px #4ecdc4,
-    100px 100px 0 8px #ffd700,
-    100px -100px 0 8px #ff6b6b,
-    -100px 100px 0 8px #4ecdc4,
-    -200px 50px 0 7px #ffd700,
-    200px -50px 0 7px #ff6b6b,
-    -50px -200px 0 7px #4ecdc4,
-    50px 200px 0 7px #ffd700,
-    180px 80px 0 6px #4ecdc4,
-    -180px -80px 0 6px #ff6b6b,
-    80px 180px 0 6px #ffd700,
-    -80px -180px 0 6px #4ecdc4;
-  animation: board-firework-particles 3s ease-out infinite;
+    0 0 50px 20px rgba(255, 215, 0, 0.9),
+    0 0 100px 40px rgba(255, 107, 107, 0.7),
+    0 0 150px 60px rgba(78, 205, 196, 0.5),
+    -120px 0 0 12px #ff6b6b,
+    120px 0 0 12px #4ecdc4,
+    0 -120px 0 12px #ffd700,
+    0 120px 0 12px #ff6b6b,
+    -85px -85px 0 10px #4ecdc4,
+    85px 85px 0 10px #ffd700,
+    85px -85px 0 10px #ff6b6b,
+    -85px 85px 0 10px #4ecdc4,
+    -170px 60px 0 9px #ffd700,
+    170px -60px 0 9px #ff6b6b,
+    -60px -170px 0 9px #4ecdc4,
+    60px 170px 0 9px #ffd700,
+    140px 100px 0 8px #4ecdc4,
+    -140px -100px 0 8px #ff6b6b,
+    100px 140px 0 8px #ffd700,
+    -100px -140px 0 8px #4ecdc4,
+    180px 40px 0 7px #ff6b6b,
+    -180px -40px 0 7px #ffd700,
+    40px 180px 0 7px #4ecdc4,
+    -40px -180px 0 7px #ff6b6b;
+  animation: firework-explode-1 2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
   pointer-events: none;
   z-index: 10;
 }
 
-@keyframes board-firework-particles {
+@keyframes firework-explode-1 {
   0% {
-    transform: translate(-50%, -50%) scale(0.3);
+    transform: scale(0.1);
     opacity: 0;
   }
-  30% {
-    transform: translate(-50%, -50%) scale(1.8);
+  25% {
+    transform: scale(2.5);
     opacity: 1;
   }
-  60% {
-    transform: translate(-50%, -50%) scale(1.3);
-    opacity: 0.8;
+  50% {
+    transform: scale(1.8);
+    opacity: 0.9;
   }
   100% {
-    transform: translate(-50%, -50%) scale(0.8);
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* 第二个烟花爆炸点 - 右上角 */
+.puzzle-board.game-complete .firework-2 {
+  position: absolute;
+  top: 20%;
+  right: 15%;
+  width: 18px;
+  height: 18px;
+  background: radial-gradient(circle, #ff6b6b 0%, #ffd700 100%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 45px 18px rgba(255, 107, 107, 0.9),
+    0 0 90px 36px rgba(255, 215, 0, 0.7),
+    0 0 135px 54px rgba(78, 205, 196, 0.5),
+    -110px 0 0 11px #ffd700,
+    110px 0 0 11px #4ecdc4,
+    0 -110px 0 11px #ff6b6b,
+    0 110px 0 11px #ffd700,
+    -75px -75px 0 9px #4ecdc4,
+    75px 75px 0 9px #ff6b6b,
+    75px -75px 0 9px #ffd700,
+    -75px 75px 0 9px #4ecdc4,
+    -150px 50px 0 8px #ffd700,
+    150px -50px 0 8px #ff6b6b,
+    -50px -150px 0 8px #4ecdc4,
+    50px 150px 0 8px #ffd700,
+    120px 90px 0 7px #4ecdc4,
+    -120px -90px 0 7px #ff6b6b,
+    90px 120px 0 7px #ffd700,
+    -90px -120px 0 7px #4ecdc4;
+  animation: firework-explode-2 2.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes firework-explode-2 {
+  0% {
+    transform: scale(0.1);
+    opacity: 0;
+  }
+  25% {
+    transform: scale(2.3);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.7);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* 第三个烟花爆炸点 - 左下角 */
+.puzzle-board.game-complete .firework-3 {
+  position: absolute;
+  bottom: 25%;
+  left: 18%;
+  width: 22px;
+  height: 22px;
+  background: radial-gradient(circle, #4ecdc4 0%, #ffd700 100%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 55px 22px rgba(78, 205, 196, 0.9),
+    0 0 110px 44px rgba(255, 215, 0, 0.7),
+    0 0 165px 66px rgba(255, 107, 107, 0.5),
+    -130px 0 0 13px #ffd700,
+    130px 0 0 13px #ff6b6b,
+    0 -130px 0 13px #4ecdc4,
+    0 130px 0 13px #ffd700,
+    -90px -90px 0 11px #ff6b6b,
+    90px 90px 0 11px #4ecdc4,
+    90px -90px 0 11px #ffd700,
+    -90px 90px 0 11px #ff6b6b,
+    -180px 70px 0 10px #4ecdc4,
+    180px -70px 0 10px #ffd700,
+    -70px -180px 0 10px #ff6b6b,
+    70px 180px 0 10px #4ecdc4,
+    150px 110px 0 9px #ff6b6b,
+    -150px -110px 0 9px #ffd700,
+    110px 150px 0 9px #4ecdc4,
+    -110px -150px 0 9px #ff6b6b,
+    190px 50px 0 8px #ffd700,
+    -190px -50px 0 8px #4ecdc4,
+    50px 190px 0 8px #ff6b6b,
+    -50px -190px 0 8px #4ecdc4;
+  animation: firework-explode-3 2.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.6s infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes firework-explode-3 {
+  0% {
+    transform: scale(0.1);
+    opacity: 0;
+  }
+  25% {
+    transform: scale(2.7);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(2);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* 第四个烟花爆炸点 - 右下角 */
+.puzzle-board.game-complete .firework-4 {
+  position: absolute;
+  bottom: 22%;
+  right: 20%;
+  width: 19px;
+  height: 19px;
+  background: radial-gradient(circle, #ffd700 0%, #4ecdc4 100%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 48px 19px rgba(255, 215, 0, 0.9),
+    0 0 96px 38px rgba(78, 205, 196, 0.7),
+    0 0 144px 57px rgba(255, 107, 107, 0.5),
+    -115px 0 0 12px #4ecdc4,
+    115px 0 0 12px #ff6b6b,
+    0 -115px 0 12px #ffd700,
+    0 115px 0 12px #4ecdc4,
+    -80px -80px 0 10px #ff6b6b,
+    80px 80px 0 10px #ffd700,
+    80px -80px 0 10px #4ecdc4,
+    -80px 80px 0 10px #ff6b6b,
+    -160px 65px 0 9px #ffd700,
+    160px -65px 0 9px #4ecdc4,
+    -65px -160px 0 9px #ff6b6b,
+    65px 160px 0 9px #ffd700,
+    130px 95px 0 8px #ff6b6b,
+    -130px -95px 0 8px #4ecdc4,
+    95px 130px 0 8px #ffd700,
+    -95px -130px 0 8px #ff6b6b,
+    175px 45px 0 7px #4ecdc4,
+    -175px -45px 0 7px #ffd700,
+    45px 175px 0 7px #ff6b6b,
+    -45px -175px 0 7px #4ecdc4;
+  animation: firework-explode-4 2.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.9s infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes firework-explode-4 {
+  0% {
+    transform: scale(0.1);
+    opacity: 0;
+  }
+  25% {
+    transform: scale(2.4);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.9);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* 第五个烟花爆炸点 - 中央 */
+.puzzle-board.game-complete .firework-5 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 25px;
+  height: 25px;
+  background: radial-gradient(circle, #ff6b6b 0%, #ffd700 100%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 60px 24px rgba(255, 107, 107, 0.9),
+    0 0 120px 48px rgba(255, 215, 0, 0.7),
+    0 0 180px 72px rgba(78, 205, 196, 0.5),
+    -140px 0 0 14px #ffd700,
+    140px 0 0 14px #4ecdc4,
+    0 -140px 0 14px #ff6b6b,
+    0 140px 0 14px #ffd700,
+    -100px -100px 0 12px #4ecdc4,
+    100px 100px 0 12px #ff6b6b,
+    100px -100px 0 12px #ffd700,
+    -100px 100px 0 12px #4ecdc4,
+    -200px 80px 0 11px #ffd700,
+    200px -80px 0 11px #ff6b6b,
+    -80px -200px 0 11px #4ecdc4,
+    80px 200px 0 11px #ffd700,
+    160px 120px 0 10px #4ecdc4,
+    -160px -120px 0 10px #ff6b6b,
+    120px 160px 0 10px #ffd700,
+    -120px -160px 0 10px #4ecdc4,
+    220px 60px 0 9px #ff6b6b,
+    -220px -60px 0 9px #ffd700,
+    60px 220px 0 9px #4ecdc4,
+    -60px -220px 0 9px #ff6b6b;
+  animation: firework-explode-5 2.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1.2s infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes firework-explode-5 {
+  0% {
+    transform: translate(-50%, -50%) scale(0.1);
+    opacity: 0;
+  }
+  25% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(2.2);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.6);
     opacity: 0;
   }
 }
@@ -269,23 +509,26 @@
 @keyframes board-glow {
   0% {
     box-shadow:
-      0 15px 35px -5px rgba(0, 0, 0, 0.15),
-      0 0 0 4px rgba(255, 215, 0, 0.5),
-      0 0 0 8px rgba(255, 107, 107, 0.3);
+      0 20px 50px -10px rgba(0, 0, 0, 0.2),
+      0 0 0 6px rgba(255, 215, 0, 0.6),
+      0 0 0 12px rgba(255, 107, 107, 0.4),
+      0 0 0 18px rgba(78, 205, 196, 0.2);
   }
   50% {
     box-shadow:
-      0 25px 60px -5px rgba(0, 0, 0, 0.25),
-      0 0 0 8px rgba(255, 215, 0, 0.8),
-      0 0 0 16px rgba(255, 107, 107, 0.5),
-      0 0 80px rgba(78, 205, 196, 0.4);
+      0 35px 80px -15px rgba(0, 0, 0, 0.3),
+      0 0 0 12px rgba(255, 215, 0, 0.9),
+      0 0 0 24px rgba(255, 107, 107, 0.6),
+      0 0 0 36px rgba(78, 205, 196, 0.4),
+      0 0 100px rgba(255, 215, 0, 0.5);
   }
   100% {
     box-shadow:
-      0 35px 85px -5px rgba(0, 0, 0, 0.3),
-      0 0 0 12px rgba(255, 215, 0, 1),
-      0 0 0 24px rgba(255, 107, 107, 0.7),
-      0 0 120px rgba(78, 205, 196, 0.5);
+      0 50px 110px -20px rgba(0, 0, 0, 0.4),
+      0 0 0 18px rgba(255, 215, 0, 1),
+      0 0 0 36px rgba(255, 107, 107, 0.8),
+      0 0 0 54px rgba(78, 205, 196, 0.6),
+      0 0 150px rgba(255, 215, 0, 0.6);
   }
 }
 

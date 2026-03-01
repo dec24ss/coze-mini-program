@@ -829,6 +829,17 @@ export default function GamePage() {
                 transition: 'opacity 0.3s ease-in-out'
               }}
             >
+              {/* 过关烟花特效 */}
+              {showCompleteAnimation && (
+                <>
+                  <View className="firework-1"></View>
+                  <View className="firework-2"></View>
+                  <View className="firework-3"></View>
+                  <View className="firework-4"></View>
+                  <View className="firework-5"></View>
+                </>
+              )}
+
               {/* 拼图碎片将由 JS 动态渲染 */}
               <View className="puzzle-grid">
                 {pieces.map((piece) => {
