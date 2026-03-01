@@ -66,6 +66,38 @@ export const useUserStore = create<UserState>((set, get) => ({
   login: async (nickname?: string, avatarUrl?: string) => {
     set({ isLoading: true })
     try {
+      // 如果没有传入昵称和头像，尝试获取用户信息
+      let userNickname = nickname
+      let userAvatarUrl = avatarUrl
+
+      if (!userNickname || !userAvatarUrl) {
+        // 检查是否在小程序环境
+        const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
+
+        if (isWeapp) {
+          try {
+            // 获取用户信息（需要用户授权）
+            const profileRes = await Taro.getUserProfile({
+              desc: '用于完善用户资料'
+            })
+
+            if (profileRes.userInfo) {
+              userNickname = profileRes.userInfo.nickName || '拼图玩家'
+              userAvatarUrl = profileRes.userInfo.avatarUrl || ''
+              console.log('获取用户信息成功:', userNickname, userAvatarUrl)
+            }
+          } catch (error) {
+            console.warn('获取用户信息失败，使用默认值:', error)
+            userNickname = userNickname || '拼图玩家'
+            userAvatarUrl = userAvatarUrl || ''
+          }
+        } else {
+          // H5 环境，使用默认值或传入的值
+          userNickname = userNickname || '拼图玩家'
+          userAvatarUrl = userAvatarUrl || ''
+        }
+      }
+
       // 调用微信登录接口
       const loginRes = await Taro.login({
         timeout: 5000
@@ -80,8 +112,8 @@ export const useUserStore = create<UserState>((set, get) => ({
           method: 'POST',
           data: {
             openid: loginRes.code,
-            nickname: nickname || '拼图玩家',
-            avatar_url: avatarUrl || ''
+            nickname: userNickname,
+            avatar_url: userAvatarUrl
           }
         })
 

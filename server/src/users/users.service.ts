@@ -22,9 +22,33 @@ export class UsersService {
       .where(eq(users.openid, openid))
       .limit(1);
 
-    // 如果用户存在，返回用户数据
+    // 如果用户存在，检查是否需要更新头像和昵称
     if (existingUsers.length > 0) {
-      return existingUsers[0];
+      const existingUser = existingUsers[0];
+      let needUpdate = false;
+      const updateData: Partial<UserData> = {};
+
+      // 如果传入了新的昵称，且与现有昵称不同，则更新
+      if (userData?.nickname && userData.nickname !== existingUser.nickname) {
+        updateData.nickname = userData.nickname;
+        needUpdate = true;
+      }
+
+      // 如果传入了新的头像，且与现有头像不同，则更新
+      if (userData?.avatar_url && userData.avatar_url !== existingUser.avatarUrl) {
+        updateData.avatar_url = userData.avatar_url;
+        needUpdate = true;
+      }
+
+      // 如果需要更新，执行更新操作
+      if (needUpdate) {
+        const updatedUsers = await this.updateUser(openid, updateData);
+        console.log('用户信息已更新:', updateData);
+        return updatedUsers;
+      }
+
+      // 不需要更新，返回现有用户数据
+      return existingUser;
     }
 
     // 用户不存在，创建新用户
@@ -39,6 +63,7 @@ export class UsersService {
       })
       .returning();
 
+    console.log('创建新用户:', newUsers[0]);
     return newUsers[0];
   }
 
