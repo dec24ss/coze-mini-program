@@ -13,9 +13,9 @@
 
 .settings-modal {
   background: white;
-  border-radius: 16px;
-  width: 80%;
-  max-width: 320px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
@@ -24,12 +24,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 24px 28px;
   border-bottom: 1px solid #F3F4F6;
 }
 
 .settings-title {
-  font-size: 18px;
+  font-size: 28px;
   font-weight: 600;
   color: #1F2937;
 }
@@ -37,7 +37,7 @@
 .settings-close {
   background: none;
   border: none;
-  padding: 4px;
+  padding: 8px;
   line-height: 1;
 }
 
@@ -46,14 +46,14 @@
 }
 
 .settings-content {
-  padding: 16px 20px;
+  padding: 24px 28px;
 }
 
 .settings-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0;
+  padding: 20px 0;
   border-bottom: 1px solid #F3F4F6;
 }
 
@@ -64,16 +64,16 @@
 .settings-item-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 .settings-item-text {
-  font-size: 16px;
+  font-size: 24px;
   color: #1F2937;
 }
 
 .settings-footer {
-  padding: 16px 20px;
+  padding: 24px 28px;
   border-top: 1px solid #F3F4F6;
 }
 
@@ -82,9 +82,9 @@
   background: #3B82F6;
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 16px;
+  border-radius: 12px;
+  padding: 18px;
+  font-size: 24px;
   font-weight: 600;
 }
 

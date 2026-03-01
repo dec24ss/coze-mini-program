@@ -19,7 +19,7 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
         <View className="settings-header">
           <Text className="block settings-title">设置</Text>
           <Button className="settings-close" onClick={() => { playVibration('light'); onClose(); }}>
-            <X size={24} color="#6B7280" />
+            <X size={32} color="#6B7280" />
           </Button>
         </View>
 
@@ -28,9 +28,9 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
           <View className="settings-item">
             <View className="settings-item-left">
               {soundEnabled ? (
-                <Volume2 size={24} color="#3B82F6" />
+                <Volume2 size={32} color="#3B82F6" />
               ) : (
-                <VolumeX size={24} color="#9CA3AF" />
+                <VolumeX size={32} color="#9CA3AF" />
               )}
               <Text className="block settings-item-text">音效</Text>
             </View>
@@ -45,9 +45,9 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
           <View className="settings-item">
             <View className="settings-item-left">
               {vibrationEnabled ? (
-                <Bell size={24} color="#3B82F6" />
+                <Bell size={32} color="#3B82F6" />
               ) : (
-                <BellOff size={24} color="#9CA3AF" />
+                <BellOff size={32} color="#9CA3AF" />
               )}
               <Text className="block settings-item-text">震动</Text>
             </View>

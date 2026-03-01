@@ -9,7 +9,7 @@ import './index.css'
 
 export default function LevelSelectPage() {
   const { levelImageMap, isImagesPreloaded } = useGameStore()
-  const { userInfo, isLoggedIn, unlockedLevels, levelImages } = useUserStore()
+  const { userInfo, unlockedLevels, levelImages } = useUserStore()
   const { initSettings } = useSettingsStore()
   const [displayLevels, setDisplayLevels] = useState(20)  // 默认显示20关
 
@@ -74,14 +74,6 @@ export default function LevelSelectPage() {
     }
   }
 
-  // 返回首页
-  const handleBackHome = () => {
-    // 播放轻微震动
-    const { playVibration } = useSettingsStore.getState()
-    playVibration('light')
-    Taro.redirectTo({ url: '/pages/index/index' })
-  }
-
   // 加载更多关卡
   const handleLoadMore = () => {
     // 播放轻微震动
@@ -95,15 +87,6 @@ export default function LevelSelectPage() {
 
   return (
     <View className="level-select-page">
-      <View className="level-header">
-        <Text className="block level-title">选择关卡</Text>
-        {isLoggedIn && userInfo && (
-          <Text className="block level-subtitle">
-            最高关卡：第{userInfo.highestLevel}关 | 已解锁：第{unlockedLevels}关
-          </Text>
-        )}
-      </View>
-
       <View className="level-grid">
         {levels.map((level) => {
           const isLocked = level > unlockedLevels
@@ -160,10 +143,8 @@ export default function LevelSelectPage() {
         </Button>
       </View>
 
-      <View className="level-footer">
-        <Button className="footer-button" onClick={handleBackHome}>
-          返回首页
-        </Button>
+      <View className="level-footer-hint">
+        <Text className="block footer-hint-text">右滑屏幕返回首页</Text>
       </View>
     </View>
   )

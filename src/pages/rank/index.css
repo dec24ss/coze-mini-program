@@ -4,6 +4,7 @@
   flex-direction: column;
   background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
   padding: 20px;
+  padding-bottom: 80px;
   position: relative;
 }
 
@@ -25,37 +26,6 @@
 
 .settings-button-top::after {
   border: none;
-}
-
-.rank-header {
-  margin-bottom: 24px;
-  text-align: center;
-}
-
-.rank-title {
-  font-size: 56px;
-  font-weight: 700;
-  color: #1F2937;
-  margin-bottom: 16px;
-}
-
-.my-rank {
-  background: white;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.my-rank-text {
-  font-size: 36px;
-  font-weight: 600;
-  color: #3B82F6;
-  margin-bottom: 4px;
-}
-
-.my-level {
-  font-size: 28px;
-  color: #6B7280;
 }
 
 .rank-list {
@@ -163,35 +133,27 @@
   color: #3B82F6;
 }
 
-.rank-footer {
-  margin-top: 24px;
+.rank-footer-hint {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
-.back-button {
-  width: 100%;
-  background: #3B82F6;
-  color: white;
-  border: none;
-  border-radius: 25px;
-  padding: 14px;
-  font-size: 32px;
-  font-weight: 600;
-}
-
-.back-button::after {
-  border: none;
+.footer-hint-text {
+  font-size: 28rpx;
+  color: #9CA3AF;
+  opacity: 0.7;
 }
 
 .rank-empty {
   flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
-.rank-empty text {
-  font-size: 18px;
+.empty-text {
+  font-size: 36rpx;
   color: #6B7280;
-  margin-bottom: 24px;
 }

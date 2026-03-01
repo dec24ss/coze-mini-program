@@ -1,12 +1,11 @@
-import { View, Text, Button, Image } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import { View, Text, Image } from '@tarojs/components'
 import { useEffect } from 'react'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import './index.css'
 
 export default function RankPage() {
-  const { userInfo, rankList, myRank, isLoggedIn, fetchRankList } = useUserStore()
+  const { userInfo, rankList, isLoggedIn, fetchRankList } = useUserStore()
   const { initSettings } = useSettingsStore()
 
   // 隐藏昵称（显示第一个字后面用*）
@@ -25,21 +24,11 @@ export default function RankPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn])
 
-  const handleBack = () => {
-    // 播放轻微震动
-    const { playVibration } = useSettingsStore.getState()
-    playVibration('light')
-    Taro.navigateBack()
-  }
-
   if (!isLoggedIn) {
     return (
       <View className="rank-page">
         <View className="rank-empty">
-          <Text className="block">请先登录</Text>
-          <Button className="back-button" onClick={handleBack}>
-            返回首页
-          </Button>
+          <Text className="block empty-text">请先登录</Text>
         </View>
       </View>
     )
@@ -47,16 +36,6 @@ export default function RankPage() {
 
   return (
     <View className="rank-page">
-      <View className="rank-header">
-        <Text className="block rank-title">排行榜</Text>
-        {userInfo && (
-          <View className="my-rank">
-            <Text className="block my-rank-text">我的排名：第{myRank}名</Text>
-            <Text className="block my-level">最高关卡：第{userInfo.highestLevel}关</Text>
-          </View>
-        )}
-      </View>
-
       <View className="rank-list">
         <View className="rank-item header">
           <Text className="block rank-col">排名</Text>
@@ -93,10 +72,8 @@ export default function RankPage() {
         ))}
       </View>
 
-      <View className="rank-footer">
-        <Button className="back-button" onClick={handleBack}>
-          返回首页
-        </Button>
+      <View className="rank-footer-hint">
+        <Text className="block footer-hint-text">右滑屏幕返回首页</Text>
       </View>
     </View>
   )
