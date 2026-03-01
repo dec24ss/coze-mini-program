@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import Taro from '@tarojs/taro'
+import { Network } from '@/network'
 
 // 用户信息
 export interface UserInfo {
@@ -43,8 +44,8 @@ interface UserState {
   updateHighestLevel: (level: number, imageUrl?: string) => Promise<void>
   fetchRankList: () => Promise<void>
   checkUnlockedLevels: () => number
-  addPoints: (points: number) => void
-  consumePoints: (points: number) => boolean
+  addPoints: (points: number) => Promise<void>
+  consumePoints: (points: number) => Promise<boolean>
   getPoints: () => number
   getCurrentLevel: () => number
   getLevelImage: (level: number) => string | undefined
@@ -73,47 +74,50 @@ export const useUserStore = create<UserState>((set, get) => ({
       if (loginRes.code) {
         console.log('微信登录成功，code:', loginRes.code)
 
-        // 使用传入的用户信息（如果有的话）
-        const userInfo: UserInfo = {
-          openid: loginRes.code,  // 实际应该用code换取openid
-          nickname: nickname || '拼图玩家',
-          avatarUrl: avatarUrl || '',
-          highestLevel: 0,
-          points: 0
-        }
-
-        // 从本地存储读取最高关卡
-        const savedHighestLevel = Taro.getStorageSync('highestLevel')
-        if (savedHighestLevel) {
-          userInfo.highestLevel = parseInt(savedHighestLevel)
-        }
-
-        // 从本地存储读取积分
-        const savedPoints = Taro.getStorageSync('points')
-        if (savedPoints) {
-          userInfo.points = parseInt(savedPoints)
-        }
-
-        // 从本地存储读取解锁的关卡
-        const savedUnlockedLevels = Taro.getStorageSync('unlockedLevels')
-        const unlockedLevels = savedUnlockedLevels ? parseInt(savedUnlockedLevels) : 1
-
-        // 从本地存储读取关卡图片映射
-        const savedLevelImages = Taro.getStorageSync('levelImages')
-        const levelImages = savedLevelImages ? JSON.parse(savedLevelImages) : {}
-
-        set({
-          userInfo,
-          isLoggedIn: true,
-          isLoading: false,
-          unlockedLevels,
-          levelImages
+        // 调用后端登录 API
+        const response = await Network.request({
+          url: '/api/users/login',
+          method: 'POST',
+          data: {
+            openid: loginRes.code,
+            nickname: nickname || '拼图玩家',
+            avatar_url: avatarUrl || ''
+          }
         })
 
-        console.log('用户登录成功:', userInfo)
-        console.log('已加载关卡图片映射:', Object.keys(levelImages).length, '个关卡')
+        if (response.data?.data) {
+          const apiUser = response.data.data
+          const userInfo: UserInfo = {
+            openid: apiUser.openid,
+            nickname: apiUser.nickname || '拼图玩家',
+            avatarUrl: apiUser.avatar_url || '',
+            highestLevel: apiUser.highest_level || 0,
+            points: apiUser.points || 0
+          }
+
+          // 从本地存储读取关卡图片映射（本地缓存）
+          const savedLevelImages = Taro.getStorageSync('levelImages')
+          const levelImages = savedLevelImages ? JSON.parse(savedLevelImages) : {}
+
+          // 从本地存储读取解锁的关卡（优先使用本地数据，确保游戏进度不会丢失）
+          const savedUnlockedLevels = Taro.getStorageSync('unlockedLevels')
+          const unlockedLevels = savedUnlockedLevels ? Math.max(parseInt(savedUnlockedLevels), 1) : 1
+
+          set({
+            userInfo,
+            isLoggedIn: true,
+            isLoading: false,
+            unlockedLevels,
+            levelImages
+          })
+
+          console.log('用户登录成功:', userInfo)
+          console.log('已加载关卡图片映射:', Object.keys(levelImages).length, '个关卡')
+        } else {
+          throw new Error('登录失败：服务器返回数据格式错误')
+        }
       } else {
-        throw new Error('登录失败')
+        throw new Error('登录失败：未获取到微信登录 code')
       }
     } catch (error) {
       console.error('微信登录失败:', error)
@@ -168,14 +172,14 @@ export const useUserStore = create<UserState>((set, get) => ({
     // 只有当新关卡大于当前最高关卡时才更新
     if (level > userInfo.highestLevel) {
       const newUserInfo = { ...userInfo, highestLevel: level }
-      
+
       // 保存关卡图片映射
       const newLevelImages = { ...get().levelImages }
       if (imageUrl) {
         newLevelImages[level] = imageUrl
       }
-      
-      set({ 
+
+      set({
         userInfo: newUserInfo,
         levelImages: newLevelImages
       })
@@ -189,6 +193,22 @@ export const useUserStore = create<UserState>((set, get) => ({
       set({ unlockedLevels: newUnlockedLevels })
       Taro.setStorageSync('unlockedLevels', newUnlockedLevels.toString())
 
+      // 同步更新到后端数据库
+      try {
+        await Network.request({
+          url: '/api/users/update-level',
+          method: 'POST',
+          data: {
+            openid: userInfo.openid,
+            highest_level: level
+          }
+        })
+        console.log(`最高关卡已同步到数据库: ${level}`)
+      } catch (error) {
+        console.error('同步最高关卡到数据库失败:', error)
+        // 失败不影响本地更新
+      }
+
       console.log(`用户最高关卡更新为: ${level}，解锁关卡: ${newUnlockedLevels}`)
       if (imageUrl) {
         console.log(`关卡 ${level} 图片已保存`)
@@ -196,47 +216,43 @@ export const useUserStore = create<UserState>((set, get) => ({
     }
   },
 
-  // 获取排行榜（本地模拟）
+  // 获取排行榜（从 Supabase 获取真实数据）
   fetchRankList: async () => {
-    // 这里可以对接真实的后端API
-    // 目前使用本地模拟数据
-    const mockRankList: RankItem[] = [
-      { openid: '1', nickname: '拼图大师', avatarUrl: '', highestLevel: 15, rank: 1 },
-      { openid: '2', nickname: '拼图高手', avatarUrl: '', highestLevel: 12, rank: 2 },
-      { openid: '3', nickname: '拼图达人', avatarUrl: '', highestLevel: 10, rank: 3 },
-      { openid: '4', nickname: '拼图新手', avatarUrl: '', highestLevel: 8, rank: 4 },
-      { openid: '5', nickname: '拼图爱好者', avatarUrl: '', highestLevel: 5, rank: 5 },
-    ]
+    try {
+      const response = await Network.request({
+        url: '/api/users/rank/list',
+        method: 'GET'
+      })
 
-    // 添加当前用户到排行榜
-    const { userInfo } = get()
-    if (userInfo) {
-      const myRankItem: RankItem = {
-        openid: userInfo.openid,
-        nickname: userInfo.nickname,
-        avatarUrl: userInfo.avatarUrl,
-        highestLevel: userInfo.highestLevel,
-        rank: 0
+      if (response.data?.data) {
+        const rankList: RankItem[] = response.data.data.map((item: any) => ({
+          openid: item.openid,
+          nickname: item.nickname || '匿名用户',
+          avatarUrl: item.avatar_url || '',
+          highestLevel: item.highest_level || 0,
+          rank: item.rank || 0
+        }))
+
+        const { userInfo } = get()
+        let myRank = 0
+
+        // 找到当前用户的排名
+        if (userInfo) {
+          const myRankItem = rankList.find(item => item.openid === userInfo.openid)
+          myRank = myRankItem?.rank || 0
+        }
+
+        set({ rankList, myRank })
+        console.log('排行榜数据加载成功，共', rankList.length, '名玩家')
+      } else {
+        throw new Error('获取排行榜失败：服务器返回数据格式错误')
       }
+    } catch (error) {
+      console.error('获取排行榜失败:', error)
+      Taro.showToast({ title: '获取排行榜失败', icon: 'none' })
 
-      // 合并并排序
-      const allRanks = [...mockRankList, myRankItem]
-      allRanks.sort((a, b) => b.highestLevel - a.highestLevel)
-
-      // 更新排名
-      allRanks.forEach((item, index) => {
-        item.rank = index + 1
-      })
-
-      // 找到当前用户的排名
-      const myRank = allRanks.find(item => item.openid === userInfo.openid)?.rank || 0
-
-      set({
-        rankList: allRanks.slice(0, 10),  // 只显示前10名
-        myRank
-      })
-    } else {
-      set({ rankList: mockRankList })
+      // 失败时使用空数据
+      set({ rankList: [], myRank: 0 })
     }
   },
 
@@ -257,7 +273,7 @@ export const useUserStore = create<UserState>((set, get) => ({
   },
 
   // 添加积分
-  addPoints: (points: number) => {
+  addPoints: async (points: number) => {
     const { userInfo, isLoggedIn } = get()
     if (!isLoggedIn || !userInfo) {
       console.log('用户未登录，无法添加积分')
@@ -271,10 +287,26 @@ export const useUserStore = create<UserState>((set, get) => ({
     // 保存到本地存储
     Taro.setStorageSync('points', newPoints.toString())
     console.log(`用户积分增加 ${points}，当前积分: ${newPoints}`)
+
+    // 同步更新到后端数据库
+    try {
+      await Network.request({
+        url: '/api/users/add-points',
+        method: 'POST',
+        data: {
+          openid: userInfo.openid,
+          points: points
+        }
+      })
+      console.log(`积分已同步到数据库`)
+    } catch (error) {
+      console.error('同步积分到数据库失败:', error)
+      // 失败不影响本地更新
+    }
   },
 
   // 使用积分（扣除积分）
-  consumePoints: (points: number) => {
+  consumePoints: async (points: number) => {
     const { userInfo, isLoggedIn } = get()
     if (!isLoggedIn || !userInfo) {
       console.log('用户未登录，无法使用积分')
@@ -293,6 +325,23 @@ export const useUserStore = create<UserState>((set, get) => ({
     // 保存到本地存储
     Taro.setStorageSync('points', newPoints.toString())
     console.log(`用户使用积分 ${points}，当前积分: ${newPoints}`)
+
+    // 同步更新到后端数据库
+    try {
+      await Network.request({
+        url: '/api/users/consume-points',
+        method: 'POST',
+        data: {
+          openid: userInfo.openid,
+          points: points
+        }
+      })
+      console.log(`积分已同步到数据库`)
+    } catch (error) {
+      console.error('同步积分到数据库失败:', error)
+      // 失败不影响本地更新
+    }
+
     return true
   },
 
