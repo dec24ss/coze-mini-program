@@ -31,9 +31,15 @@ export default function RankPage() {
     <View className="rank-page">
       <View className="rank-list">
         <View className="rank-item header">
-          <Text className="block rank-col">排名</Text>
-          <Text className="block rank-col">用户</Text>
-          <Text className="block rank-col">关卡</Text>
+          <View className="rank-col rank-number">
+            <Text className="block">排名</Text>
+          </View>
+          <View className="rank-col user-info">
+            <Text className="block">用户</Text>
+          </View>
+          <View className="rank-col level-text">
+            <Text className="block">关卡</Text>
+          </View>
         </View>
 
         {rankList.map((item) => (
@@ -60,7 +66,9 @@ export default function RankPage() {
               )}
               <Text className="block user-name">{item.nickname}</Text>
             </View>
-            <Text className="block rank-col level-text">第{item.highestLevel}关</Text>
+            <View className="rank-col level-text">
+              <Text className="block">第{item.highestLevel}关</Text>
+            </View>
           </View>
         ))}
       </View>
