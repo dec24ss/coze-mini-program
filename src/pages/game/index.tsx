@@ -60,7 +60,6 @@ export default function GamePage() {
   const [containerRect, setContainerRect] = useState<{ left: number; top: number; width: number; height: number }>({ left: 0, top: 0, width: 0, height: 0 })
   const [isImageLoaded, setIsImageLoaded] = useState(true)  // 默认为 true，避免一直显示加载中
   const [showFreePlayComplete, setShowFreePlayComplete] = useState(false)  // 自由模式完成弹窗
-  const [showNormalComplete, setShowNormalComplete] = useState(false)  // 正常模式完成弹窗
   const [animatingPieces, setAnimatingPieces] = useState<Set<number>>(new Set())  // 正在播放动画的图块ID
   const [correctPieces, setCorrectPieces] = useState<Set<number>>(new Set())  // 已放置到正确位置的图块ID
   const [showCompleteAnimation, setShowCompleteAnimation] = useState(false)  // 显示完成动画
@@ -355,13 +354,13 @@ export default function GamePage() {
   // 过关后显示弹窗
   useEffect(() => {
     if (isComplete) {
-      // 根据游戏模式显示不同的弹窗
+      // 根据游戏模式显示不同的弹窗或自动进入下一关
       if (isFreePlayMode) {
         // 自由模式显示自由模式弹窗
         setShowFreePlayComplete(true)
       } else {
-        // 正常模式显示正常模式弹窗
-        setShowNormalComplete(true)
+        // 正常模式自动进入下一关
+        handleNextLevelAuto()
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -483,18 +482,6 @@ export default function GamePage() {
         Taro.showToast({ title: '获取图片失败', icon: 'none' })
       }
     })
-  }
-
-  // 进入下一关（从正常模式完成弹窗）
-  const handleNextLevel = () => {
-    // 播放轻微震动
-    playVibration('light')
-
-    // 关闭弹窗
-    setShowNormalComplete(false)
-
-    // 进入下一关
-    handleNextLevelAuto()
   }
 
   // 提示功能
@@ -1093,31 +1080,6 @@ export default function GamePage() {
           <Text className="block footer-hint-text">右滑屏幕返回首页</Text>
         </View>
       </View>
-
-      {/* 正常模式完成弹窗 */}
-      {showNormalComplete && (
-        <View className="victory-modal">
-          <View className="victory-content">
-            <Text className="block victory-title">恭喜过关！</Text>
-            <Text className="block victory-time">获得 1 积分，下一关难度更大哦</Text>
-            <View className="victory-buttons">
-              <Button className="victory-button secondary" onClick={handleBackToLevels}>
-                返回关卡选择
-              </Button>
-              <View className="footer-button-wrapper" style={{ flex: 1 }}>
-                <Button className="victory-button primary" onClick={handleNextLevel}>
-                  进入下一关
-                </Button>
-              </View>
-              <View className="footer-button-wrapper" style={{ flex: 1 }}>
-                <Button className="victory-button primary" onClick={handleDownloadImage}>
-                  下载原图
-                </Button>
-              </View>
-            </View>
-          </View>
-        </View>
-      )}
 
       {/* 自由模式完成弹窗 */}
       {showFreePlayComplete && (
