@@ -4,64 +4,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #F0F9FF 0%, #FEF3C7 50%, #FDF2F8 100%);
+  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
   position: relative;
-  overflow: hidden;
-}
-
-/* 背景装饰元素 */
-.decoration {
-  position: absolute;
-  animation: float 3s ease-in-out infinite;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.decoration-star-1 {
-  top: 15%;
-  left: 10%;
-  animation-delay: 0s;
-}
-
-.decoration-star-2 {
-  top: 25%;
-  right: 12%;
-  animation-delay: 0.5s;
-}
-
-.decoration-star-3 {
-  bottom: 30%;
-  left: 8%;
-  animation-delay: 1s;
-}
-
-.decoration-sparkle-1 {
-  top: 45%;
-  right: 8%;
-  animation-delay: 1.5s;
-}
-
-.decoration-sparkle-2 {
-  bottom: 20%;
-  right: 15%;
-  animation-delay: 2s;
-}
-
-.decoration-heart {
-  top: 10%;
-  right: 25%;
-  animation-delay: 0.8s;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 0.8;
-  }
-  50% {
-    transform: translateY(-20px) rotate(10deg);
-    opacity: 1;
-  }
 }
 
 .settings-button-top {
@@ -90,58 +34,21 @@
   align-items: center;
   width: 80%;
   max-width: 400px;
-  z-index: 10;
-  position: relative;
-}
-
-/* Logo 区域 */
-.logo-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 32px;
-}
-
-.logo-icon {
-  width: 120px;
-  height: 120px;
-  border-radius: 60px;
-  background: linear-gradient(135deg, #60A5FA 0%, #A78BFA 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.5);
-  margin-bottom: 20px;
-  animation: logo-bounce 2s ease-in-out infinite;
-}
-
-@keyframes logo-bounce {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
 }
 
 .home-title {
-  font-size: 42px;
-  font-weight: 800;
-  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 12px;
+  font-size: 56px;
+  font-weight: 700;
+  color: #3B82F6;
+  margin-bottom: 20px;
   text-align: center;
-  text-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
 }
 
 .home-subtitle {
-  font-size: 18px;
+  font-size: 22px;
   color: #6B7280;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
   text-align: center;
-  font-weight: 500;
 }
 
 /* 用户信息区域 */
@@ -150,58 +57,29 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 24px;
-  padding: 24px;
+  padding: 20px;
   width: 100%;
-  background: white;
-  border-radius: 24px;
-  box-shadow: 0 8px 32px -8px rgba(59, 130, 246, 0.2);
-}
-
-.avatar-wrapper {
-  position: relative;
-  margin-bottom: 12px;
 }
 
 .user-avatar {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  border: 4px solid #60A5FA;
-  box-shadow: 0 4px 16px -4px rgba(96, 165, 250, 0.4);
-}
-
-.avatar-badge {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
-  border: 2px solid white;
+  margin-bottom: 12px;
+  border: 3px solid #3B82F6;
 }
 
 .user-name {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
   color: #1F2937;
   margin-bottom: 4px;
-}
-
-.user-level {
-  font-size: 16px;
-  color: #6B7280;
-  font-weight: 500;
 }
 
 /* 登录按钮 */
 .login-button {
   width: 100%;
-  background: linear-gradient(135deg, #07C160 0%, #10B981 100%);
+  background: #07C160;
   color: white;
   border-radius: 9999px;
   padding: 18px;
@@ -221,87 +99,45 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .home-button {
   width: 100%;
+  background: #3B82F6;
+  color: white;
   border-radius: 9999px;
-  padding: 0;
+  padding: 18px;
+  font-size: 20px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
   border: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
 }
 
 .home-button::after {
   border: none;
 }
 
-.home-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s ease;
-}
-
-.home-button:active::before {
-  left: 100%;
-}
-
-.button-content {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  padding: 18px 24px;
-  width: 100%;
-  gap: 12px;
-}
-
-.button-text {
-  font-size: 20px;
-  font-weight: 600;
-  color: white;
-}
-
-/* 按钮变体 */
 .home-button.primary {
-  background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
-  box-shadow: 0 12px 40px -12px rgba(59, 130, 246, 0.5);
-}
-
-.home-button.secondary {
-  background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%);
-  box-shadow: 0 12px 40px -12px rgba(139, 92, 246, 0.5);
-}
-
-.home-button.tertiary {
-  background: linear-gradient(135deg, #F59E0B 0%, #FCD34D 100%);
-  box-shadow: 0 12px 40px -12px rgba(245, 158, 11, 0.5);
-}
-
-.home-button.quaternary {
-  background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
-  box-shadow: 0 12px 40px -12px rgba(16, 185, 129, 0.5);
+  background: #3B82F6;
 }
 
 .home-button.logout {
-  background: linear-gradient(135deg, #EF4444 0%, #F87171 100%);
-  box-shadow: 0 12px 40px -12px rgba(239, 68, 68, 0.5);
+  background: #3B82F6;
+  color: white;
+  border: none;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+  font-size: 20px;
+  padding: 18px;
 }
 
 .home-button.disabled {
-  background: linear-gradient(135deg, #D1D5DB 0%, #E5E7EB 100%);
+  background: #E5E7EB;
+  color: #9CA3AF;
   box-shadow: none;
 }
 

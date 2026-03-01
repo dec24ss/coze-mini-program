@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
-import { Lock, Star, ChevronDown, Trophy, Sparkles, ArrowLeft } from 'lucide-react-taro'
+import { Lock } from 'lucide-react-taro'
 import './index.css'
 
 export default function LevelSelectPage() {
@@ -96,23 +96,11 @@ export default function LevelSelectPage() {
   return (
     <View className="level-select-page">
       <View className="level-header">
-        <View className="header-icon"><Trophy size={48} color="#F59E0B" /></View>
         <Text className="block level-title">选择关卡</Text>
         {isLoggedIn && userInfo && (
-          <View className="level-subtitle-wrapper">
-            <View className="subtitle-item">
-              <Star size={16} color="#FCD34D" />
-              <Text className="block level-subtitle">
-                最高：第{userInfo.highestLevel}关
-              </Text>
-            </View>
-            <View className="subtitle-item">
-              <Sparkles size={16} color="#60A5FA" />
-              <Text className="block level-subtitle">
-                已解锁：第{unlockedLevels}关
-              </Text>
-            </View>
-          </View>
+          <Text className="block level-subtitle">
+            最高关卡：第{userInfo.highestLevel}关 | 已解锁：第{unlockedLevels}关
+          </Text>
         )}
       </View>
 
@@ -135,7 +123,7 @@ export default function LevelSelectPage() {
               {isLocked ? (
                 // 锁定关卡显示锁图标
                 <View className="locked-icon">
-                  <Lock size={32} color="#D1D5DB" />
+                  <Lock size={28} color="#9CA3AF" />
                 </View>
               ) : isCompleted && levelImage ? (
                 // 已过关显示缩略图（自由模式）
@@ -145,31 +133,22 @@ export default function LevelSelectPage() {
                     src={levelImage}
                     mode="aspectFill"
                   />
-                  <View className="level-number-overlay">
-                    <Star size={24} color="#FCD34D" />
-                    <Text className="block">{level}</Text>
-                  </View>
-                  <View className="completed-badge"><Star size={20} color="#FCD34D" /></View>
+                  <View className="level-number-overlay">{level}</View>
                 </>
               ) : isChallenge ? (
                 // 正在挑战的关卡（正常模式，可挑战）
                 <>
-                  <Text className="block level-number challenge">{level}</Text>
-                  <View className="level-hint-wrapper challenge">
-                    <Sparkles size={20} color="#F59E0B" />
-                    <Text className="block level-hint challenge">可挑战</Text>
-                  </View>
+                  <Text className="block level-number">{level}</Text>
+                  <Text className="block level-hint challenge">可挑战</Text>
                 </>
               ) : (
                 // 其他情况（自由模式）
                 <>
                   <Text className="block level-number">{level}</Text>
-                  <View className="level-hint-wrapper">
-                    <Sparkles size={16} color="#60A5FA" />
-                    <Text className="block level-hint">自由模式</Text>
-                  </View>
+                  <Text className="block level-hint">自由模式</Text>
                 </>
               )}
+              {isCompleted && <View className="completed-overlay">✓</View>}
             </View>
           )
         })}
@@ -177,19 +156,13 @@ export default function LevelSelectPage() {
 
       <View className="load-more">
         <Button className="load-more-button" onClick={handleLoadMore}>
-          <View className="button-content">
-            <ChevronDown size={24} color="white" />
-            <Text className="block">加载更多</Text>
-          </View>
+          加载更多
         </Button>
       </View>
 
       <View className="level-footer">
         <Button className="footer-button" onClick={handleBackHome}>
-          <View className="button-content">
-            <ArrowLeft size={24} color="white" />
-            <Text className="block">返回首页</Text>
-          </View>
+          返回首页
         </Button>
       </View>
     </View>

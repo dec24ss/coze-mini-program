@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import SettingsModal from '@/components/settings-modal'
-import { Play, Grid3x3, Trophy, Settings, LogOut, Star, Sparkles, Heart } from 'lucide-react-taro'
 import './index.css'
 
 export default function IndexPage() {
@@ -122,74 +121,51 @@ export default function IndexPage() {
 
   return (
     <View className="home-page">
-      {/* 背景装饰元素 */}
-      <View className="decoration decoration-star-1"><Star size={24} color="#FCD34D" /></View>
-      <View className="decoration decoration-star-2"><Star size={20} color="#F472B6" /></View>
-      <View className="decoration decoration-star-3"><Star size={28} color="#60A5FA" /></View>
-      <View className="decoration decoration-sparkle-1"><Sparkles size={32} color="#FCD34D" /></View>
-      <View className="decoration decoration-sparkle-2"><Sparkles size={24} color="#F472B6" /></View>
-      <View className="decoration decoration-heart"><Heart size={28} color="#EF4444" /></View>
-
       <View className="home-content">
-        {/* Logo 区域 */}
-        <View className="logo-container">
-          <View className="logo-icon">
-            <Sparkles size={80} color="#3B82F6" />
-          </View>
-          <Text className="block home-title">海海拼图大作战</Text>
-          <Text className="block home-subtitle">✨ 拖拽碎片，完成拼图 ✨</Text>
-        </View>
+        <Text className="block home-title">海海拼图大作战</Text>
+        <Text className="block home-subtitle">拖拽碎片，完成拼图</Text>
 
         {/* 用户信息区域 - 仅登录后显示 */}
         {isLoggedIn && userInfo && (
           <View className="user-info">
-            <View className="avatar-wrapper">
-              {userInfo.avatarUrl && (
-                <Image className="user-avatar" src={userInfo.avatarUrl} mode="aspectFill" />
-              )}
-              <View className="avatar-badge"><Star size={16} color="#FCD34D" /></View>
-            </View>
+            {userInfo.avatarUrl && (
+              <Image className="user-avatar" src={userInfo.avatarUrl} mode="aspectFill" />
+            )}
             <Text className="block user-name">{userInfo.nickname}</Text>
-            <Text className="block user-level">🏆 最高关卡：第{userInfo.highestLevel}关</Text>
+            <Text className="block user-level">最高关卡：第{userInfo.highestLevel}关</Text>
           </View>
         )}
 
         {/* 功能按钮 */}
         <View className="button-group">
           <Button className="home-button primary" onClick={handleStartGame}>
-            <View className="button-content">
-              <Play size={32} color="white" />
-              <Text className="block button-text">开始游戏</Text>
-            </View>
+            开始游戏
           </Button>
-
-          <Button className="home-button secondary" onClick={handleLevelSelect}>
-            <View className="button-content">
-              <Grid3x3 size={28} color="white" />
-              <Text className="block button-text">关卡选择</Text>
-            </View>
+          <Button
+            className="home-button"
+            onClick={handleLevelSelect}
+          >
+            关卡选择
           </Button>
-
-          <Button className="home-button tertiary" onClick={handleRankList}>
-            <View className="button-content">
-              <Trophy size={28} color="white" />
-              <Text className="block button-text">排行榜</Text>
-            </View>
+          <Button
+            className="home-button"
+            onClick={handleRankList}
+          >
+            排行榜
           </Button>
-
-          <Button className="home-button quaternary" onClick={() => setShowSettings(true)}>
-            <View className="button-content">
-              <Settings size={28} color="white" />
-              <Text className="block button-text">设置</Text>
-            </View>
+          {/* 设置按钮 - 在排行榜下面 */}
+          <Button
+            className="home-button"
+            onClick={() => setShowSettings(true)}
+          >
+            设置
           </Button>
-
           {isLoggedIn && (
-            <Button className="home-button logout" onClick={handleLogout}>
-              <View className="button-content">
-                <LogOut size={28} color="white" />
-                <Text className="block button-text">退出登录</Text>
-              </View>
+            <Button
+              className="home-button logout"
+              onClick={handleLogout}
+            >
+              退出登录
             </Button>
           )}
         </View>
