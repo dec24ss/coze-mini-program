@@ -2,9 +2,6 @@ import { View, Text, Image } from '@tarojs/components'
 import { useEffect, useState } from 'react'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
-import { Trophy } from 'lucide-react-taro/icons/trophy'
-import { Medal } from 'lucide-react-taro/icons/medal'
-import { Award } from 'lucide-react-taro/icons/award'
 import './index.css'
 
 export default function RankPage() {
@@ -38,7 +35,6 @@ export default function RankPage() {
     <View className="rank-page">
       {/* 页面标题 */}
       <View className="rank-header">
-        <Trophy size={48} color="#FFD700" />
         <Text className="block rank-title">排行榜</Text>
       </View>
 
@@ -57,7 +53,6 @@ export default function RankPage() {
             {/* 第二名 */}
             {rankList[1] && (
               <View className="top-item second">
-                <Medal size={32} color="#C0C0C0" />
                 <Text className="block top-rank">2</Text>
                 {rankList[1].avatarUrl && (
                   <Image className="top-avatar" src={rankList[1].avatarUrl} mode="aspectFill" />
@@ -70,7 +65,6 @@ export default function RankPage() {
             {/* 第一名 */}
             {rankList[0] && (
               <View className="top-item first">
-                <Award size={40} color="#FFD700" />
                 <Text className="block top-rank">1</Text>
                 {rankList[0].avatarUrl && (
                   <Image className="top-avatar" src={rankList[0].avatarUrl} mode="aspectFill" />
@@ -83,7 +77,6 @@ export default function RankPage() {
             {/* 第三名 */}
             {rankList[2] && (
               <View className="top-item third">
-                <Medal size={32} color="#CD7F32" />
                 <Text className="block top-rank">3</Text>
                 {rankList[2].avatarUrl && (
                   <Image className="top-avatar" src={rankList[2].avatarUrl} mode="aspectFill" />
