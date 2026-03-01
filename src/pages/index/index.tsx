@@ -4,15 +4,6 @@ import { useEffect, useState } from 'react'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import SettingsModal from '@/components/settings-modal'
-import {
-  PuzzleIcon,
-  ShellIcon,
-  TrophyIcon,
-  SettingsIcon,
-  FishIcon,
-  BubbleIcon,
-  CrabIcon
-} from '@/components/ocean-icons'
 import './index.css'
 
 export default function IndexPage() {
@@ -54,7 +45,7 @@ export default function IndexPage() {
     const level = getCurrentLevel()
     console.log(`从第 ${level} 关开始游戏`)
 
-    // 跳转到游戏页面
+    // 跳转到游戏页面（游戏页面会自动初始化并从最后未完成关卡开始）
     Taro.navigateTo({ url: '/pages/game/index' })
   }
 
@@ -130,54 +121,9 @@ export default function IndexPage() {
 
   return (
     <View className="home-page">
-      {/* 背景层 */}
-      <View className="home-background">
-        {/* 天空渐变 */}
-        <View className="home-sky" />
-
-        {/* 海浪动画层 */}
-        <View className="home-wave wave-1" />
-        <View className="home-wave wave-2" />
-
-        {/* 漂浮装饰元素 */}
-        <View className="floating-elements">
-          <View className="floating-element element-1">
-            <PuzzleIcon size={40} color="#007AFF" opacity={0.3} />
-          </View>
-          <View className="floating-element element-2">
-            <FishIcon size={36} color="#FF9500" opacity={0.4} />
-          </View>
-          <View className="floating-element element-3">
-            <ShellIcon size={32} color="#FFB6C1" opacity={0.35} />
-          </View>
-          <View className="floating-element element-4">
-            <BubbleIcon size={28} color="#007AFF" opacity={0.3} />
-          </View>
-          <View className="floating-element element-5">
-            <CrabIcon size={32} color="#FF9500" opacity={0.35} />
-          </View>
-          <View className="floating-element element-6">
-            <FishIcon size={28} color="#007AFF" opacity={0.3} />
-          </View>
-          <View className="floating-element element-7">
-            <ShellIcon size={24} color="#FF9500" opacity={0.3} />
-          </View>
-          <View className="floating-element element-8">
-            <BubbleIcon size={32} color="#FFB6C1" opacity={0.35} />
-          </View>
-        </View>
-
-        {/* 底部海浪装饰 */}
-        <View className="home-bottom-wave" />
-      </View>
-
-      {/* 主内容 */}
       <View className="home-content">
-        {/* 标题区 */}
-        <View className="home-title-area">
-          <Text className="block home-title">海海拼图大作战</Text>
-          <Text className="block home-subtitle">拖拽碎片，完成拼图</Text>
-        </View>
+        <Text className="block home-title">海海拼图大作战</Text>
+        <Text className="block home-subtitle">拖拽碎片，完成拼图</Text>
 
         {/* 用户信息区域 - 仅登录后显示 */}
         {isLoggedIn && userInfo && (
@@ -192,42 +138,34 @@ export default function IndexPage() {
 
         {/* 功能按钮 */}
         <View className="button-group">
-          {/* 开始游戏 - 橙色渐变 */}
-          <Button className="home-button button-primary" onClick={handleStartGame}>
-            <View className="button-icon">
-              <PuzzleIcon size={48} color="white" />
-            </View>
-            <Text className="button-text">开始游戏</Text>
+          <Button className="home-button primary" onClick={handleStartGame}>
+            开始游戏
           </Button>
-
-          {/* 关卡选择 - 海洋蓝渐变 */}
-          <Button className="home-button button-ocean" onClick={handleLevelSelect}>
-            <View className="button-icon">
-              <ShellIcon size={48} color="white" />
-            </View>
-            <Text className="button-text">关卡选择</Text>
+          <Button
+            className="home-button"
+            onClick={handleLevelSelect}
+          >
+            关卡选择
           </Button>
-
-          {/* 排行榜 - 草绿渐变 */}
-          <Button className="home-button button-green" onClick={handleRankList}>
-            <View className="button-icon">
-              <TrophyIcon size={48} color="white" />
-            </View>
-            <Text className="button-text">排行榜</Text>
+          <Button
+            className="home-button"
+            onClick={handleRankList}
+          >
+            排行榜
           </Button>
-
-          {/* 设置 - 沙滩黄渐变 */}
-          <Button className="home-button button-sand" onClick={() => setShowSettings(true)}>
-            <View className="button-icon">
-              <SettingsIcon size={48} color="#333333" />
-            </View>
-            <Text className="button-text button-text-dark">设置</Text>
+          {/* 设置按钮 - 在排行榜下面 */}
+          <Button
+            className="home-button"
+            onClick={() => setShowSettings(true)}
+          >
+            设置
           </Button>
-
-          {/* 退出登录 - 仅登录后显示 */}
           {isLoggedIn && (
-            <Button className="home-button button-logout" onClick={handleLogout}>
-              <Text className="button-text">退出登录</Text>
+            <Button
+              className="home-button logout"
+              onClick={handleLogout}
+            >
+              退出登录
             </Button>
           )}
         </View>
@@ -238,3 +176,4 @@ export default function IndexPage() {
     </View>
   )
 }
+
