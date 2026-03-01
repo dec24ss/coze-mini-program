@@ -1033,6 +1033,11 @@
   display: none;
 }
 
+/* 去除失败弹窗的粒子特效 */
+.victory-modal.failed-modal::after {
+  display: none;
+}
+
 /* 失败时的标题 */
 .victory-modal.failed-modal .victory-title {
   background: none;
