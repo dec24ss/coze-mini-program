@@ -867,7 +867,7 @@ export default function GamePage() {
                     <View
                       key={piece.id}
                       data-piece-id={piece.id}
-                      className={`puzzle-piece-outer ${piece.id === draggingPiece?.id ? 'dragging' : ''} ${animatingPieces.has(piece.id) ? 'animating' : ''} ${correctPieces.has(piece.id) ? 'correct' : ''} ${showCompleteAnimation ? 'complete' : ''}`}
+                      className={`puzzle-piece-outer ${piece.id === draggingPiece?.id ? 'dragging' : ''} ${animatingPieces.has(piece.id) ? 'animating' : ''} ${correctPieces.has(piece.id) ? 'correct' : ''} ${showCompleteAnimation ? 'complete' : ''} ${isFailed ? 'failed' : ''}`}
                       style={{
                         width: `${pieceSize}%`,
                         height: `${pieceSize}%`,
@@ -1007,8 +1007,8 @@ export default function GamePage() {
 
       {/* 失败弹窗 */}
       {isFailed && (
-        <View className="victory-modal">
-          <View className="victory-content">
+        <View className="victory-modal failed-modal">
+          <View className="victory-content failed-content">
             <Text className="block victory-title" style={{ color: '#EF4444' }}>时间到！</Text>
             <Text className="block victory-time">很遗憾，未能完成拼图</Text>
             <View className="victory-buttons">

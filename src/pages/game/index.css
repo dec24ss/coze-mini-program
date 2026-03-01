@@ -293,7 +293,7 @@
 /* 底部功能按钮 */
 .game-footer {
   position: fixed;
-  bottom: 150px;
+  bottom: 130px;
   left: 0;
   right: 0;
   display: flex;
@@ -307,7 +307,7 @@
   display: flex;
   width: 100%;
   max-width: 500px;
-  gap: 50px; /* 间距50px */
+  gap: 70px;
   padding: 0 12px;
 }
 
@@ -899,5 +899,195 @@
   }
   100% {
     transform: scale(1.05);
+  }
+}
+
+/* ========== 失败动画效果 ========== */
+
+/* 失败时的屏幕震动动画 */
+.victory-modal.failed-modal {
+  animation: screen-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes screen-shake {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  10% {
+    transform: translate(-10px, -10px);
+  }
+  20% {
+    transform: translate(10px, 10px);
+  }
+  30% {
+    transform: translate(-10px, 10px);
+  }
+  40% {
+    transform: translate(10px, -10px);
+  }
+  50% {
+    transform: translate(-8px, -8px);
+  }
+  60% {
+    transform: translate(8px, 8px);
+  }
+  70% {
+    transform: translate(-6px, -6px);
+  }
+  80% {
+    transform: translate(6px, 6px);
+  }
+  90% {
+    transform: translate(-4px, -4px);
+  }
+}
+
+/* 失败时的弹窗样式 */
+.victory-modal.failed-modal .victory-content {
+  background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+  border-color: #EF4444;
+  box-shadow: 0 25px 50px -12px rgba(239, 68, 68, 0.4), 0 0 60px rgba(239, 68, 68, 0.3);
+}
+
+.victory-modal.failed-modal .victory-content::before {
+  background: conic-gradient(from 0deg, transparent, rgba(239, 68, 68, 0.1), transparent 30%);
+}
+
+/* 失败时的图块变黑白效果 */
+.puzzle-piece-outer.failed {
+  filter: grayscale(100%);
+  animation: failed-fade 0.5s ease-out;
+}
+
+@keyframes failed-fade {
+  0% {
+    filter: grayscale(0%);
+  }
+  100% {
+    filter: grayscale(100%);
+  }
+}
+
+/* ========== 胜利烟花效果 ========== */
+
+/* 胜利弹窗的烟花效果 - 增强版 */
+.victory-modal:not(.failed-modal)::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(255, 215, 0, 0.3) 0%, rgba(255, 107, 107, 0.2) 20%, rgba(78, 205, 196, 0.15) 40%, transparent 70%);
+  animation: firework-bg 3s ease-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes firework-bg {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* 多个烟花粒子 */
+.victory-modal:not(.failed-modal)::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 30%;
+  width: 12px;
+  height: 12px;
+  background: #ffd700;
+  border-radius: 50%;
+  box-shadow:
+    0 0 25px #ffd700,
+    0 0 50px #ff6b6b,
+    0 0 75px #4ecdc4,
+    60px 60px 0 #ff6b6b,
+    60px 60px 25px #ff6b6b,
+    60px 60px 50px #ffd700,
+    -60px 40px 0 #4ecdc4,
+    -60px 40px 25px #4ecdc4,
+    -60px 40px 50px #ff6b6b,
+    40px -60px 0 #ffd700,
+    40px -60px 25px #ffd700,
+    40px -60px 50px #4ecdc4,
+    -40px -50px 0 #ff6b6b,
+    -40px -50px 25px #ff6b6b,
+    -40px -50px 50px #ffd700;
+  animation: firework-particles 2s ease-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes firework-particles {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(30px, -40px) scale(1.8);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(60px, -80px) scale(0);
+    opacity: 0;
+  }
+}
+
+/* 第二个烟花 */
+.victory-modal {
+  position: relative;
+}
+
+.victory-modal .firework-2 {
+  content: '';
+  position: absolute;
+  top: 30%;
+  right: 25%;
+  width: 10px;
+  height: 10px;
+  background: #ff6b6b;
+  border-radius: 50%;
+  box-shadow:
+    0 0 20px #ff6b6b,
+    0 0 40px #ffd700,
+    0 0 60px #4ecdc4,
+    50px -50px 0 #ffd700,
+    50px -50px 20px #ffd700,
+    50px -50px 40px #ff6b6b,
+    -50px 30px 0 #4ecdc4,
+    -50px 30px 20px #4ecdc4,
+    -50px 30px 40px #ffd700,
+    30px 60px 0 #ff6b6b,
+    30px 60px 20px #ff6b6b,
+    30px 60px 40px #4ecdc4;
+  animation: firework-particles-2 2.2s ease-out infinite 0.3s;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes firework-particles-2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-25px, 35px) scale(1.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50px, 70px) scale(0);
+    opacity: 0;
   }
 }
