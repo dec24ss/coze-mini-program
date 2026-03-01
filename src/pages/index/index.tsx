@@ -168,7 +168,7 @@ export default function IndexPage() {
           >
             排行榜
           </Button>
-          {/* 设置按钮 - 在排行榜下面 */}
+          {/* 设置按钮 */}
           <Button
             className="home-button"
             onClick={() => setShowSettings(true)}
@@ -197,6 +197,11 @@ export default function IndexPage() {
         initialNickname={userInfo?.nickname || ''}
         initialAvatarUrl={userInfo?.avatarUrl || ''}
       />
+
+      {/* 版本号 */}
+      <View className="version-info">
+        <Text className="block version-text">版本 1.0.0</Text>
+      </View>
     </View>
   )
 }

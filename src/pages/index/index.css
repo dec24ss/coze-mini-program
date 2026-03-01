@@ -146,3 +146,20 @@
   margin-top: 4px;
   opacity: 0.8;
 }
+
+/* 版本号 */
+.version-info {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.version-text {
+  font-size: 28rpx;
+  color: #9CA3AF;
+  opacity: 0.7;
+}
