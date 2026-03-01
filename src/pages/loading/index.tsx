@@ -2,17 +2,10 @@ import { View, Text, Image } from '@tarojs/components'
 import { useEffect, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { useGameStore } from '@/stores/gameStore'
+import { Network } from '@/network'
 import './index.css'
 
 const TOTAL_IMAGES = 10 // 固定10张图片（对应10个关卡）
-
-// 音效文件列表
-const SOUND_EFFECTS = [
-  { name: 'success', url: 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.m4a' }, // 成功音效
-  { name: 'fail', url: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.m4a' }, // 失败音效
-  { name: 'click', url: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.m4a' }, // 点击音效
-  { name: 'drag', url: 'https://assets.mixkit.co/active_storage/sfx/2577/2577-preview.m4a' }, // 拖拽音效
-]
 
 export default function LoadingPage() {
   const { preloadImages, imagesLoaded, imageList } = useGameStore()
@@ -20,56 +13,95 @@ export default function LoadingPage() {
   const [soundsLoaded, setSoundsLoaded] = useState(0)
   const [isLoadingImages, setIsLoadingImages] = useState(true)
   const [isLoadingSounds, setIsLoadingSounds] = useState(false)
-  const [totalSounds] = useState(SOUND_EFFECTS.length)
+  const [totalSounds, setTotalSounds] = useState(0)
+  const [soundEffects, setSoundEffects] = useState<{ name: string; url: string }[]>([])
 
-  // 预加载音效
-  const preloadSounds = async (): Promise<void> => {
-    setIsLoadingSounds(true)
-    let loadedCount = 0
-
-    const loadPromises = SOUND_EFFECTS.map((sound) => {
-      return new Promise<void>((resolve) => {
-        const audio = new Audio()
-        audio.src = sound.url
-        audio.preload = 'auto'
-
-        audio.oncanplaythrough = () => {
-          loadedCount++
-          setSoundsLoaded(loadedCount)
-          console.log(`🎵 音效 ${sound.name} 已加载`)
-          resolve()
-        }
-
-        audio.onerror = () => {
-          console.warn(`⚠️ 音效 ${sound.name} 加载失败`)
-          // 即使失败也算加载完成，避免卡住
-          loadedCount++
-          setSoundsLoaded(loadedCount)
-          resolve()
-        }
-
-        audio.load()
+  // 从后端获取音效列表
+  const fetchSoundEffects = async (): Promise<void> => {
+    try {
+      const res = await Network.request<{ code: number; msg: string; data: { sounds: { name: string; url: string }[]; total: number } }>({
+        url: '/api/images/sounds'
       })
-    })
-
-    await Promise.all(loadPromises)
-    setIsLoadingSounds(false)
+      if (res.data.data.sounds && res.data.data.sounds.length > 0) {
+        setSoundEffects(res.data.data.sounds)
+        setTotalSounds(res.data.data.sounds.length)
+        console.log('🎵 获取音效列表成功:', res.data.data.sounds)
+      }
+    } catch (error) {
+      console.error('❌ 获取音效列表失败:', error)
+      // 使用默认音效列表作为后备方案
+      const defaultSounds = [
+        { name: 'click', url: 'https://www.soundjay.com/buttons/sounds/button-1.mp3' },
+        { name: 'success', url: 'https://www.soundjay.com/buttons/sounds/button-2.mp3' },
+        { name: 'fail', url: 'https://www.soundjay.com/buttons/sounds/button-3.mp3' },
+        { name: 'drag', url: 'https://www.soundjay.com/buttons/sounds/button-4.mp3' },
+      ]
+      setSoundEffects(defaultSounds)
+      setTotalSounds(defaultSounds.length)
+      console.log('⚠️ 使用默认音效列表作为后备方案')
+    }
   }
 
   useEffect(() => {
+    // 预加载音效函数（定义在 useEffect 内部以避免依赖问题）
+    const preloadSounds = async (): Promise<void> => {
+      setIsLoadingSounds(true)
+      let loadedCount = 0
+
+      const loadPromises = soundEffects.map((sound) => {
+        return new Promise<void>((resolve) => {
+          const timeoutId = setTimeout(() => {
+            console.warn(`⚠️ 音效 ${sound.name} 加载超时`)
+            loadedCount++
+            setSoundsLoaded(loadedCount)
+            resolve()
+          }, 10000) // 10秒超时
+
+          const audio = new Audio()
+          audio.src = sound.url
+          audio.preload = 'auto'
+
+          audio.oncanplaythrough = () => {
+            clearTimeout(timeoutId)
+            loadedCount++
+            setSoundsLoaded(loadedCount)
+            console.log(`🎵 音效 ${sound.name} 已加载`)
+            resolve()
+          }
+
+          audio.onerror = () => {
+            clearTimeout(timeoutId)
+            console.warn(`⚠️ 音效 ${sound.name} 加载失败`)
+            // 即使失败也算加载完成，避免卡住
+            loadedCount++
+            setSoundsLoaded(loadedCount)
+            resolve()
+          }
+
+          audio.load()
+        })
+      })
+
+      await Promise.all(loadPromises)
+      setIsLoadingSounds(false)
+    }
+
     // 第一步：预加载图片
     setIsLoadingImages(true)
     preloadImages().then(() => {
       setIsLoadingImages(false)
-      // 第二步：图片加载完成后预加载音效
-      preloadSounds().then(() => {
-        // 音效加载完成后跳转到首页
-        setTimeout(() => {
-          Taro.redirectTo({ url: '/pages/index/index' })
-        }, 500)
+      // 第二步：从后端获取音效列表
+      fetchSoundEffects().then(() => {
+        // 第三步：音效列表获取完成后加载音效
+        preloadSounds().then(() => {
+          // 音效加载完成后跳转到首页
+          setTimeout(() => {
+            Taro.redirectTo({ url: '/pages/index/index' })
+          }, 500)
+        })
       })
     })
-  }, [preloadImages])
+  }, [preloadImages, soundEffects])
 
   // 计算加载进度百分比
   const progressPercent = isLoadingImages
