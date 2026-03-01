@@ -90,12 +90,11 @@ export default function LevelSelectPage() {
       <View className="level-grid">
         {levels.map((level) => {
           const isLocked = level > unlockedLevels
-          const isCompleted = userInfo && level <= userInfo.highestLevel  // 已过关
+          const isCompleted = userInfo && levelImages[level]  // 已过关（有保存的图片）
           const isChallenge = userInfo && level === userInfo.highestLevel + 1  // 正在挑战
-          // 优先使用用户保存的关卡图片，否则使用预加载的图片
+          // 优先使用用户保存的关卡图片，否则不显示缩略图
           const savedImage = levelImages[level]
-          const preloadedImage = levelImageMap[level]
-          const levelImage = savedImage || (preloadedImage?.url)
+          const levelImage = savedImage  // 只使用用户保存的图片
 
           return (
             <View
