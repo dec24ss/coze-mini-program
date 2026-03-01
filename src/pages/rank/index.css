@@ -63,11 +63,28 @@
   justify-content: center;
 }
 
+.rank-item.header .rank-col.rank-number {
+  flex: 0.5;
+  padding-left: 8px;
+}
+
+.rank-item.header .rank-col.user-info {
+  flex: 2.5;
+  justify-content: flex-start;
+  padding-left: 20px;
+  gap: 12px;
+}
+
+.rank-item.header .rank-col.level-text {
+  flex: 1;
+}
+
 .rank-col.rank-number {
   flex: 0.5;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-left: 8px;
 }
 
 .rank-col.user-info {
@@ -75,8 +92,8 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 8px;
-  padding: 0 12px;
+  gap: 12px;
+  padding-left: 20px;
 }
 
 .rank-col.level-text {

@@ -988,15 +988,6 @@ export default function GamePage() {
       {/* 自由模式完成弹窗 */}
       {showFreePlayComplete && (
         <View className="victory-modal">
-          {/* 烟花效果 */}
-          <View className="firework-1"></View>
-          <View className="firework-2"></View>
-          <View className="firework-3"></View>
-          <View className="spark"></View>
-          <View className="spark"></View>
-          <View className="spark"></View>
-          <View className="spark"></View>
-
           <View className="victory-content">
             <Text className="block victory-title">拼图完成！</Text>
             <Text className="block victory-time">恭喜你完成了自由模式拼图</Text>
