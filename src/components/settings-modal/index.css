@@ -1,3 +1,5 @@
+/* 设置弹窗 - 海洋主题 */
+
 .settings-modal-overlay {
   position: fixed;
   top: 0;
@@ -9,85 +11,237 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(8rpx);
+  animation: modal-fade-in 300ms ease;
+}
+
+@keyframes modal-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .settings-modal {
-  background: white;
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 48rpx;
   width: 80%;
-  max-width: 320px;
+  max-width: 640rpx;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20rpx 60rpx -10rpx rgba(0, 0, 0, 0.2);
+  border: 8rpx solid #007AFF;
+  animation: modal-pop-in 300ms ease;
 }
 
+@keyframes modal-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 设置头部 */
 .settings-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid #F3F4F6;
+  padding: 32rpx 40rpx;
+  border-bottom: 4rpx solid #E5E5EA;
+  background: linear-gradient(135deg, #007AFF 0%, #409EFF 100%);
 }
 
 .settings-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1F2937;
+  font-size: 56rpx;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
 }
 
 .settings-close {
-  background: none;
+  width: 80rpx;
+  height: 80rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
-  padding: 4px;
-  line-height: 1;
+  color: white;
+  font-size: 48rpx;
+  font-weight: 700;
+  transition: all 150ms ease;
+}
+
+.settings-close:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .settings-close::after {
   border: none;
 }
 
+/* 设置内容 */
 .settings-content {
-  padding: 16px 20px;
+  padding: 32rpx 40rpx;
 }
 
 .settings-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid #F3F4F6;
+  padding: 24rpx 0;
+  border-bottom: 4rpx solid #E5E5EA;
+  transition: all 200ms ease;
 }
 
 .settings-item:last-child {
   border-bottom: none;
 }
 
+.settings-item:active {
+  background: #F5DEB3;
+  margin: 0 -40rpx;
+  padding: 24rpx 40rpx;
+}
+
 .settings-item-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 24rpx;
+}
+
+.settings-item-icon {
+  width: 96rpx;
+  height: 96rpx;
+  background: #007AFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.2);
+}
+
+.settings-item-icon.speaker {
+  background: #007AFF;
+}
+
+.settings-item-icon.bell {
+  background: #34C759;
 }
 
 .settings-item-text {
-  font-size: 16px;
-  color: #1F2937;
+  font-size: 44rpx;
+  font-weight: 600;
+  color: #333333;
+  line-height: 1;
 }
 
+/* 开关样式 */
+.switch-container {
+  width: 160rpx;
+  height: 80rpx;
+  border-radius: 40rpx;
+  background: #E5E5EA;
+  position: relative;
+  transition: background 300ms ease;
+  display: flex;
+  align-items: center;
+  padding: 4rpx;
+  box-shadow: inset 0 2rpx 4rpx rgba(0, 0, 0, 0.1);
+}
+
+.switch-container.active {
+  background: #007AFF;
+  box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.3);
+}
+
+.switch-knob {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  left: 4rpx;
+  transition: left 300ms ease;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+}
+
+.switch-container.active .switch-knob {
+  left: 84rpx;
+}
+
+/* 设置底部 */
 .settings-footer {
-  padding: 16px 20px;
-  border-top: 1px solid #F3F4F6;
+  padding: 32rpx 40rpx;
+  border-top: 4rpx solid #E5E5EA;
 }
 
 .settings-button {
   width: 100%;
-  background: #3B82F6;
+  background: linear-gradient(135deg, #007AFF 0%, #409EFF 100%);
   color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 16px;
+  border: 4rpx solid white;
+  border-radius: 40rpx;
+  padding: 20rpx;
+  font-size: 40rpx;
   font-weight: 600;
+  box-shadow: 0 10rpx 25rpx -5rpx rgba(0, 122, 255, 0.3);
+  transition: all 150ms ease;
+}
+
+.settings-button:active {
+  transform: translateY(4rpx);
+  box-shadow: 0 4rpx 10rpx -2rpx rgba(0, 122, 255, 0.3);
 }
 
 .settings-button::after {
   border: none;
+}
+
+/* 响应式适配 */
+@media screen and (min-width: 768px) {
+  .settings-title {
+    font-size: 28px;
+  }
+
+  .settings-close {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+
+  .settings-item-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .settings-item-text {
+    font-size: 22px;
+  }
+
+  .switch-container {
+    width: 80px;
+    height: 40px;
+  }
+
+  .switch-knob {
+    width: 36px;
+    height: 36px;
+  }
+
+  .switch-container.active .switch-knob {
+    left: 42px;
+  }
+
+  .settings-button {
+    font-size: 20px;
+    padding: 10px;
+  }
 }

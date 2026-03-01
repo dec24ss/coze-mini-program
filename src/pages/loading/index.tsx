@@ -25,12 +25,33 @@ export default function LoadingPage() {
     ? Math.round((imagesLoaded / totalImages) * 100)
     : 0
 
-  return (
-    <View className="loading-page">
-      <View className="loading-content">
-        <Text className="block loading-title">海海拼图大作战</Text>
+  // 计算小鱼位置（进度条长度600rpx，1%=6rpx）
+  const fishPosition = progressPercent * 6
 
-        {/* 进度条 */}
+  return (
+    <View className="loading-page page-enter">
+      {/* 背景层：海洋渐变 */}
+      <View className="loading-background" />
+
+      {/* 海浪动画层 */}
+      <View className="wave wave-back" />
+      <View className="wave wave-middle" />
+      <View className="wave wave-front" />
+
+      {/* 沙滩纹理 */}
+      <View className="sand-texture" />
+
+      {/* 装饰：螃蟹 */}
+      <View className="crab-decoration">
+        <View className="crab-icon" />
+      </View>
+
+      {/* 主内容区 */}
+      <View className="loading-content">
+        {/* 卡通标题 */}
+        <Text className="block loading-title">🌊 海海拼图大作战</Text>
+
+        {/* 进度条区 */}
         <View className="loading-progress-container">
           <View className="loading-progress-bar">
             <View
@@ -43,13 +64,23 @@ export default function LoadingPage() {
           </Text>
         </View>
 
+        {/* 小鱼装饰 */}
+        <View
+          className="fish-decoration"
+          style={{ left: `${fishPosition}rpx` }}
+        >
+          <View className="fish-icon fish-tail-animation" />
+        </View>
+
         {/* 加载文字 */}
-        <Text className="block loading-text">
-          {imagesLoaded === 0 ? '正在加载图片...' :
-           imagesLoaded < totalImages ?
-           `正在加载图片... ${imagesLoaded}/${totalImages}` :
-           '图片加载完成！'}
-        </Text>
+        <View className="loading-text-container">
+          <Text className="block loading-text">
+            {imagesLoaded === 0 ? '正在加载图片...' :
+             imagesLoaded < totalImages ?
+             `正在加载图片... ${imagesLoaded}/${totalImages}` :
+             '图片加载完成！'}
+          </Text>
+        </View>
 
         {/* 加载状态提示 */}
         {imagesLoaded < totalImages && imagesLoaded > 0 && (

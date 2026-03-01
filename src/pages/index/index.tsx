@@ -120,9 +120,34 @@ export default function IndexPage() {
   }
 
   return (
-    <View className="home-page">
+    <View className="home-page page-enter">
+      {/* 背景层：海洋渐变 */}
+      <View className="home-background" />
+
+      {/* 海浪动画层 */}
+      <View className="wave wave-back" />
+      <View className="wave wave-front" />
+
+      {/* 漂浮装饰 */}
+      <View className="floating-decorations">
+        {/* 拼图块装饰 */}
+        <View className="decoration puzzle-decoration-1 float-animation" />
+        <View className="decoration puzzle-decoration-2 float-animation" style={{ animationDelay: '0.5s' }} />
+        <View className="decoration puzzle-decoration-3 float-animation" style={{ animationDelay: '1s' }} />
+
+        {/* 小鱼装饰 */}
+        <View className="decoration fish-decoration-1 float-animation" style={{ animationDelay: '0.3s' }} />
+        <View className="decoration fish-decoration-2 float-animation" style={{ animationDelay: '0.8s' }} />
+
+        {/* 贝壳装饰 */}
+        <View className="decoration shell-decoration-1 float-animation" style={{ animationDelay: '0.6s' }} />
+        <View className="decoration shell-decoration-2 float-animation" style={{ animationDelay: '1.2s' }} />
+      </View>
+
+      {/* 主内容区 */}
       <View className="home-content">
-        <Text className="block home-title">海海拼图大作战</Text>
+        {/* 卡通标题 */}
+        <Text className="block home-title">🌊 海海拼图大作战</Text>
         <Text className="block home-subtitle">拖拽碎片，完成拼图</Text>
 
         {/* 用户信息区域 - 仅登录后显示 */}
@@ -138,34 +163,50 @@ export default function IndexPage() {
 
         {/* 功能按钮 */}
         <View className="button-group">
-          <Button className="home-button primary" onClick={handleStartGame}>
-            开始游戏
-          </Button>
+          {/* 开始游戏按钮 */}
           <Button
-            className="home-button"
+            className="home-button home-button-start"
+            onClick={handleStartGame}
+          >
+            <View className="button-icon button-icon-puzzle" />
+            <Text className="block button-text">开始游戏</Text>
+          </Button>
+
+          {/* 关卡选择按钮 */}
+          <Button
+            className="home-button home-button-level"
             onClick={handleLevelSelect}
           >
-            关卡选择
+            <View className="button-icon button-icon-shell" />
+            <Text className="block button-text">关卡选择</Text>
           </Button>
+
+          {/* 排行榜按钮 */}
           <Button
-            className="home-button"
+            className="home-button home-button-rank"
             onClick={handleRankList}
           >
-            排行榜
+            <View className="button-icon button-icon-trophy" />
+            <Text className="block button-text">排行榜</Text>
           </Button>
-          {/* 设置按钮 - 在排行榜下面 */}
+
+          {/* 设置按钮 */}
           <Button
-            className="home-button"
+            className="home-button home-button-settings"
             onClick={() => setShowSettings(true)}
           >
-            设置
+            <View className="button-icon button-icon-gear" />
+            <Text className="block button-text">设置</Text>
           </Button>
+
+          {/* 退出登录按钮 - 仅登录后显示 */}
           {isLoggedIn && (
             <Button
-              className="home-button logout"
+              className="home-button home-button-logout"
               onClick={handleLogout}
             >
-              退出登录
+              <View className="button-icon button-icon-logout" />
+              <Text className="block button-text">退出登录</Text>
             </Button>
           )}
         </View>
@@ -176,4 +217,3 @@ export default function IndexPage() {
     </View>
   )
 }
-

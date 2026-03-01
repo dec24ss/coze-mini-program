@@ -1,76 +1,326 @@
+/* 加载页面 - 海洋主题 */
+
 .loading-page {
+  position: relative;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
+  padding: 40rpx;
+  overflow: hidden;
+  background: linear-gradient(315deg, #E6F4FF 0%, #007AFF 100%);
 }
 
+/* 背景层 */
+.loading-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(315deg, #E6F4FF 0%, #007AFF 100%);
+  z-index: 0;
+}
+
+/* 海浪动画层 */
+.wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-repeat: repeat-x;
+  background-position: bottom;
+  z-index: 1;
+}
+
+.wave-back {
+  height: 600rpx;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 0%, rgba(0, 122, 255, 0.1) 100%);
+  animation: wave-flow 10s linear infinite;
+}
+
+.wave-middle {
+  height: 400rpx;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 0%, rgba(0, 122, 255, 0.2) 100%);
+  animation: wave-flow 10s linear infinite 2s;
+}
+
+.wave-front {
+  height: 200rpx;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3) 0%, rgba(0, 122, 255, 0.3) 100%);
+  animation: wave-flow 10s linear infinite 4s;
+}
+
+@keyframes wave-flow {
+  0% {
+    transform: translateX(-750rpx);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* 沙滩纹理 */
+.sand-texture {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 800rpx;
+  background: linear-gradient(to top, #F5DEB3 0%, transparent 100%);
+  z-index: 2;
+}
+
+/* 装饰：螃蟹 */
+.crab-decoration {
+  position: absolute;
+  bottom: 80rpx;
+  right: 80rpx;
+  z-index: 3;
+  animation: crab-float 2s ease-in-out infinite;
+}
+
+@keyframes crab-float {
+  0%, 100% {
+    transform: translateY(0) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-10rpx) rotate(5deg);
+  }
+}
+
+.crab-icon {
+  width: 120rpx;
+  height: 120rpx;
+  background: #FF9500;
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 4rpx 12rpx rgba(255, 149, 0, 0.3);
+}
+
+.crab-icon::before {
+  content: '';
+  position: absolute;
+  top: 20rpx;
+  left: 20rpx;
+  width: 24rpx;
+  height: 24rpx;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 56rpx 0 0 white;
+}
+
+.crab-icon::after {
+  content: '';
+  position: absolute;
+  top: 40rpx;
+  left: 30rpx;
+  width: 60rpx;
+  height: 20rpx;
+  background: #333;
+  border-radius: 10rpx;
+}
+
+/* 主内容区 */
 .loading-content {
+  position: relative;
+  z-index: 5;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 80%;
-  max-width: 400px;
+  max-width: 600rpx;
+  animation: content-pop-in 300ms ease-out;
 }
 
+@keyframes content-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 卡通标题 */
 .loading-title {
-  font-size: 48px;
+  font-size: 72rpx;
   font-weight: 700;
-  color: #3B82F6;
-  margin-bottom: 48px;
+  color: #007AFF;
+  margin-bottom: 160rpx;
   text-align: center;
+  text-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.2);
+  letter-spacing: 2rpx;
 }
 
-/* 进度条容器 */
+/* 进度条区 */
 .loading-progress-container {
   width: 100%;
+  max-width: 600rpx;
+  height: 120rpx;
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 16rpx;
+  margin-bottom: 160rpx;
+  position: relative;
 }
 
 .loading-progress-bar {
   flex: 1;
-  height: 12px;
-  background-color: #E5E7EB;
-  border-radius: 9999px;
+  height: 60rpx;
+  background-color: #E6F4FF;
+  border-radius: 30rpx;
   overflow: hidden;
+  position: relative;
+  border: 4rpx solid white;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
 }
 
 .loading-progress-fill {
   height: 100%;
-  background-color: #3B82F6;
-  border-radius: 9999px;
-  transition: width 0.3s ease;
+  background-color: #007AFF;
+  border-radius: 30rpx;
+  transition: width 300ms ease;
+  position: relative;
 }
 
 /* 进度百分比 */
 .loading-percent {
-  font-size: 20px;
+  font-size: 48rpx;
   font-weight: 700;
-  color: #3B82F6;
-  min-width: 60px;
+  color: #FF9500;
+  min-width: 100rpx;
   text-align: right;
+  line-height: 1;
 }
 
-/* 加载文字 */
+/* 小鱼装饰 */
+.fish-decoration {
+  position: absolute;
+  top: 0;
+  width: 120rpx;
+  height: 120rpx;
+  transition: left 300ms ease;
+}
+
+.fish-icon {
+  width: 100%;
+  height: 100%;
+  background: #34C759;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  position: relative;
+  box-shadow: 0 4rpx 12rpx rgba(52, 199, 89, 0.3);
+}
+
+.fish-icon::before {
+  content: '';
+  position: absolute;
+  top: 25%;
+  left: 20%;
+  width: 16rpx;
+  height: 16rpx;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 40rpx 0 0 white;
+}
+
+.fish-icon::after {
+  content: '';
+  position: absolute;
+  top: 35%;
+  left: 25%;
+  width: 30rpx;
+  height: 12rpx;
+  background: #333;
+  border-radius: 6rpx;
+}
+
+/* 鱼尾摆动动画 */
+.fish-tail-animation {
+  animation: fish-tail 2s ease-in-out infinite;
+}
+
+@keyframes fish-tail {
+  0%, 100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+/* 加载文字容器 */
+.loading-text-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 .loading-text {
-  font-size: 16px;
-  color: #6B7280;
+  font-size: 36rpx;
+  color: #333333;
   text-align: center;
-  margin-bottom: 16px;
+  font-weight: 500;
 }
 
 /* 加载提示 */
 .loading-tips {
-  margin-top: 8px;
+  margin-top: 40rpx;
+  padding: 16rpx 24rpx;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 16rpx;
+  border: 2rpx solid #E5E5EA;
 }
 
 .loading-tip-text {
-  font-size: 14px;
-  color: #9CA3AF;
+  font-size: 32rpx;
+  color: #E5E5EA;
   text-align: center;
+  line-height: 1.5;
+}
+
+/* 页面入场动画 */
+.page-enter {
+  animation: page-enter 300ms ease-out;
+}
+
+@keyframes page-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 响应式适配 */
+@media screen and (min-width: 768px) {
+  .loading-title {
+    font-size: 36px;
+  }
+
+  .loading-progress-container {
+    height: 60px;
+  }
+
+  .loading-progress-bar {
+    height: 30px;
+  }
+
+  .loading-percent {
+    font-size: 24px;
+  }
+
+  .loading-text {
+    font-size: 18px;
+  }
+
+  .loading-tip-text {
+    font-size: 16px;
+  }
 }

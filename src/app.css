@@ -1,4 +1,5 @@
 @import url('tailwindcss');
+@import './app-origin.css';
 
 /*
  * H5 端 rem 适配：与小程序 rpx 缩放一致

@@ -1,54 +1,193 @@
+/* 首页 - 海洋主题 */
+
 .home-page {
+  position: relative;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
-  position: relative;
+  padding: 60rpx 40rpx;
+  overflow: hidden;
+  background: linear-gradient(315deg, #E6F4FF 0%, #FFFFFF 100%);
 }
 
-.settings-button-top {
+/* 背景层 */
+.home-background {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  width: 44px;
-  height: 44px;
-  border-radius: 22px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: none;
-  z-index: 100;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(315deg, #E6F4FF 0%, #FFFFFF 100%);
+  z-index: 0;
 }
 
-.settings-button-top::after {
-  border: none;
+/* 海浪动画层 */
+.wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-repeat: repeat-x;
+  background-position: bottom;
+  z-index: 1;
+  opacity: 0.3;
 }
 
+.wave-back {
+  height: 600rpx;
+  background: linear-gradient(to bottom, rgba(0, 122, 255, 0.05) 0%, rgba(0, 122, 255, 0.1) 100%);
+  animation: wave-flow 10s linear infinite;
+}
+
+.wave-front {
+  height: 400rpx;
+  background: linear-gradient(to bottom, rgba(0, 122, 255, 0.1) 0%, rgba(0, 122, 255, 0.2) 100%);
+  animation: wave-flow 10s linear infinite 2s;
+}
+
+@keyframes wave-flow {
+  0% {
+    transform: translateX(-750rpx);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* 漂浮装饰 */
+.floating-decorations {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.decoration {
+  position: absolute;
+  border-radius: 16rpx;
+  opacity: 0.6;
+}
+
+/* 拼图块装饰 */
+.puzzle-decoration-1 {
+  width: 80rpx;
+  height: 80rpx;
+  background: #FF9500;
+  top: 10%;
+  left: 5%;
+  border: 4rpx solid white;
+  box-shadow: 0 4rpx 12rpx rgba(255, 149, 0, 0.3);
+}
+
+.puzzle-decoration-2 {
+  width: 64rpx;
+  height: 64rpx;
+  background: #007AFF;
+  top: 20%;
+  right: 8%;
+  border: 4rpx solid white;
+  box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.3);
+}
+
+.puzzle-decoration-3 {
+  width: 72rpx;
+  height: 72rpx;
+  background: #34C759;
+  bottom: 15%;
+  left: 10%;
+  border: 4rpx solid white;
+  box-shadow: 0 4rpx 12rpx rgba(52, 199, 89, 0.3);
+}
+
+/* 小鱼装饰 */
+.fish-decoration-1 {
+  width: 80rpx;
+  height: 80rpx;
+  background: #34C759;
+  top: 15%;
+  right: 15%;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  box-shadow: 0 4rpx 12rpx rgba(52, 199, 89, 0.3);
+}
+
+.fish-decoration-2 {
+  width: 64rpx;
+  height: 64rpx;
+  background: #FFB6C1;
+  bottom: 20%;
+  right: 5%;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  box-shadow: 0 4rpx 12rpx rgba(255, 182, 193, 0.3);
+}
+
+/* 贝壳装饰 */
+.shell-decoration-1 {
+  width: 72rpx;
+  height: 72rpx;
+  background: #FFB6C1;
+  top: 25%;
+  left: 12%;
+  border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+  box-shadow: 0 4rpx 12rpx rgba(255, 182, 193, 0.3);
+}
+
+.shell-decoration-2 {
+  width: 60rpx;
+  height: 60rpx;
+  background: #F5DEB3;
+  bottom: 10%;
+  right: 12%;
+  border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+  box-shadow: 0 4rpx 12rpx rgba(245, 222, 179, 0.3);
+}
+
+/* 漂浮动画 */
+.float-animation {
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20rpx);
+  }
+}
+
+/* 主内容区 */
 .home-content {
+  position: relative;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 80%;
-  max-width: 400px;
+  max-width: 600rpx;
 }
 
+/* 卡通标题 */
 .home-title {
-  font-size: 56px;
+  font-size: 72rpx;
   font-weight: 700;
-  color: #3B82F6;
-  margin-bottom: 20px;
+  color: #007AFF;
+  margin-bottom: 20rpx;
   text-align: center;
+  text-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.2);
+  letter-spacing: 2rpx;
 }
 
 .home-subtitle {
-  font-size: 22px;
-  color: #6B7280;
-  margin-bottom: 32px;
+  font-size: 36rpx;
+  color: #E5E5EA;
+  margin-bottom: 100rpx;
   text-align: center;
+  font-weight: 500;
 }
 
 /* 用户信息区域 */
@@ -56,42 +195,35 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 24px;
-  padding: 20px;
+  margin-bottom: 24rpx;
+  padding: 24rpx;
   width: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 24rpx;
+  border: 4rpx solid #E5E5EA;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 
 .user-avatar {
-  width: 80px;
-  height: 80px;
+  width: 80rpx;
+  height: 80rpx;
   border-radius: 50%;
-  margin-bottom: 12px;
-  border: 3px solid #3B82F6;
+  margin-bottom: 12rpx;
+  border: 4rpx solid #007AFF;
+  box-shadow: 0 4rpx 8rpx rgba(0, 122, 255, 0.2);
 }
 
 .user-name {
-  font-size: 18px;
+  font-size: 36rpx;
   font-weight: 600;
-  color: #1F2937;
-  margin-bottom: 4px;
+  color: #333333;
+  margin-bottom: 4rpx;
 }
 
-/* 登录按钮 */
-.login-button {
-  width: 100%;
-  background: #07C160;
-  color: white;
-  border-radius: 9999px;
-  padding: 18px;
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 24px;
-  box-shadow: 0 10px 25px -5px rgba(7, 193, 96, 0.3);
-  border: none;
-}
-
-.login-button::after {
-  border: none;
+.user-level {
+  font-size: 28rpx;
+  color: #E5E5EA;
+  font-weight: 500;
 }
 
 /* 按钮组 */
@@ -99,50 +231,241 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24rpx;
 }
 
+/* 按钮通用样式 */
 .home-button {
   width: 100%;
-  background: #3B82F6;
-  color: white;
-  border-radius: 9999px;
-  padding: 18px;
-  font-size: 20px;
-  font-weight: 600;
-  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
-  border: none;
+  height: 160rpx;
+  border-radius: 48rpx;
+  padding: 0;
+  font-size: 0;
+  border: 4rpx solid white;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  padding-left: 32rpx;
+  gap: 24rpx;
+  box-shadow: 0 10rpx 25rpx -5rpx rgba(0, 0, 0, 0.1);
+  transition: all 150ms ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.home-button:active {
+  transform: translateY(4rpx);
+  box-shadow: 0 4rpx 10rpx -2rpx rgba(0, 0, 0, 0.1);
 }
 
 .home-button::after {
   border: none;
 }
 
-.home-button.primary {
-  background: #3B82F6;
+/* 按钮图标 */
+.button-icon {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
 }
 
-.home-button.logout {
-  background: #3B82F6;
+/* 拼图图标 */
+.button-icon-puzzle {
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.button-icon-puzzle::before {
+  content: '';
+  width: 48rpx;
+  height: 48rpx;
+  background: #FF9500;
+  border-radius: 8rpx;
+  box-shadow: 0 2rpx 4rpx rgba(255, 149, 0, 0.3);
+}
+
+/* 贝壳图标 */
+.button-icon-shell {
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.button-icon-shell::before {
+  content: '';
+  width: 48rpx;
+  height: 48rpx;
+  background: #FFB6C1;
+  border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+  box-shadow: 0 2rpx 4rpx rgba(255, 182, 193, 0.3);
+}
+
+/* 奖杯图标 */
+.button-icon-trophy {
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.button-icon-trophy::before {
+  content: '';
+  width: 48rpx;
+  height: 48rpx;
+  background: #34C759;
+  border-radius: 50% 50% 8rpx 8rpx;
+  box-shadow: 0 2rpx 4rpx rgba(52, 199, 89, 0.3);
+}
+
+/* 齿轮图标 */
+.button-icon-gear {
+  background: #333333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 8rpx rgba(51, 51, 51, 0.3);
+}
+
+.button-icon-gear::before {
+  content: '';
+  width: 48rpx;
+  height: 48rpx;
+  background: #F5DEB3;
+  border-radius: 50%;
+  border: 8rpx solid #F5DEB3;
+  box-shadow: 0 0 0 4rpx #333333;
+}
+
+/* 退出图标 */
+.button-icon-logout {
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.button-icon-logout::before {
+  content: '';
+  width: 48rpx;
+  height: 48rpx;
+  background: #EF4444;
+  border-radius: 50%;
+  box-shadow: 0 2rpx 4rpx rgba(239, 68, 68, 0.3);
+}
+
+/* 按钮文字 */
+.button-text {
+  font-size: 44rpx;
+  font-weight: 600;
+  line-height: 1;
   color: white;
-  border: none;
-  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
-  font-size: 20px;
-  padding: 18px;
 }
 
+/* 开始游戏按钮 */
+.home-button-start {
+  background: linear-gradient(135deg, #FF9500 0%, #FFB700 100%);
+}
+
+/* 关卡选择按钮 */
+.home-button-level {
+  background: linear-gradient(135deg, #007AFF 0%, #409EFF 100%);
+}
+
+/* 排行榜按钮 */
+.home-button-rank {
+  background: linear-gradient(135deg, #34C759 0%, #6FE788 100%);
+}
+
+/* 设置按钮 */
+.home-button-settings {
+  background: linear-gradient(135deg, #F5DEB3 0%, #FFFFE0 100%);
+}
+
+.home-button-settings .button-text {
+  color: #333333;
+}
+
+/* 退出登录按钮 */
+.home-button-logout {
+  background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+}
+
+/* 禁用状态 */
 .home-button.disabled {
   background: #E5E7EB;
   color: #9CA3AF;
   box-shadow: none;
 }
 
+.home-button.disabled .button-text {
+  color: #9CA3AF;
+}
+
+/* 锁提示 */
 .lock-hint {
-  font-size: 12px;
-  margin-top: 4px;
+  font-size: 24rpx;
+  margin-top: 4rpx;
   opacity: 0.8;
+  color: #E5E5EA;
+}
+
+/* 页面入场动画 */
+.page-enter {
+  animation: page-enter 300ms ease-out;
+}
+
+@keyframes page-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 响应式适配 */
+@media screen and (min-width: 768px) {
+  .home-title {
+    font-size: 36px;
+  }
+
+  .home-subtitle {
+    font-size: 18px;
+  }
+
+  .home-button {
+    height: 80px;
+    border-radius: 24px;
+    padding-left: 16px;
+    gap: 12px;
+  }
+
+  .button-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .button-text {
+    font-size: 22px;
+  }
+
+  .user-name {
+    font-size: 18px;
+  }
+
+  .user-level {
+    font-size: 14px;
+  }
 }
