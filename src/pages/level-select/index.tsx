@@ -85,20 +85,17 @@ export default function LevelSelectPage() {
   // 生成关卡数组
   const levels = Array.from({ length: displayLevels }, (_, i) => i + 1)
 
-  // 调试日志：打印 levelImages
-  console.log('📋 关卡选择页面 levelImages:', levelImages)
-  console.log('📋 关卡选择页面 userInfo:', userInfo)
-
   return (
     <View className="level-select-page">
       <View className="level-grid">
         {levels.map((level) => {
           const isLocked = level > unlockedLevels
-          const isCompleted = userInfo && levelImages[level]  // 已过关（有保存的图片）
+          const isCompleted = userInfo && level <= userInfo.highestLevel  // 已过关
           const isChallenge = userInfo && level === userInfo.highestLevel + 1  // 正在挑战
-          // 优先使用用户保存的关卡图片，否则不显示缩略图
+          // 优先使用用户保存的关卡图片，否则使用预加载的图片
           const savedImage = levelImages[level]
-          const levelImage = savedImage  // 只使用用户保存的图片
+          const preloadedImage = levelImageMap[level]
+          const levelImage = savedImage || (preloadedImage?.url)
 
           return (
             <View

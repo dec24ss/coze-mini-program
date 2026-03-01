@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import Taro from '@tarojs/taro'
 import { Network } from '@/network'
-import { useUserStore } from './userStore'
 
 // 拼图碎片类型
 export interface PuzzlePiece {
@@ -270,28 +269,13 @@ export const useGameStore = create<GameState>((set, get) => ({
     const { imageList, levelImageMap } = get()
     const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
 
-    // 获取用户保存的关卡图片
-    const { levelImages } = useUserStore.getState()
-
-    let config = getLevelConfig(level, imageList, levelImageMap)
+    const config = getLevelConfig(level, imageList, levelImageMap)
 
     console.log('==========================================')
     console.log('🎮 startGame 被调用，关卡:', level, '模式:', isFreePlay ? '自由模式' : '正常模式')
     console.log('📋 imageList 长度:', imageList.length)
     console.log('📋 levelImageMap 长度:', Object.keys(levelImageMap).length)
-    console.log('📋 levelImages:', levelImages)
     console.log('📋 当前平台:', isWeapp ? '小程序' : 'H5')
-
-    // 统一策略：优先使用用户过关时保存的网络图片URL（确保图片一致）
-    // 无论是正常模式还是自由模式，都优先使用 levelImages[level]
-    if (levelImages[level]) {
-      console.log('🎮 使用用户保存的关卡图片:', levelImages[level])
-      config = {
-        ...config,
-        imageUrl: levelImages[level],  // 使用保存的网络图片URL
-        originalUrl: levelImages[level]  // 保存原始URL用于下载
-      }
-    }
 
     console.log('🎮 开始游戏，关卡:', config.level)
     console.log('🖼️  图片 URL:', config.imageUrl.substring(0, 80))
@@ -301,29 +285,12 @@ export const useGameStore = create<GameState>((set, get) => ({
       config.imageUrl.startsWith('wxfile://') ? '本地路径' : '网络路径'
     )
 
-    // 小程序端：如果是网络图片URL，需要转换为本地路径
-    // H5端：直接使用网络图片URL
-    let finalImageUrl = config.imageUrl
-
-    // 如果是网络图片URL，小程序端需要转换为本地路径（提高加载速度）
-    if (isWeapp && finalImageUrl.startsWith('http')) {
-      // 检查是否在 levelImageMap 中有对应的本地路径
-      if (levelImageMap[level] && levelImageMap[level].url === finalImageUrl) {
-        finalImageUrl = levelImageMap[level].path
-        console.log('🖼️  小程序端使用预加载的本地路径:', finalImageUrl)
-      } else {
-        // 没有对应的本地路径，直接使用网络URL（小程序会自动缓存）
-        console.log('🖼️  小程序端使用网络URL（会自动缓存）:', finalImageUrl)
-      }
-    }
+    // 直接使用 getLevelConfig 返回的图片路径
+    // 小程序端使用本地路径（wxfile://），H5 端使用 Base64 或网络路径
+    const finalImageUrl = config.imageUrl
 
     console.log('🖼️  最终图片 URL:', finalImageUrl.substring(0, 80))
     console.log('==========================================')
-
-    // 调试日志：打印 originalUrl
-    console.log(`🎮 原始图片 URL:`, config.originalUrl?.substring(0, 80))
-    console.log(`🎮 用户保存的图片 URL:`, levelImages[level]?.substring(0, 80))
-    console.log(`🎮 配置中的 originalUrl === levelImages[level]:`, config.originalUrl === levelImages[level])
 
     // 根据关卡设置不同的倒计时时长
     let countdownTime = 180

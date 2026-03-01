@@ -163,21 +163,17 @@ export const useUserStore = create<UserState>((set, get) => ({
       return
     }
 
-    console.log(`🖼️  updateHighestLevel 被调用: level=${level}, imageUrl=${imageUrl?.substring(0, 80)}`)
-    console.log(`🖼️  当前 levelImages:`, get().levelImages)
-
-    // 保存关卡图片映射（无论是否更新最高关卡，都要保存图片）
-    const newLevelImages = { ...get().levelImages }
-    if (imageUrl) {
-      newLevelImages[level] = imageUrl
-      console.log(`🖼️  关卡 ${level} 图片URL已保存:`, imageUrl.substring(0, 80))
-    }
-
     // 只有当新关卡大于当前最高关卡时才更新
     if (level > userInfo.highestLevel) {
       const newUserInfo = { ...userInfo, highestLevel: level }
-
-      set({
+      
+      // 保存关卡图片映射
+      const newLevelImages = { ...get().levelImages }
+      if (imageUrl) {
+        newLevelImages[level] = imageUrl
+      }
+      
+      set({ 
         userInfo: newUserInfo,
         levelImages: newLevelImages
       })
@@ -192,12 +188,9 @@ export const useUserStore = create<UserState>((set, get) => ({
       Taro.setStorageSync('unlockedLevels', newUnlockedLevels.toString())
 
       console.log(`用户最高关卡更新为: ${level}，解锁关卡: ${newUnlockedLevels}`)
-    } else {
-      // 只是保存图片，不更新最高关卡
-      set({ levelImages: newLevelImages })
-      Taro.setStorageSync('levelImages', JSON.stringify(newLevelImages))
-      console.log(`关卡 ${level} 图片已更新，不更新最高关卡`)
-      console.log(`更新后的 levelImages:`, newLevelImages)
+      if (imageUrl) {
+        console.log(`关卡 ${level} 图片已保存`)
+      }
     }
   },
 

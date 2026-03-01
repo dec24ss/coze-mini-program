@@ -1,7 +1,6 @@
-import { View, Text, Button, Image } from '@tarojs/components'
+import { View, Text, Button, Image, Canvas } from '@tarojs/components'
 import { useEffect, useRef, useState } from 'react'
 import Taro, { useRouter } from '@tarojs/taro'
-import { Network } from '@/network'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
@@ -27,7 +26,6 @@ export default function GamePage() {
     currentLevel,
     gridSize,
     imageUrl,
-    originalImageUrl,
     isPlaying,
     isComplete,
     isFailed,
@@ -247,28 +245,18 @@ export default function GamePage() {
 
   // 自动进入下一关
   const handleNextLevelAuto = async () => {
-    console.log('==========================================')
-    console.log(`🎮 handleNextLevelAuto 被调用: level=${currentLevel}, isFreePlayMode=${isFreePlayMode}`)
-    console.log(`🎮 originalImageUrl:`, originalImageUrl?.substring(0, 80))
-    console.log(`🎮 imageUrl:`, imageUrl?.substring(0, 80))
-    console.log('==========================================')
-
     // 自由模式不记录进度，但也要获得积分
     if (isFreePlayMode) {
       // 过关获得1积分
       addPoints(1)
       Taro.showToast({ title: '获得 1 积分！', icon: 'none' })
-
-      // 自由模式：更新关卡图片（即使已经过关，也要保存当前图片URL）
-      await updateHighestLevel(currentLevel, originalImageUrl)
-
       setShowFreePlayComplete(true)
       return
     }
 
     // 正式模式：更新进度和积分
-    // 保存当前关卡对应的图片（使用网络图片URL而不是临时路径）
-    await updateHighestLevel(currentLevel, originalImageUrl)
+    // 保存当前关卡对应的图片
+    await updateHighestLevel(currentLevel, imageUrl)
     // 过关获得1积分
     addPoints(1)
     Taro.showToast({ title: '获得 1 积分！', icon: 'none' })
@@ -280,23 +268,18 @@ export default function GamePage() {
   // 过关后显示提示并自动进入下一关
   useEffect(() => {
     if (isComplete) {
-      if (isFreePlayMode) {
-        // 自由模式：直接显示完成弹窗，不显示4秒提示
-        handleNextLevelAuto()
-      } else {
-        // 正常模式：显示4秒提示并自动进入下一关
-        Taro.showToast({
-          title: '恭喜过关！4秒后进入下一关',
-          icon: 'success',
-          duration: 3800
-        })
+      // 立即显示过关提示
+      Taro.showToast({
+        title: '恭喜过关！4秒后进入下一关',
+        icon: 'success',
+        duration: 3800
+      })
 
-        // 4秒后自动进入下一关
-        const timer = setTimeout(() => {
-          handleNextLevelAuto()
-        }, 4000)
-        return () => clearTimeout(timer)
-      }
+      // 4秒后自动进入下一关
+      const timer = setTimeout(() => {
+        handleNextLevelAuto()
+      }, 4000)
+      return () => clearTimeout(timer)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isComplete])
@@ -323,80 +306,103 @@ export default function GamePage() {
   }
 
   // 下载图片（保存拼完的完整图片）
-  const handleDownloadImage = async () => {
+  const handleDownloadImage = () => {
     // 播放轻微震动
     playVibration('light')
 
-    Taro.showLoading({ title: '下载中...' })
+    Taro.showLoading({ title: '生成图片中...' })
 
-    let filePath: string
+    // 获取图片信息
+    Taro.getImageInfo({
+      src: imageUrl,
+      success: (imgInfo) => {
+        const { width, height } = imgInfo
 
-    // 检查图片类型，使用最优方式保存原图
-    if (imageUrl.startsWith('wxfile://')) {
-      // 小程序本地路径，直接使用（确保是原图）
-      filePath = imageUrl
-      console.log('📥 使用本地路径保存（原图）:', filePath)
-    } else if (imageUrl.startsWith('data:image')) {
-      // Base64 数据，需要先下载
-      console.log('📥 Base64 数据，先下载到临时文件')
-      const downloadRes = await Network.downloadFile({
-        url: imageUrl
-      })
-      if (!downloadRes.tempFilePath) {
-        Taro.hideLoading()
-        Taro.showToast({ title: 'Base64 图片下载失败', icon: 'none' })
-        return
-      }
-      filePath = downloadRes.tempFilePath
-    } else if (imageUrl.startsWith('http')) {
-      // 网络路径，使用 originalImageUrl 下载（确保是原图）
-      if (!originalImageUrl) {
-        Taro.hideLoading()
-        Taro.showToast({ title: '图片URL无效', icon: 'none' })
-        return
-      }
+        // 创建 Canvas 来绘制完整的图片
+        const canvasId = 'saveCanvas'
+        const ctx = Taro.createCanvasContext(canvasId)
 
-      console.log('📥 网络路径，使用 originalImageUrl 下载:', originalImageUrl.substring(0, 50) + '...')
-      const downloadRes = await Network.downloadFile({
-        url: originalImageUrl
-      })
-      if (!downloadRes.tempFilePath) {
-        Taro.hideLoading()
-        Taro.showToast({ title: '网络图片下载失败', icon: 'none' })
-        return
-      }
-      filePath = downloadRes.tempFilePath
-    } else {
-      Taro.hideLoading()
-      Taro.showToast({ title: '不支持的图片路径格式', icon: 'none' })
-      return
-    }
+        // 设置 Canvas 尺寸为图片的实际尺寸
+        // 注意：小程序 Canvas 的最大尺寸有限制，可能需要缩放
+        let canvasWidth = width
+        let canvasHeight = height
 
-    // 保存到相册
-    Taro.saveImageToPhotosAlbum({
-      filePath: filePath,
-      success: () => {
-        Taro.hideLoading()
-        Taro.showToast({ title: '保存成功', icon: 'success' })
+        // 如果图片太大，按比例缩小（小程序 Canvas 最大尺寸限制）
+        const MAX_SIZE = 2048
+        if (canvasWidth > MAX_SIZE || canvasHeight > MAX_SIZE) {
+          const ratio = Math.min(MAX_SIZE / canvasWidth, MAX_SIZE / canvasHeight)
+          canvasWidth = Math.floor(canvasWidth * ratio)
+          canvasHeight = Math.floor(canvasHeight * ratio)
+        }
+
+        // 计算每个图块的尺寸
+        const pieceWidth = canvasWidth / gridSize
+        const pieceHeight = canvasHeight / gridSize
+
+        // 绘制每个图块（模拟拼图完成后的效果）
+        pieces.forEach((piece) => {
+          // 计算图块在当前的位置（currentIndex）
+          const currentCol = piece.currentIndex % gridSize
+          const currentRow = Math.floor(piece.currentIndex / gridSize)
+
+          // 计算图块应该在的位置（correctIndex）
+          const correctCol = piece.correctIndex % gridSize
+          const correctRow = Math.floor(piece.correctIndex / gridSize)
+
+          // 计算源图像的裁剪区域（correctIndex 对应的部分）
+          const sourceX = (correctCol * width) / gridSize
+          const sourceY = (correctRow * height) / gridSize
+          const sourceW = width / gridSize
+          const sourceH = height / gridSize
+
+          // 计算目标 Canvas 的绘制位置（currentIndex 对应的位置）
+          const destX = currentCol * pieceWidth
+          const destY = currentRow * pieceHeight
+
+          // 绘制图块到 Canvas
+          ctx.drawImage(
+            imageUrl, // 源图片
+            sourceX, sourceY, sourceW, sourceH, // 源裁剪区域
+            destX, destY, pieceWidth, pieceHeight // 目标绘制区域
+          )
+        })
+
+        // 绘制完成后导出图片
+        ctx.draw(false, () => {
+          setTimeout(() => {
+            Taro.canvasToTempFilePath({
+              canvasId,
+              x: 0,
+              y: 0,
+              width: canvasWidth,
+              height: canvasHeight,
+              success: (canvasRes) => {
+                Taro.hideLoading()
+                // 保存到相册
+                Taro.saveImageToPhotosAlbum({
+                  filePath: canvasRes.tempFilePath,
+                  success: () => {
+                    Taro.showToast({ title: '保存成功', icon: 'success' })
+                  },
+                  fail: (err) => {
+                    console.error('保存到相册失败:', err)
+                    Taro.showToast({ title: '保存失败，请授权相册权限', icon: 'none' })
+                  }
+                })
+              },
+              fail: (err) => {
+                Taro.hideLoading()
+                console.error('Canvas 导出失败:', err)
+                Taro.showToast({ title: '生成图片失败', icon: 'none' })
+              }
+            })
+          }, 100)
+        })
       },
       fail: (err) => {
         Taro.hideLoading()
-        console.error('保存到相册失败:', err)
-
-        // 检查是否是权限问题
-        if (err.errMsg?.includes('auth')) {
-          Taro.showModal({
-            title: '需要相册权限',
-            content: '保存图片需要相册权限，是否去设置？',
-            success: (modalRes) => {
-              if (modalRes.confirm) {
-                Taro.openSetting()
-              }
-            }
-          })
-        } else {
-          Taro.showToast({ title: '保存失败，请重试', icon: 'none' })
-        }
+        console.error('获取图片信息失败:', err)
+        Taro.showToast({ title: '获取图片失败', icon: 'none' })
       }
     })
   }
@@ -1035,6 +1041,19 @@ export default function GamePage() {
           </View>
         </View>
       )}
+
+      {/* 隐藏的 Canvas，用于生成拼完后的图片 */}
+      <Canvas
+        canvasId="saveCanvas"
+        style={{
+          position: 'fixed',
+          left: '-9999px',
+          top: '-9999px',
+          width: '2048px',
+          height: '2048px'
+        }}
+      />
+
     </View>
   )
 }
