@@ -44,14 +44,6 @@ const PAINTING_URLS = [
   'https://picsum.photos/id/130/1200/1600.jpg', // 自然风光
 ]
 
-// 4种游戏音效URL（使用可靠的 CDN 源，稳定且免费）
-const SOUND_URLS = [
-  'https://www.soundjay.com/buttons/sounds/button-1.mp3', // 点击音效
-  'https://www.soundjay.com/buttons/sounds/button-2.mp3', // 成功音效
-  'https://www.soundjay.com/buttons/sounds/button-3.mp3', // 失败音效
-  'https://www.soundjay.com/buttons/sounds/button-4.mp3', // 拖拽音效
-]
-
 @Injectable()
 export class ImageService implements OnModuleInit {
   // 使用相对于编译后文件的路径：从 dist/image 向上回到 server/public
@@ -62,7 +54,7 @@ export class ImageService implements OnModuleInit {
   async onModuleInit() {
     console.log('🖼️  图片服务已启动，将异步下载图片资源...')
     await this.ensureImagesDir()
-    // 异步下载图片，不阻塞服务器启动
+    // 异步下载，不阻塞服务器启动
     setTimeout(() => {
       this.downloadAllImages().catch((error) => {
         console.error('❌ 下载图片失败:', error)
@@ -199,14 +191,5 @@ export class ImageService implements OnModuleInit {
       // 返回原始 URL 作为后备方案
       return PAINTING_URLS
     }
-  }
-
-  getAllSounds(): { name: string; url: string }[] {
-    // 直接返回音效URL列表，不下载到本地
-    const soundNames = ['click', 'success', 'fail', 'drag']
-    return soundNames.map((name, i) => ({
-      name,
-      url: SOUND_URLS[i]
-    }))
   }
 }

@@ -37,20 +37,4 @@ export class ImageController {
       }
     }
   }
-
-  /**
-   * 获取所有音效列表
-   */
-  @Get('sounds')
-  getAllSounds() {
-    const sounds = this.imageService.getAllSounds()
-    return {
-      code: 200,
-      msg: 'success',
-      data: {
-        sounds,
-        total: sounds.length
-      }
-    }
-  }
 }
