@@ -67,6 +67,12 @@ export default function GamePage() {
   const countdownRef = useRef<ReturnType<typeof setInterval>>()  // 游戏倒计时器
   const isMountedRef = useRef(false)
 
+  // 监听关卡变化，重置弹窗状态
+  useEffect(() => {
+    console.log('🎮 关卡变化，重置弹窗状态，当前关卡:', currentLevel)
+    setShowFreePlayComplete(false)
+  }, [currentLevel])
+
   // 组件挂载后获取容器位置
   useEffect(() => {
     isMountedRef.current = true
@@ -394,6 +400,9 @@ export default function GamePage() {
         }, 3000)
         return () => clearTimeout(timer)
       }
+    } else {
+      // 游戏未完成时，关闭自由模式完成弹窗
+      setShowFreePlayComplete(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isComplete, isFreePlayMode])
