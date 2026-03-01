@@ -1,4 +1,5 @@
-export default definePageConfig({
-  navigationBarTitleText: '排行榜',
-  navigationStyle: 'custom'
-})
+export default typeof definePageConfig === 'function'
+  ? definePageConfig({
+      navigationBarTitleText: '排行榜'
+    })
+  : { navigationBarTitleText: '排行榜' }
