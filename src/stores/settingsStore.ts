@@ -10,7 +10,7 @@ interface SettingsState {
   initSettings: () => void
   toggleSound: () => void
   toggleVibration: () => void
-  playSound: (type: 'success' | 'error' | 'click' | 'swap' | 'whoosh' | 'snap') => void
+  playSound: (type: 'success' | 'error' | 'fail' | 'click' | 'swap' | 'whoosh' | 'snap') => void
   playVibration: (type: 'light' | 'medium' | 'heavy' | 'success' | 'error') => void
 }
 
@@ -45,7 +45,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   },
 
   // 播放音效（使用在线音效文件 - 活泼风格）
-  playSound: (type: 'success' | 'error' | 'click' | 'swap' | 'whoosh' | 'snap') => {
+  playSound: (type: 'success' | 'error' | 'fail' | 'click' | 'swap' | 'whoosh' | 'snap') => {
     const { soundEnabled } = get()
     if (!soundEnabled) return
 
@@ -54,6 +54,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       click: 'https://assets.mixkit.co/active_storage/sfx/2821/2821-preview.mp3', // 清脆的点击声
       success: 'https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3', // 活泼的成功音效
       error: 'https://assets.mixkit.co/active_storage/sfx/2573/2573-preview.mp3', // 可爱的错误音效
+      fail: 'https://assets.mixkit.co/active_storage/sfx/3362/3362-preview.mp3', // 沮丧的失败音效
       swap: 'https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3', // 轻快的交换音效
       whoosh: 'https://assets.mixkit.co/active_storage/sfx/2574/2574-preview.mp3', // 活泼的嗖声
       snap: 'https://assets.mixkit.co/active_storage/sfx/2575/2575-preview.mp3' // 可爱的啪嗒声

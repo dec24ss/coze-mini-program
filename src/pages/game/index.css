@@ -293,7 +293,7 @@
 /* 底部功能按钮 */
 .game-footer {
   position: fixed;
-  bottom: 150px;
+  bottom: 175px;
   left: 0;
   right: 0;
   display: flex;
@@ -307,7 +307,7 @@
   display: flex;
   width: 100%;
   max-width: 500px;
-  gap: 50px; /* 间距50px */
+  gap: 70px;
   padding: 0 12px;
 }
 
@@ -347,14 +347,14 @@
 
 /* 底部右滑返回提示 */
 .game-footer-hint {
-  margin-top: 16px;
-  padding-top: 12px;
+  margin-top: 40px;
+  padding-top: 20px;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
 .footer-hint-text {
-  font-size: 24rpx;
+  font-size: 28rpx;
   color: #9CA3AF;
   opacity: 0.7;
 }
@@ -885,6 +885,95 @@
   }
   100% {
     transform: scale(1);
+  }
+}
+
+/* 失败弹窗 - 黑白画面和沮丧动画 */
+.failed-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+  animation: modal-fade-in 0.5s ease-in;
+}
+
+@keyframes modal-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.failed-content {
+  width: 100%;
+  max-width: 340px;
+  background: #f3f4f6;
+  border-radius: 24px;
+  padding: 40px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  border: 2px solid #9CA3AF;
+  animation: fail-shake 0.8s ease-in-out;
+  position: relative;
+  filter: grayscale(100%);
+}
+
+@keyframes fail-shake {
+  0% {
+    transform: translateX(0) scale(1);
+  }
+  10% {
+    transform: translateX(-10px) scale(0.98);
+  }
+  20% {
+    transform: translateX(10px) scale(0.98);
+  }
+  30% {
+    transform: translateX(-10px) scale(0.98);
+  }
+  40% {
+    transform: translateX(10px) scale(0.98);
+  }
+  50% {
+    transform: translateX(-5px) scale(0.99);
+  }
+  60% {
+    transform: translateX(5px) scale(0.99);
+  }
+  70% {
+    transform: translateX(0) scale(1);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+.failed-content::before {
+  content: '😢';
+  font-size: 80px;
+  position: absolute;
+  top: -40px;
+  animation: emoji-sad 2s ease-in-out infinite;
+}
+
+@keyframes emoji-sad {
+  0%,
+  100% {
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    transform: scale(1.1) translateY(-10px);
   }
 }
 

@@ -202,6 +202,15 @@ export default function GamePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, isComplete, isFailed])
 
+  // 监听失败状态，播放沮丧音效
+  useEffect(() => {
+    if (isFailed) {
+      playSound('fail')
+      playVibration('heavy')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFailed])
+
   // 时间冻结倒计时
   useEffect(() => {
     if (isTimeFrozen && freezeTimeRemaining > 0) {
@@ -1007,10 +1016,10 @@ export default function GamePage() {
 
       {/* 失败弹窗 */}
       {isFailed && (
-        <View className="victory-modal">
-          <View className="victory-content">
-            <Text className="block victory-title" style={{ color: '#EF4444' }}>时间到！</Text>
-            <Text className="block victory-time">很遗憾，未能完成拼图</Text>
+        <View className="victory-modal failed-modal">
+          <View className="victory-content failed-content">
+            <Text className="block victory-title" style={{ color: '#6B7280' }}>时间到！</Text>
+            <Text className="block victory-time" style={{ color: '#9CA3AF' }}>很遗憾，未能完成拼图</Text>
             <View className="victory-buttons">
               <Button className="victory-button secondary" onClick={handleBackHome}>
                 返回首页
