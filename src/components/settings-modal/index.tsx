@@ -1,5 +1,5 @@
 import { View, Text, Button, Switch } from '@tarojs/components'
-import { X, Volume2, VolumeX, Bell, BellOff } from 'lucide-react-taro'
+import { Volume2, VolumeX, Bell, BellOff } from 'lucide-react-taro'
 import { useSettingsStore } from '@/stores/settingsStore'
 import './index.css'
 
@@ -18,9 +18,6 @@ export default function SettingsModal({ visible, onClose }: SettingsModalProps) 
       <View className="settings-modal" onClick={(e) => e.stopPropagation()}>
         <View className="settings-header">
           <Text className="block settings-title">设置</Text>
-          <Button className="settings-close" onClick={() => { playVibration('light'); onClose(); }}>
-            <X size={32} color="#6B7280" />
-          </Button>
         </View>
 
         <View className="settings-content">

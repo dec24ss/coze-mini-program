@@ -23,26 +23,15 @@
 .settings-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 24px 28px;
   border-bottom: 1px solid #F3F4F6;
 }
 
 .settings-title {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 600;
   color: #1F2937;
-}
-
-.settings-close {
-  background: none;
-  border: none;
-  padding: 8px;
-  line-height: 1;
-}
-
-.settings-close::after {
-  border: none;
 }
 
 .settings-content {

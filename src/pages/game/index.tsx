@@ -978,6 +978,11 @@ export default function GamePage() {
             <View className="points-badge">{getPoints()}</View>
           </View>
         </View>
+
+        {/* 底部右滑返回提示 */}
+        <View className="game-footer-hint">
+          <Text className="block footer-hint-text">右滑屏幕返回首页</Text>
+        </View>
       </View>
 
       {/* 自由模式完成弹窗 */}
