@@ -317,57 +317,80 @@ export default function GamePage() {
   }
 
   // 下载图片（保存拼完的完整图片）
-  const handleDownloadImage = () => {
+  const handleDownloadImage = async () => {
     // 播放轻微震动
     playVibration('light')
 
     Taro.showLoading({ title: '下载中...' })
 
-    // 使用网络图片URL下载
-    if (!originalImageUrl) {
+    let filePath: string
+
+    // 检查图片类型，使用最优方式保存原图
+    if (imageUrl.startsWith('wxfile://')) {
+      // 小程序本地路径，直接使用（确保是原图）
+      filePath = imageUrl
+      console.log('📥 使用本地路径保存（原图）:', filePath)
+    } else if (imageUrl.startsWith('data:image')) {
+      // Base64 数据，需要先下载
+      console.log('📥 Base64 数据，先下载到临时文件')
+      const downloadRes = await Network.downloadFile({
+        url: imageUrl
+      })
+      if (!downloadRes.tempFilePath) {
+        Taro.hideLoading()
+        Taro.showToast({ title: 'Base64 图片下载失败', icon: 'none' })
+        return
+      }
+      filePath = downloadRes.tempFilePath
+    } else if (imageUrl.startsWith('http')) {
+      // 网络路径，使用 originalImageUrl 下载（确保是原图）
+      if (!originalImageUrl) {
+        Taro.hideLoading()
+        Taro.showToast({ title: '图片URL无效', icon: 'none' })
+        return
+      }
+
+      console.log('📥 网络路径，使用 originalImageUrl 下载:', originalImageUrl.substring(0, 50) + '...')
+      const downloadRes = await Network.downloadFile({
+        url: originalImageUrl
+      })
+      if (!downloadRes.tempFilePath) {
+        Taro.hideLoading()
+        Taro.showToast({ title: '网络图片下载失败', icon: 'none' })
+        return
+      }
+      filePath = downloadRes.tempFilePath
+    } else {
       Taro.hideLoading()
-      Taro.showToast({ title: '图片URL无效', icon: 'none' })
+      Taro.showToast({ title: '不支持的图片路径格式', icon: 'none' })
       return
     }
 
-    // 下载图片到本地
-    Network.downloadFile({
-      url: originalImageUrl,
-      success: (downloadRes) => {
-        console.log('图片下载成功:', downloadRes.tempFilePath)
-
-        // 保存到相册
-        Taro.saveImageToPhotosAlbum({
-          filePath: downloadRes.tempFilePath,
-          success: () => {
-            Taro.hideLoading()
-            Taro.showToast({ title: '保存成功', icon: 'success' })
-          },
-          fail: (err) => {
-            Taro.hideLoading()
-            console.error('保存到相册失败:', err)
-
-            // 检查是否是权限问题
-            if (err.errMsg?.includes('auth')) {
-              Taro.showModal({
-                title: '需要相册权限',
-                content: '保存图片需要相册权限，是否去设置？',
-                success: (modalRes) => {
-                  if (modalRes.confirm) {
-                    Taro.openSetting()
-                  }
-                }
-              })
-            } else {
-              Taro.showToast({ title: '保存失败，请重试', icon: 'none' })
-            }
-          }
-        })
+    // 保存到相册
+    Taro.saveImageToPhotosAlbum({
+      filePath: filePath,
+      success: () => {
+        Taro.hideLoading()
+        Taro.showToast({ title: '保存成功', icon: 'success' })
       },
       fail: (err) => {
         Taro.hideLoading()
-        console.error('下载图片失败:', err)
-        Taro.showToast({ title: '下载失败，请检查网络', icon: 'none' })
+        console.error('保存到相册失败:', err)
+
+        // 检查是否是权限问题
+        if (err.errMsg?.includes('auth')) {
+          Taro.showModal({
+            title: '需要相册权限',
+            content: '保存图片需要相册权限，是否去设置？',
+            success: (modalRes) => {
+              if (modalRes.confirm) {
+                Taro.openSetting()
+              }
+            }
+          })
+        } else {
+          Taro.showToast({ title: '保存失败，请重试', icon: 'none' })
+        }
       }
     })
   }
