@@ -59,8 +59,8 @@ export default function GamePage() {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [containerRect, setContainerRect] = useState<{ left: number; top: number; width: number; height: number }>({ left: 0, top: 0, width: 0, height: 0 })
   const [isImageLoaded, setIsImageLoaded] = useState(true)  // 默认为 true，避免一直显示加载中
-  const [showNormalComplete, setShowNormalComplete] = useState(false)  // 正常模式完成弹窗
   const [showFreePlayComplete, setShowFreePlayComplete] = useState(false)  // 自由模式完成弹窗
+  const [showNormalComplete, setShowNormalComplete] = useState(false)  // 正常模式完成弹窗
   const [animatingPieces, setAnimatingPieces] = useState<Set<number>>(new Set())  // 正在播放动画的图块ID
   const [correctPieces, setCorrectPieces] = useState<Set<number>>(new Set())  // 已放置到正确位置的图块ID
   const [showCompleteAnimation, setShowCompleteAnimation] = useState(false)  // 显示完成动画
@@ -352,21 +352,17 @@ export default function GamePage() {
     })
   }
 
-  // 过关后显示提示并自动进入下一关
+  // 过关后显示弹窗
   useEffect(() => {
-    if (isComplete && !isFreePlayMode) {
-      // 立即显示过关提示
-      Taro.showToast({
-        title: '恭喜过关！4秒后进入下一关',
-        icon: 'success',
-        duration: 3800
-      })
-
-      // 4秒后自动进入下一关
-      const timer = setTimeout(() => {
-        handleNextLevelAuto()
-      }, 4000)
-      return () => clearTimeout(timer)
+    if (isComplete) {
+      // 根据游戏模式显示不同的弹窗
+      if (isFreePlayMode) {
+        // 自由模式显示自由模式弹窗
+        setShowFreePlayComplete(true)
+      } else {
+        // 正常模式显示正常模式弹窗
+        setShowNormalComplete(true)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isComplete, isFreePlayMode])
@@ -487,6 +483,18 @@ export default function GamePage() {
         Taro.showToast({ title: '获取图片失败', icon: 'none' })
       }
     })
+  }
+
+  // 进入下一关（从正常模式完成弹窗）
+  const handleNextLevel = () => {
+    // 播放轻微震动
+    playVibration('light')
+
+    // 关闭弹窗
+    setShowNormalComplete(false)
+
+    // 进入下一关
+    handleNextLevelAuto()
   }
 
   // 提示功能
