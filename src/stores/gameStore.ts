@@ -282,9 +282,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     console.log('📋 levelImages:', levelImages)
     console.log('📋 当前平台:', isWeapp ? '小程序' : 'H5')
 
-    // 自由模式：使用用户过关时保存的网络图片URL
-    if (isFreePlay && levelImages[level]) {
-      console.log('🎮 自由模式，使用用户保存的关卡图片:', levelImages[level])
+    // 统一策略：优先使用用户过关时保存的网络图片URL（确保图片一致）
+    // 无论是正常模式还是自由模式，都优先使用 levelImages[level]
+    if (levelImages[level]) {
+      console.log('🎮 使用用户保存的关卡图片:', levelImages[level])
       config = {
         ...config,
         imageUrl: levelImages[level],  // 使用保存的网络图片URL
@@ -303,17 +304,15 @@ export const useGameStore = create<GameState>((set, get) => ({
     // 小程序端：如果是网络图片URL，需要转换为本地路径
     // H5端：直接使用网络图片URL
     let finalImageUrl = config.imageUrl
-    // 只在自由模式下，才直接使用网络图片URL
-    // 正常模式下，使用预加载的本地路径
-    if (isFreePlay) {
-      console.log('🖼️  自由模式直接使用网络图片URL:', finalImageUrl)
-    } else if (isWeapp && !config.imageUrl.startsWith('wxfile://') && !config.imageUrl.startsWith('data:image')) {
-      // 网络图片，使用预加载的本地路径
-      if (levelImageMap[level]) {
+
+    // 如果是网络图片URL，小程序端需要转换为本地路径（提高加载速度）
+    if (isWeapp && finalImageUrl.startsWith('http')) {
+      // 检查是否在 levelImageMap 中有对应的本地路径
+      if (levelImageMap[level] && levelImageMap[level].url === finalImageUrl) {
         finalImageUrl = levelImageMap[level].path
         console.log('🖼️  小程序端使用预加载的本地路径:', finalImageUrl)
       } else {
-        // 如果没有预加载，使用网络URL（小程序也会自动缓存）
+        // 没有对应的本地路径，直接使用网络URL（小程序会自动缓存）
         console.log('🖼️  小程序端使用网络URL（会自动缓存）:', finalImageUrl)
       }
     }
