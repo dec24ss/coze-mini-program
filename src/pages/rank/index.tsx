@@ -2,9 +2,9 @@ import { View, Text, Image } from '@tarojs/components'
 import { useEffect, useState } from 'react'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
-import Trophy from 'lucide-react-taro/dist/icons/trophy'
-import Medal from 'lucide-react-taro/dist/icons/medal'
-import Award from 'lucide-react-taro/dist/icons/award'
+import { Trophy } from 'lucide-react-taro/icons/trophy'
+import { Medal } from 'lucide-react-taro/icons/medal'
+import { Award } from 'lucide-react-taro/icons/award'
 import './index.css'
 
 export default function RankPage() {
