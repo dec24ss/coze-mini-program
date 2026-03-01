@@ -4,9 +4,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #faf9f6; /* 暖白色背景 */
+  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
   position: relative;
-  padding: 40px 20px 120px;
 }
 
 .settings-button-top {
@@ -16,11 +15,11 @@
   width: 44px;
   height: 44px;
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.9);
+  background: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06); /* 更细腻的阴影 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: none;
   z-index: 100;
 }
@@ -33,26 +32,23 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  max-width: 420px;
+  width: 80%;
+  max-width: 400px;
 }
 
 .home-title {
-  font-size: 48px;
-  font-weight: 500;
-  color: #525252; /* 低饱和度深灰色 */
-  margin-bottom: 12px;
+  font-size: 56px;
+  font-weight: 700;
+  color: #3B82F6;
+  margin-bottom: 20px;
   text-align: center;
-  letter-spacing: 0.02em;
 }
 
 .home-subtitle {
-  font-size: 18px;
-  color: #78716c; /* 低饱和度中性色 */
-  margin-bottom: 40px;
+  font-size: 22px;
+  color: #6B7280;
+  margin-bottom: 32px;
   text-align: center;
-  font-weight: 400;
-  letter-spacing: 0.01em;
 }
 
 /* 用户信息区域 */
@@ -60,57 +56,42 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 32px;
-  padding: 24px;
+  margin-bottom: 24px;
+  padding: 20px;
   width: 100%;
-  background: rgba(255, 255, 255, 0.6); /* 半透明白色 */
-  border-radius: 24px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
 .user-avatar {
-  width: 72px;
-  height: 72px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   margin-bottom: 12px;
-  border: 2px solid rgba(168, 162, 158, 0.2); /* 柔和的边框 */
+  border: 3px solid #3B82F6;
 }
 
 .user-name {
   font-size: 18px;
-  font-weight: 500;
-  color: #525252;
+  font-weight: 600;
+  color: #1F2937;
   margin-bottom: 4px;
-}
-
-.user-level {
-  font-size: 14px;
-  color: #78716c;
-  font-weight: 400;
 }
 
 /* 登录按钮 */
 .login-button {
   width: 100%;
-  background: #a8a29e; /* 柔和的中性色 */
+  background: #07C160;
   color: white;
-  border-radius: 26px; /* 圆角更大 */
+  border-radius: 9999px;
   padding: 18px;
-  font-size: 18px;
-  font-weight: 500;
-  margin-bottom: 32px;
-  box-shadow: 0 4px 12px rgba(168, 162, 158, 0.25); /* 柔和的阴影 */
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 25px -5px rgba(7, 193, 96, 0.3);
   border: none;
-  transition: all 0.2s ease;
 }
 
 .login-button::after {
   border: none;
-}
-
-.login-button:active {
-  transform: scale(0.96);
-  box-shadow: 0 2px 8px rgba(168, 162, 158, 0.2);
 }
 
 /* 按钮组 */
@@ -118,24 +99,23 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .home-button {
   width: 100%;
-  background: rgba(255, 255, 255, 0.8); /* 半透明白色 */
-  color: #525252;
-  border-radius: 26px;
+  background: #3B82F6;
+  color: white;
+  border-radius: 9999px;
   padding: 18px;
-  font-size: 18px;
-  font-weight: 500;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(168, 162, 158, 0.15);
+  font-size: 20px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+  border: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
 }
 
 .home-button::after {
@@ -143,36 +123,26 @@
 }
 
 .home-button.primary {
-  background: #a8a29e; /* 柔和的中性色 */
-  color: white;
-  border: none;
-  box-shadow: 0 4px 12px rgba(168, 162, 158, 0.25);
-}
-
-.home-button:active {
-  transform: scale(0.96);
-  box-shadow: 0 2px 8px rgba(168, 162, 158, 0.2);
+  background: #3B82F6;
 }
 
 .home-button.logout {
-  background: rgba(252, 165, 165, 0.3); /* 柔和的红色 */
-  color: #7f1d1d;
+  background: #3B82F6;
+  color: white;
   border: none;
-  box-shadow: 0 2px 12px rgba(252, 165, 165, 0.2);
-  font-size: 18px;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+  font-size: 20px;
   padding: 18px;
 }
 
 .home-button.disabled {
-  background: rgba(214, 211, 209, 0.5);
-  color: #a8a29e;
+  background: #E5E7EB;
+  color: #9CA3AF;
   box-shadow: none;
-  border: none;
 }
 
 .lock-hint {
   font-size: 12px;
   margin-top: 4px;
-  opacity: 0.7;
-  color: #78716c;
+  opacity: 0.8;
 }
