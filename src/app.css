@@ -1,20 +1,29 @@
 @import url('tailwindcss');
 
 /*
- * H5 端 rem 适配：与小程序 rpx 缩放一致
- * 375px 屏幕：1rem = 16px，小程序 32rpx = 16px
+ * 海海拼图大作战 - 趣味卡通风全局样式
+ * 适配微信小程序和 H5 双端
  */
+
+/* ============================================
+   1. H5 端 rem 适配
+   375px 屏幕：1rem = 16px，小程序 32rpx = 16px
+   ============================================ */
 html {
   font-size: 4vw !important;
 }
 
-/* 小程序页面容器高度设置，确保垂直居中生效 */
-/* stylelint-disable-next-line selector-type-no-unknown */
+/* ============================================
+   2. 小程序页面容器高度设置
+   ============================================ */
 page {
   height: 100%;
+  background: linear-gradient(135deg, #E6F4FF 0%, #FFFFFF 100%);
 }
 
-/* H5 端组件默认样式修复 */
+/* ============================================
+   3. H5 端组件默认样式修复
+   ============================================ */
 taro-view-core {
   display: block;
 }
@@ -44,9 +53,556 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent;
+  border: none;
 }
 
 taro-button-core::after,
 button::after {
   border: none;
+}
+
+/* ============================================
+   4. 字体系统定义（模拟卡通风格）
+   ============================================ */
+.font-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+               'Microsoft YaHei', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.font-button {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+               'Microsoft YaHei', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.font-body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+               'Microsoft YaHei', sans-serif;
+  font-weight: 400;
+}
+
+.font-number {
+  font-family: 'Arial Rounded MT Bold', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 700;
+}
+
+/* ============================================
+   5. 全局动效系统
+   ============================================ */
+
+/* 页面切换动画 */
+.page-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms ease-in-out, transform 300ms ease-in-out;
+}
+
+.page-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.page-exit-active {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 300ms ease-in-out, transform 300ms ease-in-out;
+}
+
+/* 元素从下往上入场 */
+.fade-up-enter {
+  opacity: 0;
+  transform: translateY(50px);
+}
+
+.fade-up-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
+
+/* 按钮点击下沉 */
+.button-click {
+  transform: translateY(2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 关卡卡片弹跳 */
+.level-card-hover {
+  transform: translateY(-8px) rotate(1deg);
+  box-shadow: 0 12px 24px rgba(0, 122, 255, 0.3);
+  transition: all 200ms ease-out;
+}
+
+/* 漂浮动画 - 用于装饰元素 */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 2s ease-in-out infinite;
+}
+
+/* 海浪滚动动画 - 用于背景 */
+@keyframes wave-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-wave {
+  animation: wave-scroll 10s linear infinite;
+}
+
+/* 小鱼游动动画 - 用于进度条 */
+@keyframes fish-swim {
+  0% {
+    transform: translateX(-20px);
+  }
+  100% {
+    transform: translateX(calc(100% + 20px));
+  }
+}
+
+.animate-fish-swim {
+  animation: fish-swim 10s linear infinite;
+}
+
+/* ============================================
+   6. 游戏特定动效
+   ============================================ */
+
+/* 图块位置正确 - 烟花爆炸效果 */
+@keyframes fireworks {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.puzzle-piece.correct {
+  animation: fireworks 0.6s ease-out;
+  position: relative;
+}
+
+.puzzle-piece.correct::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  background: radial-gradient(circle, rgba(255, 149, 0, 0.6) 0%, transparent 70%);
+  border-radius: 12px;
+  animation: glow-pulse 0.6s ease-out;
+  pointer-events: none;
+}
+
+.puzzle-piece.correct::after {
+  content: '✨';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  animation: spark-rotate 0.6s ease-out;
+  pointer-events: none;
+}
+
+@keyframes glow-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes spark-rotate {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(0deg) scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(180deg) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(360deg) scale(0.5);
+  }
+}
+
+/* 提示道具 - 全屏脉冲光晕效果 */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.hint-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0, 122, 255, 0.3) 0%, transparent 70%);
+  pointer-events: none;
+  animation: pulse-glow 0.8s ease-in-out;
+  z-index: 40;
+}
+
+/* 拼图块拖拽 - 弹性跟随 */
+.puzzle-piece.dragging {
+  transition: none;
+  transform: scale(1.05);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+}
+
+.puzzle-piece.dragging::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, #FF9500, #007AFF);
+  border-radius: 10px;
+  z-index: -1;
+  animation: border-rotate 1s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes border-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 拼图块放置错误 - 震动效果 */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+.puzzle-piece.shake {
+  animation: shake 0.2s ease-in-out;
+}
+
+/* 开关切换动画 */
+@keyframes switch-bounce {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+
+.switch-handle {
+  transition: transform 200ms ease-in-out;
+}
+
+.switch-handle.active {
+  transform: translateX(32px);
+}
+
+/* 气泡弹出动画 */
+@keyframes bubble-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-20px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(1.2);
+  }
+}
+
+.bubble {
+  animation: bubble-pop 0.6s ease-out;
+}
+
+/* ============================================
+   7. 拼图板完成状态 - 隐藏所有边框
+   ============================================ */
+.puzzle-board.game-complete .puzzle-piece {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* ============================================
+   8. 进度条样式
+   ============================================ */
+.progress-container {
+  width: 100%;
+  height: 30px;
+  background: #E6F4FF;
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #007AFF, #409EFF);
+  border-radius: 15px;
+  transition: width 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* ============================================
+   9. 排行榜列表样式
+   ============================================ */
+.ranking-item {
+  transition: all 200ms ease-out;
+}
+
+.ranking-item:hover {
+  background: #F5DEB3;
+  transform: translateY(-2px);
+}
+
+.ranking-item.mine {
+  background: #007AFF;
+}
+
+.ranking-item.mine .ranking-name,
+.ranking-item.mine .ranking-level {
+  color: white !important;
+}
+
+/* ============================================
+   10. 徽章样式
+   ============================================ */
+.badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 24px;
+  height: 24px;
+  background: #FF4444;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  border: 2px solid white;
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+}
+
+/* ============================================
+   11. 奖杯颜色
+   ============================================ */
+.trophy-gold {
+  color: #FFD700;
+}
+
+.trophy-silver {
+  color: #C0C0C0;
+}
+
+.trophy-bronze {
+  color: #CD7F32;
+}
+
+/* ============================================
+   12. 卡通装饰元素
+   ============================================ */
+.decoration-fish {
+  position: fixed;
+  font-size: 32px;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.decoration-wave {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: linear-gradient(to top, rgba(0, 122, 255, 0.2), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============================================
+   13. 游戏界面特殊样式
+   ============================================ */
+/* 顶部信息栏 */
+.game-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, white 80%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 30;
+}
+
+/* 底部按钮组 */
+.game-actions {
+  position: fixed;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 20px;
+  z-index: 30;
+}
+
+/* 拼图容器 */
+.puzzle-container {
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 1;
+  background: white;
+  border-radius: 8px;
+  border: 2px solid #007AFF;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.2);
+  overflow: hidden;
+  position: relative;
+  margin: 0 auto;
+}
+
+/* ============================================
+   14. 弹窗样式
+   ============================================ */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  width: 600px;
+  max-width: 90%;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 24px;
+  border: 2px solid white;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+}
+
+/* ============================================
+   15. 开关组件样式
+   ============================================ */
+.switch {
+  width: 80px;
+  height: 40px;
+  background: #E5E5EA;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  transition: background 200ms ease;
+}
+
+.switch.active {
+  background: #007AFF;
+}
+
+.switch-handle {
+  width: 32px;
+  height: 32px;
+  background: white;
+  border-radius: 16px;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 200ms ease;
+}
+
+.switch.active .switch-handle {
+  transform: translateX(40px);
+}
+
+/* ============================================
+   16. SafeArea 适配
+   ============================================ */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
 }

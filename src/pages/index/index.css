@@ -1,64 +1,210 @@
+/* ============================================
+   首页 - 趣味卡通风样式
+   ============================================ */
+
 .home-page {
   min-height: 100vh;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
-  position: relative;
+  overflow: hidden;
 }
 
-.settings-button-top {
+/* ============================================
+   背景层
+   ============================================ */
+
+.home-background {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  width: 44px;
-  height: 44px;
-  border-radius: 22px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: none;
-  z-index: 100;
+  inset: 0;
+  z-index: 0;
 }
 
-.settings-button-top::after {
-  border: none;
+/* 天空渐变 */
+.home-sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #E6F4FF 0%, #FFFFFF 100%);
 }
+
+/* 海浪动画层 */
+.home-wave {
+  position: absolute;
+  left: -50%;
+  width: 200%;
+  height: 100px;
+  background-repeat: repeat-x;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.wave-1 {
+  bottom: 50px;
+  background: linear-gradient(180deg, transparent 0%, #007AFF 100%);
+  height: 60px;
+  animation: wave-scroll 10s linear infinite;
+}
+
+.wave-2 {
+  bottom: 30px;
+  background: linear-gradient(180deg, transparent 0%, #007AFF 100%);
+  height: 40px;
+  opacity: 0.1;
+  animation: wave-scroll 12s linear infinite reverse;
+}
+
+@keyframes wave-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(25%);
+  }
+}
+
+/* 漂浮装饰元素 */
+.floating-elements {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.floating-element {
+  position: absolute;
+  animation: float 2s ease-in-out infinite;
+}
+
+.element-1 {
+  top: 15%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.element-2 {
+  top: 25%;
+  right: 12%;
+  animation-delay: 0.3s;
+}
+
+.element-3 {
+  top: 60%;
+  left: 8%;
+  animation-delay: 0.6s;
+}
+
+.element-4 {
+  top: 70%;
+  right: 10%;
+  animation-delay: 0.9s;
+}
+
+.element-5 {
+  top: 40%;
+  left: 15%;
+  animation-delay: 1.2s;
+}
+
+.element-6 {
+  top: 55%;
+  right: 18%;
+  animation-delay: 1.5s;
+}
+
+.element-7 {
+  top: 80%;
+  left: 12%;
+  animation-delay: 1.8s;
+}
+
+.element-8 {
+  top: 35%;
+  right: 8%;
+  animation-delay: 2.1s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(-10px) translateX(5px);
+  }
+  50% {
+    transform: translateY(0) translateX(0);
+  }
+  75% {
+    transform: translateY(-10px) translateX(-5px);
+  }
+}
+
+/* 底部海浪装饰 */
+.home-bottom-wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: linear-gradient(to top, rgba(0, 122, 255, 0.2), transparent);
+  pointer-events: none;
+}
+
+/* ============================================
+   主内容
+   ============================================ */
 
 .home-content {
+  position: relative;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 80%;
-  max-width: 400px;
+  width: 90%;
+  max-width: 600px;
+  padding: 0 20px;
+}
+
+/* ============================================
+   标题区
+   ============================================ */
+
+.home-title-area {
+  margin-bottom: 80px;
+  text-align: center;
 }
 
 .home-title {
-  font-size: 56px;
+  font-size: 36px;
   font-weight: 700;
-  color: #3B82F6;
-  margin-bottom: 20px;
-  text-align: center;
+  color: #007AFF;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(51, 51, 51, 0.1);
+  letter-spacing: 0.5px;
 }
 
 .home-subtitle {
-  font-size: 22px;
+  font-size: 18px;
   color: #6B7280;
-  margin-bottom: 32px;
-  text-align: center;
+  margin-bottom: 0;
 }
 
-/* 用户信息区域 */
+/* ============================================
+   用户信息区域
+   ============================================ */
+
 .user-info {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 40px;
   padding: 20px;
   width: 100%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.1);
+  border: 2px solid white;
 }
 
 .user-avatar {
@@ -66,83 +212,130 @@
   height: 80px;
   border-radius: 50%;
   margin-bottom: 12px;
-  border: 3px solid #3B82F6;
+  border: 3px solid #007AFF;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
 }
 
 .user-name {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
-  color: #1F2937;
+  color: #333333;
   margin-bottom: 4px;
 }
 
-/* 登录按钮 */
-.login-button {
-  width: 100%;
-  background: #07C160;
-  color: white;
-  border-radius: 9999px;
-  padding: 18px;
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 24px;
-  box-shadow: 0 10px 25px -5px rgba(7, 193, 96, 0.3);
-  border: none;
+.user-level {
+  font-size: 18px;
+  font-weight: 400;
+  color: #6B7280;
 }
 
-.login-button::after {
-  border: none;
-}
+/* ============================================
+   按钮组
+   ============================================ */
 
-/* 按钮组 */
 .button-group {
   width: 100%;
+  max-width: 600px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .home-button {
   width: 100%;
-  background: #3B82F6;
-  color: white;
-  border-radius: 9999px;
-  padding: 18px;
-  font-size: 20px;
+  height: 80px;
+  border-radius: 24px;
+  padding: 0;
+  font-size: 22px;
   font-weight: 600;
-  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
-  border: none;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  border: 2px solid white;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
+  gap: 12px;
+  transition: all 150ms ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .home-button::after {
   border: none;
 }
 
-.home-button.primary {
-  background: #3B82F6;
+.home-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.home-button.logout {
-  background: #3B82F6;
+/* 按钮图标 */
+.button-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 按钮文字 */
+.button-text {
+  font-size: 22px;
+  font-weight: 600;
   color: white;
-  border: none;
-  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
-  font-size: 20px;
-  padding: 18px;
 }
 
-.home-button.disabled {
-  background: #E5E7EB;
-  color: #9CA3AF;
-  box-shadow: none;
+.button-text-dark {
+  color: #333333;
 }
 
-.lock-hint {
-  font-size: 12px;
-  margin-top: 4px;
-  opacity: 0.8;
+/* 开始游戏 - 橙色渐变 */
+.button-primary {
+  background: linear-gradient(135deg, #FF9500 0%, #FFB700 100%);
+  box-shadow: 0 8px 16px rgba(255, 149, 0, 0.3);
+}
+
+.button-primary:active {
+  box-shadow: 0 4px 8px rgba(255, 149, 0, 0.2);
+}
+
+/* 关卡选择 - 海洋蓝渐变 */
+.button-ocean {
+  background: linear-gradient(135deg, #007AFF 0%, #409EFF 100%);
+  box-shadow: 0 8px 16px rgba(0, 122, 255, 0.3);
+}
+
+.button-ocean:active {
+  box-shadow: 0 4px 8px rgba(0, 122, 255, 0.2);
+}
+
+/* 排行榜 - 草绿渐变 */
+.button-green {
+  background: linear-gradient(135deg, #34C759 0%, #6FE788 100%);
+  box-shadow: 0 8px 16px rgba(52, 199, 89, 0.3);
+}
+
+.button-green:active {
+  box-shadow: 0 4px 8px rgba(52, 199, 89, 0.2);
+}
+
+/* 设置 - 沙滩黄渐变 */
+.button-sand {
+  background: linear-gradient(135deg, #F5DEB3 0%, #FFFFE0 100%);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.button-sand:active {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 退出登录 */
+.button-logout {
+  background: linear-gradient(135deg, #E5E5EA 0%, #F5F5F5 100%);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.button-logout:active {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }

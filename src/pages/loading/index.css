@@ -1,76 +1,317 @@
+/* ============================================
+   加载页面 - 趣味卡通风样式
+   ============================================ */
+
 .loading-page {
   min-height: 100vh;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
-}
-
-.loading-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 80%;
-  max-width: 400px;
-}
-
-.loading-title {
-  font-size: 48px;
-  font-weight: 700;
-  color: #3B82F6;
-  margin-bottom: 48px;
-  text-align: center;
-}
-
-/* 进度条容器 */
-.loading-progress-container {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.loading-progress-bar {
-  flex: 1;
-  height: 12px;
-  background-color: #E5E7EB;
-  border-radius: 9999px;
   overflow: hidden;
 }
 
+/* ============================================
+   背景层
+   ============================================ */
+
+.loading-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* 天空渐变 */
+.loading-sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #E6F4FF 0%, #FFFFFF 100%);
+}
+
+/* 海浪层 */
+.loading-wave {
+  position: absolute;
+  left: -50%;
+  width: 200%;
+  height: 120px;
+  background-repeat: repeat-x;
+  opacity: 0.8;
+}
+
+.wave-layer-1 {
+  bottom: 100px;
+  background: linear-gradient(180deg, transparent 0%, #007AFF 100%);
+  height: 80px;
+  opacity: 0.3;
+}
+
+.wave-layer-2 {
+  bottom: 80px;
+  background: linear-gradient(180deg, transparent 0%, #007AFF 100%);
+  height: 60px;
+  opacity: 0.5;
+}
+
+.wave-layer-3 {
+  bottom: 60px;
+  background: linear-gradient(180deg, transparent 0%, #007AFF 100%);
+  height: 40px;
+  opacity: 0.7;
+}
+
+/* 沙滩层 */
+.loading-sand {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(180deg, #F5DEB3 0%, #DEB887 100%);
+  border-radius: 0 0 0 0;
+}
+
+/* 装饰元素 */
+.decoration-decoration {
+  position: absolute;
+  animation: float 3s ease-in-out infinite;
+}
+
+.decoration-crab-1 {
+  bottom: 20px;
+  right: 60px;
+  animation-delay: 0s;
+}
+
+.decoration-crab-2 {
+  bottom: 10px;
+  right: 100px;
+  animation-delay: 1s;
+  transform: scale(0.75);
+}
+
+.decoration-shell-1 {
+  bottom: 25px;
+  right: 140px;
+  animation-delay: 0.5s;
+}
+
+.decoration-shell-2 {
+  bottom: 15px;
+  right: 180px;
+  animation-delay: 1.5s;
+  transform: scale(0.83);
+}
+
+.decoration-shell-3 {
+  bottom: 30px;
+  right: 210px;
+  animation-delay: 2s;
+}
+
+/* ============================================
+   主内容
+   ============================================ */
+
+.loading-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  max-width: 700px;
+  padding: 0 20px;
+}
+
+/* ============================================
+   标题区
+   ============================================ */
+
+.loading-title-area {
+  position: relative;
+  margin-bottom: 80px;
+  text-align: center;
+}
+
+.loading-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #007AFF;
+  text-shadow: 2px 2px 4px rgba(51, 51, 51, 0.1);
+  letter-spacing: 0.5px;
+  position: relative;
+  z-index: 2;
+}
+
+/* 标题装饰 */
+.title-decorations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.title-decoration {
+  position: absolute;
+  animation: float 2s ease-in-out infinite;
+}
+
+.title-decoration-1 {
+  top: -10px;
+  right: 40px;
+  animation-delay: 0s;
+}
+
+.title-decoration-2 {
+  bottom: -20px;
+  left: 50px;
+  animation-delay: 0.7s;
+}
+
+.title-decoration-3 {
+  top: 20px;
+  right: -30px;
+  animation-delay: 1.4s;
+  transform: scale(0.67);
+}
+
+/* ============================================
+   进度条区
+   ============================================ */
+
+.loading-progress-area {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.loading-progress-container {
+  position: relative;
+  width: 100%;
+  height: 30px;
+  background-color: #E6F4FF;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.1);
+}
+
 .loading-progress-fill {
+  position: relative;
   height: 100%;
-  background-color: #3B82F6;
-  border-radius: 9999px;
+  background: linear-gradient(90deg, #007AFF, #409EFF);
+  border-radius: 15px;
   transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+/* 进度条波浪效果 */
+.loading-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* 小鱼沿进度条游动 */
+.loading-progress-fish {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 0.3s ease;
+  animation: fish-swim 10s linear infinite;
+}
+
+@keyframes fish-swim {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(5deg);
+  }
 }
 
 /* 进度百分比 */
 .loading-percent {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
-  color: #3B82F6;
-  min-width: 60px;
-  text-align: right;
-}
-
-/* 加载文字 */
-.loading-text {
-  font-size: 16px;
-  color: #6B7280;
+  color: #FF9500;
   text-align: center;
-  margin-bottom: 16px;
+  margin-top: 20px;
+  font-family: 'Arial Rounded MT Bold', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* 加载提示 */
+/* ============================================
+   加载文字区
+   ============================================ */
+
+.loading-text-area {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.loading-text {
+  font-size: 18px;
+  color: #333333;
+  text-align: center;
+  font-weight: 400;
+}
+
+.loading-question-icon {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.question-mark {
+  position: absolute;
+  font-size: 14px;
+  font-weight: 700;
+  color: #007AFF;
+}
+
+/* ============================================
+   副提示
+   ============================================ */
+
 .loading-tips {
   margin-top: 8px;
 }
 
 .loading-tip-text {
-  font-size: 14px;
+  font-size: 16px;
   color: #9CA3AF;
   text-align: center;
+  font-weight: 400;
+}
+
+/* ============================================
+   浮动动画
+   ============================================ */
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
