@@ -85,6 +85,10 @@ export default function LevelSelectPage() {
   // 生成关卡数组
   const levels = Array.from({ length: displayLevels }, (_, i) => i + 1)
 
+  // 调试日志：打印 levelImages
+  console.log('📋 关卡选择页面 levelImages:', levelImages)
+  console.log('📋 关卡选择页面 userInfo:', userInfo)
+
   return (
     <View className="level-select-page">
       <View className="level-grid">

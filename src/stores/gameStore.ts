@@ -320,6 +320,11 @@ export const useGameStore = create<GameState>((set, get) => ({
     console.log('🖼️  最终图片 URL:', finalImageUrl.substring(0, 80))
     console.log('==========================================')
 
+    // 调试日志：打印 originalUrl
+    console.log(`🎮 原始图片 URL:`, config.originalUrl?.substring(0, 80))
+    console.log(`🎮 用户保存的图片 URL:`, levelImages[level]?.substring(0, 80))
+    console.log(`🎮 配置中的 originalUrl === levelImages[level]:`, config.originalUrl === levelImages[level])
+
     // 根据关卡设置不同的倒计时时长
     let countdownTime = 180
     if (config.level >= 1 && config.level <= 3) {

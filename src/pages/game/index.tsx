@@ -247,6 +247,12 @@ export default function GamePage() {
 
   // 自动进入下一关
   const handleNextLevelAuto = async () => {
+    console.log('==========================================')
+    console.log(`🎮 handleNextLevelAuto 被调用: level=${currentLevel}, isFreePlayMode=${isFreePlayMode}`)
+    console.log(`🎮 originalImageUrl:`, originalImageUrl?.substring(0, 80))
+    console.log(`🎮 imageUrl:`, imageUrl?.substring(0, 80))
+    console.log('==========================================')
+
     // 自由模式不记录进度，但也要获得积分
     if (isFreePlayMode) {
       // 过关获得1积分
