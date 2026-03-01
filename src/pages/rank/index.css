@@ -63,6 +63,12 @@
   justify-content: center;
 }
 
+.rank-item.header .rank-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .rank-item.header .rank-col.rank-number {
   flex: 0.5;
   padding-left: 8px;
@@ -70,9 +76,8 @@
 
 .rank-item.header .rank-col.user-info {
   flex: 2.5;
-  justify-content: flex-start;
-  padding-left: 20px;
-  gap: 12px;
+  justify-content: center;
+  padding-left: 0;
 }
 
 .rank-item.header .rank-col.level-text {
@@ -91,9 +96,8 @@
   flex: 2.5;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 12px;
-  padding-left: 20px;
 }
 
 .rank-col.level-text {

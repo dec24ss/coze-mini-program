@@ -1016,22 +1016,56 @@
   }
 }
 
-/* 失败时的弹窗样式 */
+/* 失败时的弹窗样式 - 黑白色 */
+.victory-modal.failed-modal {
+  background: rgba(0, 0, 0, 0.85);
+}
+
 .victory-modal.failed-modal .victory-content {
-  background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
-  border-color: #EF4444;
-  box-shadow: 0 25px 50px -12px rgba(239, 68, 68, 0.4), 0 0 60px rgba(239, 68, 68, 0.3);
+  background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
+  border-color: #9CA3AF;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 60px rgba(0, 0, 0, 0.3);
   animation: screen-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
+/* 去除失败弹窗的旋转背景特效 */
 .victory-modal.failed-modal .victory-content::before {
-  background: conic-gradient(from 0deg, transparent, rgba(239, 68, 68, 0.1), transparent 30%);
+  display: none;
+}
+
+/* 失败时的标题 */
+.victory-modal.failed-modal .victory-title {
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  filter: none;
+  animation: none;
+}
+
+/* 失败时的时间描述 - 黑白 */
+.victory-modal.failed-modal .victory-time {
+  color: #6B7280;
+}
+
+/* 失败时的按钮 - 保持原色 */
+.victory-modal.failed-modal .victory-button {
+  filter: grayscale(0%);
 }
 
 /* 失败时的图块变黑白效果 */
 .puzzle-piece-outer.failed {
   filter: grayscale(100%);
   animation: failed-fade 0.5s ease-out;
+}
+
+/* 失败时的道具按钮变黑白 */
+.footer-buttons-row.failed-mode .footer-button {
+  filter: grayscale(100%);
+}
+
+/* 失败时的积分角标变黑白 */
+.footer-buttons-row.failed-mode .points-badge {
+  filter: grayscale(100%);
 }
 
 @keyframes failed-fade {

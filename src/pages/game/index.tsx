@@ -946,7 +946,7 @@ export default function GamePage() {
 
       {/* 底部功能按钮 */}
       <View className="game-footer">
-        <View className="footer-buttons-row">
+        <View className={`footer-buttons-row ${isFailed ? 'failed-mode' : ''}`}>
           {/* 提示按钮 */}
           <View className="footer-button-wrapper">
             <Button
