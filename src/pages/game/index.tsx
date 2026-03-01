@@ -63,6 +63,7 @@ export default function GamePage() {
   const [animatingPieces, setAnimatingPieces] = useState<Set<number>>(new Set())  // 正在播放动画的图块ID
   const [correctPieces, setCorrectPieces] = useState<Set<number>>(new Set())  // 已放置到正确位置的图块ID
   const [showCompleteAnimation, setShowCompleteAnimation] = useState(false)  // 显示完成动画
+  const [nextLevelCountdown, setNextLevelCountdown] = useState(0)  // 进入下一关的倒计时（3秒）
   const timerRef = useRef<ReturnType<typeof setTimeout>>()  // 原图查看定时器
   const countdownRef = useRef<ReturnType<typeof setInterval>>()  // 游戏倒计时器
   const isMountedRef = useRef(false)
@@ -835,6 +836,25 @@ export default function GamePage() {
         // 动画结束后隐藏
         setTimeout(() => {
           setShowCompleteAnimation(false)
+
+          // 正常模式：显示3秒倒计时，然后进入下一关
+          if (!isFreePlayMode) {
+            console.log('🎯 正常模式完成，3秒后进入下一关')
+            setNextLevelCountdown(3)
+
+            let count = 3
+            const countdownInterval = setInterval(() => {
+              count--
+              if (count > 0) {
+                setNextLevelCountdown(count)
+              } else {
+                clearInterval(countdownInterval)
+                setNextLevelCountdown(0)
+                // 进入下一关
+                loadNextLevel()
+              }
+            }, 1000)
+          }
         }, pieces.length * 50 + 300)
       }
     }, 200)
@@ -915,6 +935,23 @@ export default function GamePage() {
                   <View className="firework-4"></View>
                   <View className="firework-5"></View>
                 </>
+              )}
+
+              {/* 正常模式进入下一关倒计时提示 */}
+              {nextLevelCountdown > 0 && !isFreePlayMode && (
+                <View className="next-level-countdown">
+                  <View className="countdown-content">
+                    <Text className="block countdown-text">
+                      🎉 过关！
+                    </Text>
+                    <Text className="block countdown-number">
+                      {nextLevelCountdown}
+                    </Text>
+                    <Text className="block countdown-subtext">
+                      秒后进入下一关
+                    </Text>
+                  </View>
+                </View>
               )}
 
               {/* 拼图碎片将由 JS 动态渲染 */}
