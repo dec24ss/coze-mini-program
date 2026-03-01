@@ -2,8 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
-  position: relative;
+  background: linear-gradient(135deg, #F0F9FF 0%, #FEF3C7 50%, #FDF2F8 100%);
 }
 
 .settings-button-top {
@@ -35,27 +34,49 @@
 }
 
 .game-loading text {
-  font-size: 22px; /* 字体缩小50% */
+  font-size: 22px;
   color: #6B7280;
 }
 
 /* 顶部信息栏 */
 .game-header {
   position: fixed;
-  top: 150px; /* 距离屏幕上边缘150px */
+  top: 150px;
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 20px;
-  padding: 16px 20px;
-  background: transparent;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.95);
   z-index: 50;
+  border-radius: 0 0 24px 24px;
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.1);
+}
+
+.header-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 2px 12px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.header-item.special {
+  background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+  box-shadow: 0 4px 16px -4px rgba(16, 185, 129, 0.4);
+}
+
+.header-item.special .header-text {
+  color: white;
 }
 
 .header-text {
-  font-size: 24px; /* 字体缩小50% */
+  font-size: 18px;
   font-weight: 700;
   color: #1F2937;
 }
@@ -68,8 +89,8 @@
   justify-content: center;
   padding: 12px;
   position: relative;
-  padding-top: 80px; /* 为顶部信息栏留出空间 */
-  padding-bottom: 100px; /* 为底部按钮留出空间 */
+  padding-top: 80px;
+  padding-bottom: 100px;
 }
 
 /* 原图显示 */
@@ -78,9 +99,9 @@
   max-width: 90vw;
   max-height: 80vh;
   aspect-ratio: 3/4;
-  border-radius: 16px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.2);
 }
 
 .original-image {
@@ -95,16 +116,17 @@
   right: 16px;
   width: 50px;
   height: 50px;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
+  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.2);
 }
 
 .timer-text {
-  color: white;
+  color: #10B981;
   font-size: 20px;
   font-weight: 700;
 }
@@ -119,7 +141,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   z-index: 100;
   transition: opacity 0.3s ease-in-out;
 }
@@ -148,6 +170,11 @@
   aspect-ratio: 3/4;
   touch-action: none;
   user-select: none;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.15);
+  background: white;
+}
   -webkit-user-select: none;
 }
 
@@ -443,19 +470,273 @@
   }
 }
 
+/* 底部功能按钮 */
+.game-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 16px 20px;
+  z-index: 50;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -4px 20px -5px rgba(0, 0, 0, 0.1);
+}
+
+.footer-buttons-row {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer-button-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.footer-button {
+  width: 100%;
+  background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+  color: white;
+  border-radius: 20px;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 600;
+  box-shadow: 0 8px 20px -5px rgba(59, 130, 246, 0.4);
+  border: none;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.footer-button::after {
+  border: none;
+}
+
+.footer-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.footer-button:active::before {
+  left: 100%;
+}
+
+.footer-button-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 12px;
+  gap: 6px;
+}
+
+.footer-button-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+
+.footer-button.active {
+  background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+  box-shadow: 0 8px 20px -5px rgba(16, 185, 129, 0.4);
+}
+
+.points-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+  padding: 0 6px;
+  border: 2px solid white;
+}
+
+/* 胜利/失败弹窗 */
+.victory-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 200;
+  animation: modal-fade-in 0.3s ease-out;
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.victory-content {
+  background: white;
+  border-radius: 28px;
+  padding: 40px 32px;
+  width: 80%;
+  max-width: 400px;
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.3);
+  animation: modal-scale-in 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@keyframes modal-scale-in {
+  0% {
+    transform: scale(0.3) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.15) rotate(5deg);
+  }
+  70% {
+    transform: scale(0.9) rotate(-3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.victory-icon {
+  width: 120px;
+  height: 120px;
+  border-radius: 60px;
+  background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  box-shadow: 0 12px 40px -10px rgba(251, 191, 36, 0.5);
+  animation: icon-bounce 1s ease-in-out infinite;
+}
+
+.victory-icon.failed {
+  background: linear-gradient(135deg, #F87171 0%, #EF4444 100%);
+  box-shadow: 0 12px 40px -10px rgba(239, 68, 68, 0.5);
+}
+
+@keyframes icon-bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
 .victory-title {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 800;
-  background: linear-gradient(135deg, #ffd700 0%, #ff6b6b 50%, #ffd700 100%);
+  background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
   text-align: center;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-  animation: title-glow 2s ease-in-out infinite alternate;
+}
+
+.victory-time {
+  font-size: 18px;
+  color: #6B7280;
+  margin-bottom: 32px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.victory-buttons {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
+.victory-button {
+  flex: 1;
+  border-radius: 20px;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 700;
+  border: none;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   position: relative;
-  z-index: 1;
+  overflow: hidden;
+}
+
+.victory-button::after {
+  border: none;
+}
+
+.victory-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.victory-button:active::before {
+  left: 100%;
+}
+
+.victory-button-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 20px;
+}
+
+.victory-button.primary {
+  background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+  color: white;
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+.victory-button.primary:active {
+  transform: scale(0.95);
+}
+
+.victory-button.secondary {
+  background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+  color: white;
+  box-shadow: 0 8px 20px rgba(107, 114, 128, 0.3);
+}
+
+.victory-button.secondary:active {
+  transform: scale(0.95);
 }
 
 @keyframes title-glow {

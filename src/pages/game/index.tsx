@@ -4,6 +4,7 @@ import Taro, { useRouter } from '@tarojs/taro'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
+import { Clock, Snowflake, Eye, Lightbulb, Download, RotateCcw, Star, Sparkles, Trophy, ArrowLeft } from 'lucide-react-taro'
 import './index.css'
 
 export default function GamePage() {
@@ -769,26 +770,43 @@ export default function GamePage() {
     <View className="game-page">
       {/* 顶部信息栏 */}
       <View className="game-header">
-        <Text className="block header-text">
-          第{currentLevel}关
-        </Text>
+        <View className="header-item">
+          <Trophy size={24} color="#F59E0B" />
+          <Text className="block header-text">
+            第{currentLevel}关
+          </Text>
+        </View>
+
         {showOriginalImage ? (
-          <Text className="block header-text" style={{ color: '#10B981' }}>
-            原图查看 {originalImageTimeRemaining}s
-          </Text>
+          <View className="header-item special">
+            <Eye size={24} color="#10B981" />
+            <Text className="block header-text" style={{ color: '#10B981' }}>
+              原图查看 {originalImageTimeRemaining}s
+            </Text>
+          </View>
         ) : isFreePlayMode ? (
-          <Text className="block header-text" style={{ color: '#F59E0B' }}>
-            自由模式
-          </Text>
+          <View className="header-item special">
+            <Sparkles size={24} color="#F59E0B" />
+            <Text className="block header-text" style={{ color: '#F59E0B' }}>
+              自由模式
+            </Text>
+          </View>
         ) : (
-          <Text className="block header-text">
-            {formatTime(countdownTime)}
-          </Text>
+          <View className="header-item">
+            <Clock size={24} color="#3B82F6" />
+            <Text className="block header-text">
+              {formatTime(countdownTime)}
+            </Text>
+          </View>
         )}
+
         {isTimeFrozen && !isFreePlayMode && (
-          <Text className="block header-text">
-            {freezeTimeRemaining}秒后恢复
-          </Text>
+          <View className="header-item special">
+            <Snowflake size={24} color="#60A5FA" />
+            <Text className="block header-text" style={{ color: '#60A5FA' }}>
+              {freezeTimeRemaining}秒后恢复
+            </Text>
+          </View>
         )}
       </View>
 
@@ -953,27 +971,42 @@ export default function GamePage() {
               className={`footer-button ${showHint ? 'active' : ''}`}
               onClick={handleHint}
             >
-              提示
+              <View className="footer-button-content">
+                <Lightbulb size={24} color="white" />
+                <Text className="block footer-button-text">提示</Text>
+              </View>
             </Button>
             <View className="points-badge">{getPoints()}</View>
           </View>
+
           {/* 原图按钮 */}
           <View className="footer-button-wrapper">
             <Button
               className={`footer-button ${showOriginalImage ? 'active' : ''}`}
               onClick={handleToggleOriginal}
             >
-              {showOriginalImage ? `${originalImageTimeRemaining}s` : '原图'}
+              <View className="footer-button-content">
+                <Eye size={24} color="white" />
+                <Text className="block footer-button-text">
+                  {showOriginalImage ? `${originalImageTimeRemaining}s` : '原图'}
+                </Text>
+              </View>
             </Button>
             <View className="points-badge">{getPoints()}</View>
           </View>
+
           {/* 冻结按钮 */}
           <View className="footer-button-wrapper">
             <Button
               className={`footer-button ${isTimeFrozen ? 'active' : ''}`}
               onClick={handleFreezeTime}
             >
-              {isTimeFrozen ? `${freezeTimeRemaining}s` : '冻结'}
+              <View className="footer-button-content">
+                <Snowflake size={24} color="white" />
+                <Text className="block footer-button-text">
+                  {isTimeFrozen ? `${freezeTimeRemaining}s` : '冻结'}
+                </Text>
+              </View>
             </Button>
             <View className="points-badge">{getPoints()}</View>
           </View>
@@ -984,6 +1017,9 @@ export default function GamePage() {
       {showFreePlayComplete && (
         <View className="victory-modal">
           <View className="victory-content">
+            <View className="victory-icon">
+              <Star size={64} color="#FCD34D" />
+            </View>
             <Text className="block victory-title">拼图完成！</Text>
             <Text className="block victory-time">恭喜你完成了自由模式拼图</Text>
             <View className="victory-buttons">
@@ -992,7 +1028,10 @@ export default function GamePage() {
               </Button>
               <View className="footer-button-wrapper" style={{ flex: 1 }}>
                 <Button className="victory-button primary" onClick={handleDownloadImage}>
-                  下载原图
+                  <View className="victory-button-content">
+                    <Download size={24} color="white" />
+                    <Text className="block">下载原图</Text>
+                  </View>
                 </Button>
               </View>
             </View>
@@ -1004,14 +1043,23 @@ export default function GamePage() {
       {isFailed && (
         <View className="victory-modal">
           <View className="victory-content">
+            <View className="victory-icon failed">
+              <Clock size={64} color="#EF4444" />
+            </View>
             <Text className="block victory-title" style={{ color: '#EF4444' }}>时间到！</Text>
             <Text className="block victory-time">很遗憾，未能完成拼图</Text>
             <View className="victory-buttons">
               <Button className="victory-button secondary" onClick={handleBackHome}>
-                返回首页
+                <View className="victory-button-content">
+                  <ArrowLeft size={24} color="#6B7280" />
+                  <Text className="block">返回首页</Text>
+                </View>
               </Button>
               <Button className="victory-button primary" onClick={handleRestart}>
-                重新开始
+                <View className="victory-button-content">
+                  <RotateCcw size={24} color="white" />
+                  <Text className="block">重新开始</Text>
+                </View>
               </Button>
             </View>
           </View>
