@@ -253,24 +253,32 @@ export default function GamePage() {
       setShowFreePlayComplete(true)
       return
     }
-    
+
     // 正式模式：更新进度和积分
     // 保存当前关卡对应的图片
     await updateHighestLevel(currentLevel, imageUrl)
     // 过关获得1积分
     addPoints(1)
     Taro.showToast({ title: '获得 1 积分！', icon: 'none' })
-    
+
     // 自动进入下一关
     loadNextLevel()
   }
 
-  // 过关后自动进入下一关（延迟1.5秒，让玩家看到完成效果）
+  // 过关后显示提示并自动进入下一关
   useEffect(() => {
     if (isComplete) {
+      // 立即显示过关提示
+      Taro.showToast({
+        title: '恭喜过关！4秒后进入下一关',
+        icon: 'success',
+        duration: 3800
+      })
+
+      // 4秒后自动进入下一关
       const timer = setTimeout(() => {
         handleNextLevelAuto()
-      }, 1500)
+      }, 4000)
       return () => clearTimeout(timer)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
