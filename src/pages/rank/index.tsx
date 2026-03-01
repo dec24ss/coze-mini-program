@@ -8,13 +8,6 @@ export default function RankPage() {
   const { userInfo, rankList, isLoggedIn, fetchRankList } = useUserStore()
   const { initSettings } = useSettingsStore()
 
-  // 隐藏昵称（显示第一个字后面用*）
-  const hideNickname = (nickname: string) => {
-    if (!nickname || nickname.length === 0) return '*'
-    if (nickname.length === 1) return nickname
-    return nickname.charAt(0) + '*'.repeat(nickname.length - 1)
-  }
-
   useEffect(() => {
     if (isLoggedIn) {
       fetchRankList()
@@ -65,7 +58,7 @@ export default function RankPage() {
                   <Text className="block">{item.nickname.charAt(0)}</Text>
                 </View>
               )}
-              <Text className="block user-name">{hideNickname(item.nickname)}</Text>
+              <Text className="block user-name">{item.nickname}</Text>
             </View>
             <Text className="block rank-col level-text">第{item.highestLevel}关</Text>
           </View>
