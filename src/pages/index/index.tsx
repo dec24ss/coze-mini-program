@@ -153,7 +153,14 @@ export default function IndexPage() {
           >
             排行榜
           </Button>
-          {/* 设置按钮 - 在排行榜下面 */}
+          {/* 设计预览按钮 - 在排行榜下面 */}
+          <Button
+            className="home-button"
+            onClick={() => Taro.navigateTo({ url: '/pages/design-preview/index' })}
+          >
+            设计预览
+          </Button>
+          {/* 设置按钮 - 在设计预览下面 */}
           <Button
             className="home-button"
             onClick={() => setShowSettings(true)}

@@ -4,7 +4,8 @@ export default defineAppConfig({
     'pages/index/index',
     'pages/game/index',
     'pages/level-select/index',
-    'pages/rank/index'
+    'pages/rank/index',
+    'pages/design-preview/index'
   ],
   window: {
     backgroundTextStyle: 'light',
