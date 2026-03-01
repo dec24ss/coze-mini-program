@@ -146,6 +146,35 @@ function getLevelConfig(level: number, imageList: string[], levelImageMap: Recor
   }
 }
 
+// 初始化时从本地存储读取缓存数据
+const initializeFromStorage = () => {
+  try {
+    const cachedLevelImageMap = Taro.getStorageSync('levelImageMap') || {}
+    const cachedImageList = Taro.getStorageSync('imageList') || []
+    const cachedImageVersion = Taro.getStorageSync('imageVersion') || ''
+    const cachedIsImagesPreloaded = cachedImageList.length > 0 && Object.keys(cachedLevelImageMap).length > 0
+
+    console.log('📦 从本地存储初始化游戏状态:')
+    console.log('- levelImageMap length:', Object.keys(cachedLevelImageMap).length)
+    console.log('- imageList length:', cachedImageList.length)
+    console.log('- imageVersion:', cachedImageVersion)
+    console.log('- isImagesPreloaded:', cachedIsImagesPreloaded)
+
+    return {
+      levelImageMap: cachedLevelImageMap,
+      imageList: cachedImageList,
+      imageVersion: cachedImageVersion,
+      isImagesPreloaded: cachedIsImagesPreloaded,
+      imagesLoaded: cachedImageList.length
+    }
+  } catch (error) {
+    console.error('❌ 从本地存储初始化失败:', error)
+    return {}
+  }
+}
+
+const initialStorageData = initializeFromStorage()
+
 // 创建游戏store
 export const useGameStore = create<GameState>((set, get) => ({
   // 初始状态
@@ -159,13 +188,13 @@ export const useGameStore = create<GameState>((set, get) => ({
   isLoading: false,
   isGameCompleted: false,
   isFreePlayMode: false,
-  imageList: [],
+  imageList: initialStorageData.imageList || [],
   imagePaths: [],
-  imagesLoaded: 0,
+  imagesLoaded: initialStorageData.imagesLoaded || 0,
   isImagesLoading: false,
-  isImagesPreloaded: false,
-  levelImageMap: {},  // 每一关的图片映射
-  imageVersion: '',  // 图片版本号
+  isImagesPreloaded: initialStorageData.isImagesPreloaded || false,
+  levelImageMap: initialStorageData.levelImageMap || {},  // 每一关的图片映射
+  imageVersion: initialStorageData.imageVersion || '',  // 图片版本号
   networkType: '',  // 网络类型
   isOnline: true,  // 是否在线（默认在线）
   isNetworkMonitoring: false,  // 是否正在监听网络状态

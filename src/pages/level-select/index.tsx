@@ -14,13 +14,6 @@ export default function LevelSelectPage() {
   const [displayLevels, setDisplayLevels] = useState(20)  // 默认显示20关，最多100关
 
   useEffect(() => {
-    // 如果图片未预加载，跳回首页
-    if (!isImagesPreloaded || Object.keys(levelImageMap).length === 0) {
-      Taro.showToast({ title: '请先开始游戏', icon: 'none' })
-      setTimeout(() => {
-        Taro.redirectTo({ url: '/pages/index/index' })
-      }, 1500)
-    }
     // 初始化设置
     initSettings()
     // 检查已解锁的关卡（确保显示最新的解锁状态）
@@ -28,7 +21,7 @@ export default function LevelSelectPage() {
     checkUnlockedLevels()
 
     // 调试信息：检查缩略图数据
-    console.log('🖼️  关卡选择页面数据:')
+    console.log('🖼️  关卡选择页面初始化:')
     console.log('- isImagesPreloaded:', isImagesPreloaded)
     console.log('- levelImageMap length:', Object.keys(levelImageMap).length)
     console.log('- levelImageMap sample:', Object.keys(levelImageMap).slice(0, 3).map(key => `${key}: ${levelImageMap[key]?.url?.substring(0, 50)}...`))
@@ -38,8 +31,9 @@ export default function LevelSelectPage() {
     console.log('- levelImages:', levelImages)
     console.log('- levelImages keys:', Object.keys(levelImages))
     console.log('- levelImages values:', Object.values(levelImages).map(url => url?.substring(0, 50)))
+    console.log('- 本地存储 levelImages:', Taro.getStorageSync('levelImages'))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isImagesPreloaded, levelImageMap])
+  }, [])
 
   // 开始指定关卡
   const handleStartLevel = async (level: number) => {

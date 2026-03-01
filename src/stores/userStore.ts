@@ -146,12 +146,14 @@ export const useUserStore = create<UserState>((set, get) => ({
       userInfo: null,
       isLoggedIn: false,
       rankList: [],
-      myRank: 0
+      myRank: 0,
+      levelImages: {}  // 清除关卡图片缓存
     })
     Taro.removeStorageSync('highestLevel')
     Taro.removeStorageSync('unlockedLevels')
     Taro.removeStorageSync('points')
-    console.log('用户退出登录')
+    Taro.removeStorageSync('levelImages')  // 清除关卡图片缓存
+    console.log('用户退出登录，已清除关卡图片缓存')
   },
 
   // 更新最高关卡
