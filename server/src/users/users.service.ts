@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { db } from '@/storage/database/sqlite/db';
+import { users } from '@/storage/database/sqlite/schema';
+import { eq, desc } from 'drizzle-orm';
 
 export interface UserData {
   openid: string;
@@ -11,98 +13,78 @@ export interface UserData {
 
 @Injectable()
 export class UsersService {
-  private supabase = getSupabaseClient();
-
   // 获取或创建用户
   async getOrCreateUser(openid: string, userData?: Partial<UserData>) {
     // 先查询用户是否存在
-    const { data: existingUser, error: queryError } = await this.supabase
-      .from('users')
-      .select('*')
-      .eq('openid', openid)
-      .single();
-
-    if (queryError && queryError.code !== 'PGRST116') {
-      console.error('查询用户失败:', queryError);
-      throw new Error('查询用户失败');
-    }
+    const existingUsers = await db
+      .select()
+      .from(users)
+      .where(eq(users.openid, openid))
+      .limit(1);
 
     // 如果用户存在，返回用户数据
-    if (existingUser) {
-      return existingUser;
+    if (existingUsers.length > 0) {
+      return existingUsers[0];
     }
 
     // 用户不存在，创建新用户
-    const { data: newUser, error: insertError } = await this.supabase
-      .from('users')
-      .insert({
+    const newUsers = await db
+      .insert(users)
+      .values({
         openid,
         nickname: userData?.nickname || '匿名用户',
-        avatar_url: userData?.avatar_url || '',
-        highest_level: userData?.highest_level || 0,
+        avatarUrl: userData?.avatar_url || '',
+        highestLevel: userData?.highest_level || 0,
         points: userData?.points || 0,
       })
-      .select()
-      .single();
+      .returning();
 
-    if (insertError) {
-      console.error('创建用户失败:', insertError);
-      throw new Error('创建用户失败');
-    }
-
-    return newUser;
+    return newUsers[0];
   }
 
   // 更新用户数据
   async updateUser(openid: string, userData: Partial<UserData>) {
-    const { data, error } = await this.supabase
-      .from('users')
-      .update({
-        ...userData,
-        updated_at: new Date().toISOString(),
+    const updatedUsers = await db
+      .update(users)
+      .set({
+        nickname: userData.nickname,
+        avatarUrl: userData.avatar_url,
+        highestLevel: userData.highest_level,
+        points: userData.points,
+        updatedAt: new Date().toISOString(),
       })
-      .eq('openid', openid)
-      .select()
-      .single();
+      .where(eq(users.openid, openid))
+      .returning();
 
-    if (error) {
-      console.error('更新用户失败:', error);
-      throw new Error('更新用户失败');
-    }
-
-    return data;
+    return updatedUsers[0];
   }
 
   // 获取用户数据
   async getUser(openid: string) {
-    const { data, error } = await this.supabase
-      .from('users')
-      .select('*')
-      .eq('openid', openid)
-      .single();
+    const result = await db
+      .select()
+      .from(users)
+      .where(eq(users.openid, openid))
+      .limit(1);
 
-    if (error) {
-      console.error('获取用户失败:', error);
-      return null;
-    }
-
-    return data;
+    return result.length > 0 ? result[0] : null;
   }
 
   // 获取排行榜（按最高关卡排序）
   async getRankList(limit: number = 10) {
-    const { data, error } = await this.supabase
-      .from('users')
-      .select('openid, nickname, avatar_url, highest_level, points')
-      .order('highest_level', { ascending: false })
+    const rankList = await db
+      .select({
+        openid: users.openid,
+        nickname: users.nickname,
+        avatar_url: users.avatarUrl,
+        highest_level: users.highestLevel,
+        points: users.points,
+      })
+      .from(users)
+      .orderBy(desc(users.highestLevel), desc(users.points))
       .limit(limit);
 
-    if (error) {
-      console.error('获取排行榜失败:', error);
-      throw new Error('获取排行榜失败');
-    }
-
-    return data || [];
+    return rankList;
   }
 
   // 添加积分
