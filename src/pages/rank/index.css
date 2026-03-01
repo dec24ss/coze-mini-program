@@ -63,37 +63,24 @@
   justify-content: center;
 }
 
+/* 标题行：三列等距居中 */
 .rank-item.header .rank-col {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.rank-item.header .rank-col.rank-number {
-  flex: 0.5;
-  padding-left: 8px;
-}
-
-.rank-item.header .rank-col.user-info {
-  flex: 2.5;
-  justify-content: center;
-  padding-left: 0;
-}
-
-.rank-item.header .rank-col.level-text {
   flex: 1;
-}
-
-.rank-col.rank-number {
-  flex: 0.5;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-left: 8px;
+}
+
+/* 内容行：三列等距居中 */
+.rank-col.rank-number {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .rank-col.user-info {
-  flex: 2.5;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
