@@ -43,6 +43,11 @@ interface GameState {
   levelImageMap: Record<number, { url: string; path: string }>  // 每一关的图片映射（包含URL和本地路径）
   imageVersion: string           // 图片版本号（用于支持增量更新）
 
+  // 网络状态
+  networkType: string            // 网络类型（wifi/4g/3g/2g/none）
+  isOnline: boolean              // 是否在线
+  isNetworkMonitoring: boolean   // 是否正在监听网络状态
+
   // 计时相关
   startTime: number              // 开始时间戳
   countdownTime: number          // 倒计时剩余时间（秒）
@@ -86,6 +91,11 @@ interface GameState {
   checkFailed: () => boolean
   loadNextLevel: () => Promise<void>
   startFreePlayMode: (level: number) => Promise<void>  // 自由游玩模式（不倒计时）
+
+  // 网络状态管理
+  initNetworkMonitoring: () => void  // 初始化网络状态监听
+  stopNetworkMonitoring: () => void  // 停止网络状态监听
+  clearCache: () => Promise<void>    // 清除图片缓存
 }
 
 // 关卡配置生成器
@@ -156,6 +166,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   isImagesPreloaded: false,
   levelImageMap: {},  // 每一关的图片映射
   imageVersion: '',  // 图片版本号
+  networkType: '',  // 网络类型
+  isOnline: true,  // 是否在线（默认在线）
+  isNetworkMonitoring: false,  // 是否正在监听网络状态
   startTime: 0,
   countdownTime: 180,
   initialCountdownTime: 180,
@@ -243,29 +256,45 @@ export const useGameStore = create<GameState>((set, get) => ({
         let loadedCount = 0
 
         // 使用 Taro.getImageInfo 预加载每张图片（真正缓存到本地）
+        // 添加重试机制，最多重试 3 次
         const loadImagePromise = async (url: string, index: number): Promise<void> => {
-          try {
-            console.log(`📥 正在加载图片 ${index + 1}/${serverImages.length}: ${url.substring(0, 50)}...`)
+          const maxRetries = 3
+          let retryCount = 0
 
-            // 使用 Taro.getImageInfo 下载并缓存图片，并获取本地路径
-            const res = await Taro.getImageInfo({
-              src: url
-            })
+          const tryLoadImage = async (): Promise<void> => {
+            try {
+              console.log(`📥 正在加载图片 ${index + 1}/${serverImages.length} ${retryCount > 0 ? `(重试 ${retryCount}/${maxRetries})` : ''}: ${url.substring(0, 50)}...`)
 
-            // 保存原始 URL 和本地路径
-            loadedImages[index] = url
-            loadedPaths[index] = res.path  // 保存本地路径
-            loadedCount++
-            set({ imagesLoaded: loadedCount })
-            console.log(`✅ 图片 ${index + 1} 加载完成，本地路径:`, res.path)
-          } catch (error) {
-            console.error(`❌ 图片 ${index + 1} 加载失败:`, error)
-            // 加载失败也继续，使用原始 URL
-            loadedImages[index] = url
-            loadedPaths[index] = url  // 降级使用 URL
-            loadedCount++
-            set({ imagesLoaded: loadedCount })
+              // 使用 Taro.getImageInfo 下载并缓存图片，并获取本地路径
+              const res = await Taro.getImageInfo({
+                src: url
+              })
+
+              // 保存原始 URL 和本地路径
+              loadedImages[index] = url
+              loadedPaths[index] = res.path  // 保存本地路径
+              loadedCount++
+              set({ imagesLoaded: loadedCount })
+              console.log(`✅ 图片 ${index + 1} 加载完成，本地路径:`, res.path)
+            } catch (error) {
+              retryCount++
+              if (retryCount <= maxRetries) {
+                console.log(`🔄 图片 ${index + 1} 加载失败，正在重试 ${retryCount}/${maxRetries}...`)
+                // 延迟后重试（指数退避：1s, 2s, 4s）
+                await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000))
+                return tryLoadImage()
+              } else {
+                console.error(`❌ 图片 ${index + 1} 加载失败，已重试 ${maxRetries} 次，跳过:`, error)
+                // 加载失败也继续，使用原始 URL
+                loadedImages[index] = url
+                loadedPaths[index] = url  // 降级使用 URL
+                loadedCount++
+                set({ imagesLoaded: loadedCount })
+              }
+            }
           }
+
+          await tryLoadImage()
         }
 
         // 并行加载所有图片
@@ -682,6 +711,93 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     // 开始第一关
     await get().startGame(1)
+  },
+
+  // 初始化网络状态监听
+  initNetworkMonitoring: () => {
+    if (get().isNetworkMonitoring) {
+      console.log('⚠️  网络状态监听已存在，跳过')
+      return
+    }
+
+    console.log('📶 初始化网络状态监听...')
+
+    // 获取初始网络状态
+    Taro.getNetworkType({
+      success: (res) => {
+        const isOnline = res.networkType !== 'none'
+        console.log(`📶 初始网络状态: ${res.networkType}, 在线: ${isOnline}`)
+        set({
+          networkType: res.networkType,
+          isOnline
+        })
+      },
+      fail: () => {
+        console.log('⚠️  获取网络状态失败，默认在线')
+        set({
+          networkType: 'unknown',
+          isOnline: true
+        })
+      }
+    })
+
+    // 监听网络状态变化
+    Taro.onNetworkStatusChange((res) => {
+      const isOnline = res.networkType !== 'none'
+      console.log(`📶 网络状态变化: ${res.networkType}, 在线: ${isOnline}`)
+
+      set({
+        networkType: res.networkType,
+        isOnline
+      })
+
+      // 网络变化时自动切换模式
+      if (isOnline) {
+        console.log('🌐 网络已恢复，可以正常使用')
+        Taro.showToast({ title: '网络已恢复', icon: 'success', duration: 1500 })
+      } else {
+        console.log('📵 网络已断开，切换到离线模式')
+        Taro.showToast({ title: '网络已断开，使用离线模式', icon: 'none', duration: 2000 })
+      }
+    })
+
+    set({ isNetworkMonitoring: true })
+  },
+
+  // 停止网络状态监听
+  stopNetworkMonitoring: () => {
+    if (!get().isNetworkMonitoring) {
+      console.log('⚠️  网络状态监听未运行，跳过')
+      return
+    }
+
+    console.log('📶 停止网络状态监听...')
+    Taro.offNetworkStatusChange()
+    set({ isNetworkMonitoring: false })
+  },
+
+  // 清除图片缓存
+  clearCache: async () => {
+    console.log('🗑️  清除图片缓存...')
+
+    // 清除本地存储
+    Taro.removeStorageSync('levelImageMap')
+    Taro.removeStorageSync('imageList')
+    Taro.removeStorageSync('imageVersion')
+
+    // 重置状态
+    set({
+      imageList: [],
+      imagePaths: [],
+      imagesLoaded: 0,
+      isImagesPreloaded: false,
+      levelImageMap: {},
+      imageVersion: ''
+    })
+
+    console.log('✅ 图片缓存已清除')
+
+    Taro.showToast({ title: '缓存已清除', icon: 'success', duration: 1500 })
   }
 }))
 

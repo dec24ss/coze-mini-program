@@ -105,12 +105,21 @@ export default function GamePage() {
         return
       }
 
-      // 如果是网络路径，等待图片加载完成
+      // 如果是网络路径，使用 Taro.getImageInfo 验证图片是否可访问
       setIsImageLoaded(false)
-      setTimeout(() => {
-        setIsImageLoaded(true)
-        console.log('✅ 网络路径图片已显示')
-      }, 100)  // 100ms延迟
+      Taro.getImageInfo({
+        src: imageUrl,
+        success: () => {
+          console.log('✅ 网络路径图片已验证，立即显示')
+          setIsImageLoaded(true)
+        },
+        fail: (err) => {
+          console.error('❌ 网络路径图片加载失败:', err)
+          // 图片加载失败，降级显示占位符
+          setIsImageLoaded(true)
+          Taro.showToast({ title: '图片加载失败', icon: 'none', duration: 2000 })
+        }
+      })
     } else {
       console.log('⚠️  imageUrl 为空')
     }

@@ -12,6 +12,7 @@ export default function LevelSelectPage() {
   const { userInfo, unlockedLevels, levelImages } = useUserStore()
   const { initSettings } = useSettingsStore()
   const [displayLevels, setDisplayLevels] = useState(20)  // 默认显示20关，最多100关
+  const [visibleLevels, setVisibleLevels] = useState<Set<number>>(new Set())  // 可见的关卡（懒加载）
 
   useEffect(() => {
     // 如果图片未预加载，跳回首页
@@ -28,6 +29,13 @@ export default function LevelSelectPage() {
     checkUnlockedLevels()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isImagesPreloaded, levelImageMap])
+
+  // 懒加载：当关卡进入可视区域时加载图片
+  const handleLevelVisible = (level: number) => {
+    if (!visibleLevels.has(level)) {
+      setVisibleLevels(prev => new Set(prev).add(level))
+    }
+  }
 
   // 开始指定关卡
   const handleStartLevel = async (level: number) => {
@@ -105,21 +113,31 @@ export default function LevelSelectPage() {
               key={level}
               className={`level-item ${isLocked ? 'locked' : ''} ${isCompleted ? 'completed' : ''}`}
               onClick={() => !isLocked && handleStartLevel(level)}
+              // 使用 onAppear 实现懒加载（小程序端）
+              onAppear={() => handleLevelVisible(level)}
             >
               {isLocked ? (
                 // 锁定关卡显示锁图标
                 <View className="locked-icon">
                   <Lock size={28} color="#9CA3AF" />
                 </View>
-              ) : isCompleted && levelImage ? (
-                // 已过关显示缩略图（自由模式）
+              ) : isCompleted && levelImage && visibleLevels.has(level) ? (
+                // 已过关显示缩略图（自由模式，懒加载）
                 <>
                   <Image
                     className="level-thumbnail"
                     src={levelImage}
                     mode="aspectFill"
+                    lazyLoad  // 启用懒加载
                   />
                   <View className="level-number-overlay">{level}</View>
+                </>
+              ) : isCompleted && levelImage && !visibleLevels.has(level) ? (
+                // 已过关但图片未加载（显示占位符）
+                <>
+                  <View className="thumbnail-placeholder">
+                    <Text className="block placeholder-text">{level}</Text>
+                  </View>
                 </>
               ) : isCompleted ? (
                 // 已过关但没有图片（降级显示）
