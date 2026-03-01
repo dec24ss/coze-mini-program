@@ -4,6 +4,7 @@ import Taro, { useRouter } from '@tarojs/taro'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
+import type { PuzzlePiece } from '@/stores/gameStore'
 import './index.css'
 
 export default function GamePage() {
@@ -17,10 +18,11 @@ export default function GamePage() {
   const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
   const { playSound, playVibration, initSettings } = useSettingsStore()
 
-  // 初始化设置
+  // 初始化设置（只在组件挂载时执行一次）
   useEffect(() => {
     initSettings()
-  }, [initSettings])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const {
     currentLevel,
@@ -55,7 +57,7 @@ export default function GamePage() {
 
   const { updateHighestLevel, addPoints, consumePoints, getPoints } = useUserStore()
 
-  const [draggingPiece, setDraggingPiece] = useState<any>(null)
+  const [draggingPiece, setDraggingPiece] = useState<PuzzlePiece | null>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [containerRect, setContainerRect] = useState<{ left: number; top: number; width: number; height: number }>({ left: 0, top: 0, width: 0, height: 0 })
   const [isImageLoaded, setIsImageLoaded] = useState(true)  // 默认为 true，避免一直显示加载中
@@ -77,7 +79,7 @@ export default function GamePage() {
   useEffect(() => {
     isMountedRef.current = true
     // 延迟获取以确保 DOM 已渲染
-    setTimeout(() => {
+    const containerTimer = setTimeout(() => {
       getContainerRect().then((rect) => {
         if (rect) {
           setContainerRect(rect)
@@ -88,6 +90,7 @@ export default function GamePage() {
 
     return () => {
       isMountedRef.current = false
+      clearTimeout(containerTimer)  // 清理容器位置获取定时器
     }
   }, [isWeapp])
 
@@ -214,6 +217,7 @@ export default function GamePage() {
         countdownRef.current = undefined
       }
     }
+    // 依赖 updateCountdown 和 checkFailed 但这些函数在 store 中，不会频繁变化
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, isComplete, isFailed])
 
@@ -225,7 +229,9 @@ export default function GamePage() {
       }, 1000)
       return () => clearInterval(freezeTimer)
     }
-  }, [isTimeFrozen, freezeTimeRemaining, updateFreezeCountdown])
+    // 依赖 updateFreezeCountdown 但这个函数在 store 中，不会频繁变化
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isTimeFrozen, freezeTimeRemaining])
 
   // 原图查看定时器 - 打开原图时5秒自动关闭
   useEffect(() => {
@@ -256,7 +262,9 @@ export default function GamePage() {
         timerRef.current = undefined
       }
     }
-  }, [showOriginalImage, toggleOriginalImage, updateOriginalImageCountdown])
+    // 依赖 toggleOriginalImage 和 updateOriginalImageCountdown 但这些函数在 store 中
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showOriginalImage])
 
   // 自动进入下一关
   const handleNextLevelAuto = async () => {
@@ -349,17 +357,42 @@ export default function GamePage() {
                 success: (canvasRes) => {
                   console.log('拼图完成图片生成成功（临时路径）:', canvasRes.tempFilePath)
 
-                  // 将临时路径保存为永久路径
-                  Taro.saveFile({
-                    tempFilePath: canvasRes.tempFilePath,
-                    success: (saveRes) => {
-                      console.log('拼图完成图片保存为永久路径:', saveRes.savedFilePath)
-                      resolve(saveRes.savedFilePath)
+                  // 压缩图片以减少存储占用
+                  Taro.compressImage({
+                    src: canvasRes.tempFilePath,
+                    quality: 60,  // 压缩质量（60%）
+                    compressedWidth: canvasWidth,  // 保持原尺寸
+                    compressedHeight: canvasHeight,
+                    success: (compressRes) => {
+                      console.log('图片压缩成功:', compressRes.tempFilePath)
+
+                      // 将压缩后的临时路径保存为永久路径
+                      Taro.saveFile({
+                        tempFilePath: compressRes.tempFilePath,
+                        success: (saveRes) => {
+                          console.log('压缩后的图片保存为永久路径:', saveRes.savedFilePath)
+                          resolve(saveRes.savedFilePath)
+                        },
+                        fail: (err) => {
+                          console.error('保存文件失败，使用压缩后的临时路径:', err)
+                          resolve(compressRes.tempFilePath)
+                        }
+                      })
                     },
                     fail: (err) => {
-                      console.error('保存文件失败，使用临时路径:', err)
-                      // 如果保存失败，使用临时路径
-                      resolve(canvasRes.tempFilePath)
+                      console.error('图片压缩失败，使用原始临时路径:', err)
+                      // 压缩失败，使用原始临时路径
+                      Taro.saveFile({
+                        tempFilePath: canvasRes.tempFilePath,
+                        success: (saveRes) => {
+                          console.log('原始图片保存为永久路径:', saveRes.savedFilePath)
+                          resolve(saveRes.savedFilePath)
+                        },
+                        fail: (saveErr) => {
+                          console.error('保存文件失败，使用临时路径:', saveErr)
+                          resolve(canvasRes.tempFilePath)
+                        }
+                      })
                     }
                   })
                 },

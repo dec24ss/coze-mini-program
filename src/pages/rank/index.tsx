@@ -14,6 +14,7 @@ export default function RankPage() {
     }
     // 初始化设置
     initSettings()
+    // 依赖登录状态变化时重新获取排行榜
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn])
 

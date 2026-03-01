@@ -98,27 +98,23 @@ interface GameState {
   clearCache: () => Promise<void>    // 清除图片缓存
 }
 
+// 关卡难度配置
+const LEVEL_DIFFICULTY_CONFIG = [
+  { minLevel: 1, maxLevel: 3, gridSize: 3, label: '入门' },
+  { minLevel: 4, maxLevel: 6, gridSize: 4, label: '进阶' },
+  { minLevel: 7, maxLevel: 9, gridSize: 5, label: '挑战' },
+  { minLevel: 10, maxLevel: 12, gridSize: 6, label: '大师' },
+  { minLevel: 13, maxLevel: Infinity, gridSize: 7, label: '无限' }
+]
+
 // 关卡配置生成器
 function getLevelConfig(level: number, imageList: string[], levelImageMap: Record<number, { url: string; path: string }>): LevelConfig {
-  let gridSize: number
+  // 根据关卡查找对应的难度配置
+  const difficulty = LEVEL_DIFFICULTY_CONFIG.find(
+    config => level >= config.minLevel && level <= config.maxLevel
+  ) || LEVEL_DIFFICULTY_CONFIG[LEVEL_DIFFICULTY_CONFIG.length - 1]  // 默认使用最高难度
 
-  // 关卡难度规则：
-  // 第1-3关：3×3
-  // 第4-6关：4×4
-  // 第7-9关：5×5
-  // 第10-12关：6×6
-  // 第13关开始：7×7（无限关卡）
-  if (level >= 1 && level <= 3) {
-    gridSize = 3   // 第1-3关：3×3（入门）
-  } else if (level >= 4 && level <= 6) {
-    gridSize = 4   // 第4-6关：4×4（进阶）
-  } else if (level >= 7 && level <= 9) {
-    gridSize = 5   // 第7-9关：5×5（挑战）
-  } else if (level >= 10 && level <= 12) {
-    gridSize = 6   // 第10-12关：6×6（大师）
-  } else {
-    gridSize = 7   // 第13关开始：7×7（无限关卡）
-  }
+  const gridSize = difficulty.gridSize
 
   // 使用预先规划的每一关的图片映射（优先使用本地路径）
   let imageUrl: string
@@ -284,6 +280,9 @@ export const useGameStore = create<GameState>((set, get) => ({
         const loadedPaths: string[] = []  // 新增：保存本地路径
         let loadedCount = 0
 
+        // 分批大小：每次加载 10 张图片
+        const BATCH_SIZE = 10
+
         // 使用 Taro.getImageInfo 预加载每张图片（真正缓存到本地）
         // 添加重试机制，最多重试 3 次
         const loadImagePromise = async (url: string, index: number): Promise<void> => {
@@ -326,8 +325,22 @@ export const useGameStore = create<GameState>((set, get) => ({
           await tryLoadImage()
         }
 
-        // 并行加载所有图片
-        await Promise.all(serverImages.map((url, index) => loadImagePromise(url, index)))
+        // 分批加载所有图片（每次 BATCH_SIZE 张）
+        for (let i = 0; i < serverImages.length; i += BATCH_SIZE) {
+          const batch = serverImages.slice(i, i + BATCH_SIZE)
+          const batchStartIndex = i
+
+          console.log(`📦 加载批次 ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(serverImages.length / BATCH_SIZE)}，共 ${batch.length} 张图片`)
+
+          await Promise.all(
+            batch.map((url, batchIndex) => loadImagePromise(url, batchStartIndex + batchIndex))
+          )
+
+          // 每批加载后短暂延迟，避免网络拥塞
+          if (i + BATCH_SIZE < serverImages.length) {
+            await new Promise(resolve => setTimeout(resolve, 100))
+          }
+        }
 
         console.log(`✅ 所有图片加载完成，成功 ${loadedCount}/${serverImages.length}`)
 

@@ -1,4 +1,4 @@
-import { View, Text, Button, Image } from '@tarojs/components'
+import { View, Text, Image, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { useGameStore } from '@/stores/gameStore'
@@ -12,6 +12,7 @@ export default function LevelSelectPage() {
   const { userInfo, unlockedLevels, levelImages } = useUserStore()
   const { initSettings } = useSettingsStore()
   const [displayLevels, setDisplayLevels] = useState(20)  // 默认显示20关，最多100关
+  const [imageErrors, setImageErrors] = useState<Set<number>>(new Set())  // 记录加载失败的图片
 
   useEffect(() => {
     // 初始化设置
@@ -32,6 +33,7 @@ export default function LevelSelectPage() {
     console.log('- levelImages keys:', Object.keys(levelImages))
     console.log('- levelImages values:', Object.values(levelImages).map(url => url?.substring(0, 50)))
     console.log('- 本地存储 levelImages:', Taro.getStorageSync('levelImages'))
+    // 只在组件挂载时执行一次
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -88,7 +90,16 @@ export default function LevelSelectPage() {
     // 播放轻微震动
     const { playVibration } = useSettingsStore.getState()
     playVibration('light')
-    setDisplayLevels(prev => prev + 10)
+    const newCount = Math.min(displayLevels + 20, 100)  // 每次加载20关，最多100关
+    setDisplayLevels(newCount)
+  }
+
+  // 滚动到底部时自动加载更多
+  const handleScrollToLower = () => {
+    if (displayLevels < 100) {
+      console.log('滚动到底部，加载更多关卡')
+      handleLoadMore()
+    }
   }
 
   // 生成关卡数组
@@ -96,7 +107,13 @@ export default function LevelSelectPage() {
 
   return (
     <View className="level-select-page">
-      <View className="level-grid">
+      <ScrollView
+        className="level-scroll"
+        scrollY
+        onScrollToLower={handleScrollToLower}
+        lowerThreshold={100}
+      >
+        <View className="level-grid">
         {levels.map((level) => {
           const isLocked = level > unlockedLevels
           const isCompleted = userInfo && level <= userInfo.highestLevel  // 已过关
@@ -117,7 +134,7 @@ export default function LevelSelectPage() {
                 <View className="locked-icon">
                   <Lock size={28} color="#9CA3AF" />
                 </View>
-              ) : isCompleted && levelImage ? (
+              ) : isCompleted && levelImage && !imageErrors.has(level) ? (
                 // 已过关显示缩略图（自由模式）
                 <>
                   <Image
@@ -130,6 +147,13 @@ export default function LevelSelectPage() {
                     }}
                     onError={(err) => {
                       console.error(`❌ 关卡 ${level} 缩略图加载失败:`, err)
+                      // 记录加载失败，显示降级UI
+                      setImageErrors(prev => new Set([...prev, level]))
+                      Taro.showToast({
+                        title: `关卡 ${level} 缩略图加载失败`,
+                        icon: 'none',
+                        duration: 2000
+                      })
                     }}
                   />
                   <View className="level-number-overlay">{level}</View>
@@ -160,15 +184,17 @@ export default function LevelSelectPage() {
         })}
       </View>
 
-      <View className="load-more">
-        <Button className="load-more-button" onClick={handleLoadMore}>
-          加载更多
-        </Button>
-      </View>
+      {/* 显示加载更多提示 */}
+      {displayLevels < 100 && (
+        <View className="load-more-hint">
+          <Text className="block load-more-text">继续下滑加载更多关卡</Text>
+        </View>
+      )}
 
       <View className="level-footer-hint">
         <Text className="block footer-hint-text">右滑屏幕返回首页</Text>
       </View>
+      </ScrollView>
     </View>
   )
 }
