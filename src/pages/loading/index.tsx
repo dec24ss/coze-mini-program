@@ -4,7 +4,7 @@ import Taro from '@tarojs/taro'
 import { useGameStore } from '@/stores/gameStore'
 import './index.css'
 
-const TOTAL_IMAGES = 10 // 固定10张图片（对应10个关卡）
+const TOTAL_IMAGES = 100 // 固定100张图片（对应100个关卡）
 
 export default function LoadingPage() {
   const { preloadImages, imagesLoaded, imageList } = useGameStore()

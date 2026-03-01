@@ -11,7 +11,7 @@ export default function LevelSelectPage() {
   const { levelImageMap, isImagesPreloaded } = useGameStore()
   const { userInfo, unlockedLevels, levelImages } = useUserStore()
   const { initSettings } = useSettingsStore()
-  const [displayLevels, setDisplayLevels] = useState(20)  // 默认显示20关
+  const [displayLevels, setDisplayLevels] = useState(20)  // 默认显示20关，最多100关
 
   useEffect(() => {
     // 如果图片未预加载，跳回首页

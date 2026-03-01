@@ -8,40 +8,110 @@ const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
 const access = promisify(fs.access);
 
-// 30张高质量艺术风格图片URL（使用Lorem Picsum，最稳定可靠）
+// 100张高质量艺术风格图片URL（使用Lorem Picsum，最稳定可靠）
+// 优化策略：使用更小的尺寸（900x1200）和质量（75%），加快加载速度
 // Lorem Picsum 优点：永不会404、固定尺寸、免费无限调用、响应速度快
+// 使用 ID 100-199，确保图片存在且质量高
 const PAINTING_URLS = [
-  // 使用已验证的 Image ID，确保图片存在
-  'https://picsum.photos/id/100/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/101/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/102/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/103/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/104/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/106/1200/1600.jpg', // 跳过105（不存在）
-  'https://picsum.photos/id/107/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/108/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/109/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/110/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/111/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/112/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/113/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/114/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/115/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/116/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/117/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/118/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/119/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/120/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/121/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/122/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/123/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/124/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/125/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/126/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/127/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/128/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/129/1200/1600.jpg', // 自然风光
-  'https://picsum.photos/id/130/1200/1600.jpg', // 自然风光
+  'https://picsum.photos/id/100/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/101/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/102/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/103/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/104/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/106/900/1200.jpg?quality=75', // 建筑艺术（跳过105）
+  'https://picsum.photos/id/107/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/108/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/109/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/110/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/111/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/112/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/113/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/114/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/115/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/116/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/117/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/118/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/119/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/120/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/121/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/122/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/123/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/124/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/125/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/126/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/127/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/128/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/129/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/130/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/131/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/132/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/133/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/134/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/135/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/136/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/137/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/138/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/139/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/140/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/141/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/142/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/143/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/144/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/145/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/146/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/147/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/148/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/149/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/150/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/151/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/152/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/153/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/154/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/155/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/156/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/157/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/158/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/159/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/160/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/161/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/162/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/163/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/164/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/165/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/166/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/167/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/168/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/169/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/170/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/171/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/172/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/173/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/174/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/175/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/176/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/177/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/178/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/179/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/180/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/181/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/182/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/183/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/184/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/185/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/186/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/187/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/188/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/189/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/190/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/191/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/192/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/193/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/194/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/195/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/196/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/197/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/198/900/1200.jpg?quality=75', // 自然风光
+  'https://picsum.photos/id/199/900/1200.jpg?quality=75', // 自然风光
 ]
 
 @Injectable()
@@ -168,15 +238,26 @@ export class ImageService implements OnModuleInit {
   }
 
   // 生成随机图片列表（每次返回不同的图片）
-  getRandomImages(count: number = 30): string[] {
+  // 优化：使用更小的尺寸（900x1200）和质量参数，加快加载速度
+  getRandomImages(count: number = 100): string[] {
     // 使用时间戳作为随机种子，确保每次请求都生成不同的图片
     const randomSeed = Date.now()
 
     // 生成指定数量的随机图片 URL
     return Array.from({ length: count }, (_, i) => {
-      // 使用 ?random 参数确保每次都不同
-      return `https://picsum.photos/1200/1600?random=${randomSeed}_${i}`
+      // 使用 ?random 参数确保每次都不同，并设置质量参数
+      return `https://picsum.photos/900/1200?random=${randomSeed}_${i}&quality=75`
     })
+  }
+
+  // 获取图片版本号（用于支持增量更新）
+  getImageVersion(): string {
+    // 使用日期字符串作为版本号，格式：YYYYMMDD
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    return `${year}${month}${day}`
   }
 
   getAllImages(): string[] {

@@ -23,17 +23,20 @@ export class ImageController {
 
   /**
    * 获取随机图片列表
-   * 每次返回10张全新的随机图片（对应10个关卡，使用时间戳作为随机种子）
+   * 每次返回100张全新的随机图片（对应100个关卡，使用时间戳作为随机种子）
+   * 返回图片版本号，用于支持增量更新
    */
   @Get('random')
   getRandomImages() {
-    const images = this.imageService.getRandomImages(10) // 返回10张随机图片
+    const images = this.imageService.getRandomImages(100) // 返回100张随机图片
+    const version = this.imageService.getImageVersion() // 获取图片版本号
     return {
       code: 200,
       msg: 'success',
       data: {
         images,
-        total: images.length
+        total: images.length,
+        version // 返回版本号
       }
     }
   }

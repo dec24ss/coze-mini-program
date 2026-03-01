@@ -35,12 +35,13 @@ interface GameState {
   isFreePlayMode: boolean        // 是否是自由游玩模式（不倒计时）
 
   // 图片资源
-  imageList: string[]            // 图片列表（预加载的10张图片URL）
+  imageList: string[]            // 图片列表（预加载的100张图片URL）
   imagePaths: string[]           // 图片本地路径列表（缓存后的本地路径）
   imagesLoaded: number           // 已加载的图片数量
   isImagesLoading: boolean       // 是否正在加载图片
   isImagesPreloaded: boolean     // 图片是否已预加载并缓存
   levelImageMap: Record<number, { url: string; path: string }>  // 每一关的图片映射（包含URL和本地路径）
+  imageVersion: string           // 图片版本号（用于支持增量更新）
 
   // 计时相关
   startTime: number              // 开始时间戳
@@ -154,6 +155,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   isImagesLoading: false,
   isImagesPreloaded: false,
   levelImageMap: {},  // 每一关的图片映射
+  imageVersion: '',  // 图片版本号
   startTime: 0,
   countdownTime: 180,
   initialCountdownTime: 180,
@@ -171,12 +173,49 @@ export const useGameStore = create<GameState>((set, get) => ({
   originalImageCount: 0,
   freezeCount: 0,
 
-  // 预加载图片（使用 Taro.getImageInfo 真正缓存图片）
+  // 预加载图片（使用 Taro.getImageInfo 真正缓存图片，支持版本号管理和离线模式）
   preloadImages: async () => {
     set({ isImagesLoading: true, imagesLoaded: 0, imageList: [], isImagesPreloaded: false })
 
     try {
-      // 从服务器获取随机图片列表
+      // 检测网络状态
+      const networkType = await Taro.getNetworkType()
+      const isOffline = networkType.networkType === 'none'
+
+      if (isOffline) {
+        console.log('📶 网络离线，尝试使用本地缓存的图片')
+
+        // 尝试从本地存储加载缓存的图片
+        const cachedLevelImageMap = Taro.getStorageSync('levelImageMap') || {}
+        const cachedImageList = Taro.getStorageSync('imageList') || []
+
+        if (Object.keys(cachedLevelImageMap).length > 0 && cachedImageList.length > 0) {
+          console.log(`✅ 从本地缓存加载了 ${Object.keys(cachedLevelImageMap).length} 张图片`)
+
+          set({
+            imageList: cachedImageList,
+            imagePaths: cachedImageList, // 离线模式下使用缓存路径
+            imagesLoaded: cachedImageList.length,
+            isImagesLoading: false,
+            isImagesPreloaded: true,
+            levelImageMap: cachedLevelImageMap,
+            imageVersion: Taro.getStorageSync('imageVersion') || ''
+          })
+
+          Taro.showToast({ title: '离线模式：使用缓存的图片', icon: 'none', duration: 2000 })
+          return
+        } else {
+          console.log('⚠️  没有本地缓存，无法离线使用')
+          Taro.showToast({ title: '离线模式：请先联网下载图片', icon: 'none', duration: 3000 })
+          set({
+            isImagesLoading: false,
+            isImagesPreloaded: false
+          })
+          return
+        }
+      }
+
+      // 在线模式：从服务器获取随机图片列表
       console.log('🖼️  从服务器获取图片列表...')
       const response = await Network.request({
         url: '/api/images/random',
@@ -185,7 +224,19 @@ export const useGameStore = create<GameState>((set, get) => ({
 
       if (response.data?.data?.images) {
         const serverImages = response.data.data.images
-        console.log(`✅ 从服务器获取到 ${serverImages.length} 张图片`)
+        const serverVersion = response.data.data.version || '' // 获取服务器版本号
+        console.log(`✅ 从服务器获取到 ${serverImages.length} 张图片，版本号: ${serverVersion}`)
+
+        // 检查版本号是否变化
+        const localVersion = Taro.getStorageSync('imageVersion') || ''
+        const versionChanged = serverVersion && localVersion && serverVersion !== localVersion
+
+        if (versionChanged) {
+          console.log(`🔄 图片版本号已更新: ${localVersion} -> ${serverVersion}，将重新加载图片`)
+          // 清除本地缓存
+          Taro.removeStorageSync('levelImageMap')
+          Taro.removeStorageSync('imageList')
+        }
 
         const loadedImages: string[] = []
         const loadedPaths: string[] = []  // 新增：保存本地路径
@@ -223,9 +274,9 @@ export const useGameStore = create<GameState>((set, get) => ({
         console.log(`✅ 所有图片加载完成，成功 ${loadedCount}/${serverImages.length}`)
 
         // 预先规划每一关用哪张图片（包含URL和本地路径）
-        // 前10关使用前10张图片，如果图片不够则循环使用
+        // 前100关使用前100张图片，如果图片不够则循环使用
         const levelImageMap: Record<number, { url: string; path: string }> = {}
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 100; i++) {
           const imageIndex = i % loadedImages.length
           levelImageMap[i + 1] = {
             url: loadedImages[imageIndex],
@@ -241,13 +292,25 @@ export const useGameStore = create<GameState>((set, get) => ({
         console.log('✅ levelImageMap 已生成，长度:', Object.keys(levelImageMap).length)
         console.log('✅ 第一关图片路径:', levelImageMap[1]?.path)
 
+        // 保存版本号到本地
+        if (serverVersion) {
+          Taro.setStorageSync('imageVersion', serverVersion)
+          console.log('💾 保存图片版本号到本地:', serverVersion)
+        }
+
+        // 保存图片到本地缓存（用于离线模式）
+        Taro.setStorageSync('levelImageMap', levelImageMap)
+        Taro.setStorageSync('imageList', loadedImages)
+        console.log('💾 保存图片到本地缓存，支持离线模式')
+
         set({
           imageList: loadedImages,
           imagePaths: loadedPaths,  // 保存本地路径列表
           imagesLoaded: serverImages.length,
           isImagesLoading: false,
           isImagesPreloaded: true,  // 标记图片已预加载完成
-          levelImageMap  // 保存每一关的图片映射
+          levelImageMap,  // 保存每一关的图片映射
+          imageVersion: serverVersion  // 保存版本号到状态
         })
       } else {
         throw new Error('服务器返回数据格式错误')
