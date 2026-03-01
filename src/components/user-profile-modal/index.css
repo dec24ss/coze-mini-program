@@ -1,0 +1,163 @@
+/* 用户信息设置弹窗样式 */
+.user-profile-modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.user-profile-modal-content {
+  width: 85%;
+  max-width: 400px;
+  background: white;
+  border-radius: 24rpx;
+  padding: 48rpx 40rpx 40rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1f2937;
+  text-align: center;
+  margin-bottom: 16rpx;
+}
+
+.modal-subtitle {
+  font-size: 28rpx;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 48rpx;
+}
+
+.section-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 16rpx;
+}
+
+/* 头像区域 */
+.avatar-section {
+  margin-bottom: 32rpx;
+}
+
+.avatar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.avatar-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  border: 4rpx solid #e5e7eb;
+}
+
+.avatar-placeholder {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  border: 4rpx dashed #d1d5db;
+  background-color: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-placeholder-text {
+  font-size: 24rpx;
+  color: #9ca3af;
+}
+
+.avatar-button {
+  width: 200rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  font-size: 28rpx;
+  border: none;
+  border-radius: 32rpx;
+}
+
+/* 昵称区域 */
+.nickname-section {
+  margin-bottom: 48rpx;
+}
+
+.input-wrapper {
+  background-color: #f9fafb;
+  border-radius: 16rpx;
+  padding: 4rpx;
+  border: 2rpx solid #e5e7eb;
+}
+
+.nickname-input {
+  width: 100%;
+  height: 80rpx;
+  line-height: 80rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #1f2937;
+  background: transparent;
+  border: none;
+}
+
+/* 按钮组 */
+.button-group {
+  display: flex;
+  gap: 16rpx;
+}
+
+.cancel-button {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  font-size: 32rpx;
+  border: none;
+  border-radius: 16rpx;
+  font-weight: 500;
+}
+
+.confirm-button {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 32rpx;
+  border: none;
+  border-radius: 16rpx;
+  font-weight: 600;
+}
+
+.confirm-button::after {
+  border: none;
+}
+
+.cancel-button::after {
+  border: none;
+}

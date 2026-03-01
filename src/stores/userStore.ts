@@ -37,8 +37,9 @@ interface UserState {
   levelImages: Record<number, string>  // 关卡号 -> 图片URL
 
   // 动作方法
-  login: () => Promise<void>
+  login: (nickname?: string, avatarUrl?: string) => Promise<void>
   logout: () => void
+  updateUserInfo: (nickname: string, avatarUrl: string) => void
   updateHighestLevel: (level: number, imageUrl?: string) => Promise<void>
   fetchRankList: () => Promise<void>
   checkUnlockedLevels: () => number
@@ -61,7 +62,7 @@ export const useUserStore = create<UserState>((set, get) => ({
   levelImages: {},  // 关卡图片映射
 
   // 微信登录
-  login: async () => {
+  login: async (nickname?: string, avatarUrl?: string) => {
     set({ isLoading: true })
     try {
       // 调用微信登录接口
@@ -72,87 +73,45 @@ export const useUserStore = create<UserState>((set, get) => ({
       if (loginRes.code) {
         console.log('微信登录成功，code:', loginRes.code)
 
-        // 获取用户信息（需要用户授权）
-        try {
-          const userProfile = await Taro.getUserProfile({
-            desc: '用于完善用户资料',
-          })
-
-          const userInfo: UserInfo = {
-            openid: loginRes.code,  // 实际应该用code换取openid
-            nickname: userProfile.userInfo.nickName,
-            avatarUrl: userProfile.userInfo.avatarUrl,
-            highestLevel: 0,
-            points: 0
-          }
-
-          // 从本地存储读取最高关卡
-          const savedHighestLevel = Taro.getStorageSync('highestLevel')
-          if (savedHighestLevel) {
-            userInfo.highestLevel = parseInt(savedHighestLevel)
-          }
-
-          // 从本地存储读取积分
-          const savedPoints = Taro.getStorageSync('points')
-          if (savedPoints) {
-            userInfo.points = parseInt(savedPoints)
-          }
-
-          // 从本地存储读取解锁的关卡
-          const savedUnlockedLevels = Taro.getStorageSync('unlockedLevels')
-          const unlockedLevels = savedUnlockedLevels ? parseInt(savedUnlockedLevels) : 1
-
-          // 从本地存储读取关卡图片映射
-          const savedLevelImages = Taro.getStorageSync('levelImages')
-          const levelImages = savedLevelImages ? JSON.parse(savedLevelImages) : {}
-
-          set({
-            userInfo,
-            isLoggedIn: true,
-            isLoading: false,
-            unlockedLevels,
-            levelImages
-          })
-
-          console.log('用户登录成功:', userInfo)
-          console.log('已加载关卡图片映射:', Object.keys(levelImages).length, '个关卡')
-        } catch (profileError) {
-          // 用户拒绝授权，仍然可以登录，但使用默认信息
-          console.log('获取用户信息失败:', profileError)
-
-          const userInfo: UserInfo = {
-            openid: loginRes.code,
-            nickname: '匿名用户',
-            avatarUrl: '',
-            highestLevel: 0,
-            points: 0
-          }
-
-          const savedHighestLevel = Taro.getStorageSync('highestLevel')
-          if (savedHighestLevel) {
-            userInfo.highestLevel = parseInt(savedHighestLevel)
-          }
-
-          const savedPoints = Taro.getStorageSync('points')
-          if (savedPoints) {
-            userInfo.points = parseInt(savedPoints)
-          }
-
-          const savedUnlockedLevels = Taro.getStorageSync('unlockedLevels')
-          const unlockedLevels = savedUnlockedLevels ? parseInt(savedUnlockedLevels) : 1
-
-          // 从本地存储读取关卡图片映射
-          const savedLevelImages = Taro.getStorageSync('levelImages')
-          const levelImages = savedLevelImages ? JSON.parse(savedLevelImages) : {}
-
-          set({
-            userInfo,
-            isLoggedIn: true,
-            isLoading: false,
-            unlockedLevels,
-            levelImages
-          })
+        // 使用传入的用户信息（如果有的话）
+        const userInfo: UserInfo = {
+          openid: loginRes.code,  // 实际应该用code换取openid
+          nickname: nickname || '拼图玩家',
+          avatarUrl: avatarUrl || '',
+          highestLevel: 0,
+          points: 0
         }
+
+        // 从本地存储读取最高关卡
+        const savedHighestLevel = Taro.getStorageSync('highestLevel')
+        if (savedHighestLevel) {
+          userInfo.highestLevel = parseInt(savedHighestLevel)
+        }
+
+        // 从本地存储读取积分
+        const savedPoints = Taro.getStorageSync('points')
+        if (savedPoints) {
+          userInfo.points = parseInt(savedPoints)
+        }
+
+        // 从本地存储读取解锁的关卡
+        const savedUnlockedLevels = Taro.getStorageSync('unlockedLevels')
+        const unlockedLevels = savedUnlockedLevels ? parseInt(savedUnlockedLevels) : 1
+
+        // 从本地存储读取关卡图片映射
+        const savedLevelImages = Taro.getStorageSync('levelImages')
+        const levelImages = savedLevelImages ? JSON.parse(savedLevelImages) : {}
+
+        set({
+          userInfo,
+          isLoggedIn: true,
+          isLoading: false,
+          unlockedLevels,
+          levelImages
+        })
+
+        console.log('用户登录成功:', userInfo)
+        console.log('已加载关卡图片映射:', Object.keys(levelImages).length, '个关卡')
       } else {
         throw new Error('登录失败')
       }
@@ -161,6 +120,24 @@ export const useUserStore = create<UserState>((set, get) => ({
       set({ isLoading: false })
       Taro.showToast({ title: '登录失败', icon: 'none' })
     }
+  },
+
+  // 更新用户信息
+  updateUserInfo: async (nickname: string, avatarUrl: string) => {
+    const { userInfo } = get()
+    if (!userInfo) {
+      console.log('用户未登录，无法更新信息')
+      return
+    }
+
+    const newUserInfo = {
+      ...userInfo,
+      nickname,
+      avatarUrl
+    }
+
+    set({ userInfo: newUserInfo })
+    console.log('用户信息已更新:', newUserInfo)
   },
 
   // 退出登录

@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import SettingsModal from '@/components/settings-modal'
+import UserProfileModal from '@/components/user-profile-modal'
 import './index.css'
 
 export default function IndexPage() {
-  const { userInfo, isLoggedIn, login, logout, checkUnlockedLevels, getCurrentLevel } = useUserStore()
+  const { userInfo, isLoggedIn, login, logout, updateUserInfo, checkUnlockedLevels, getCurrentLevel } = useUserStore()
   const { initSettings } = useSettingsStore()
   const [showSettings, setShowSettings] = useState(false)
+  const [showUserProfile, setShowUserProfile] = useState(false)
 
   useEffect(() => {
     // 检查已解锁的关卡
@@ -97,7 +99,20 @@ export default function IndexPage() {
     // 播放轻微震动
     const { playVibration } = useSettingsStore.getState()
     playVibration('light')
+
+    // 先调用微信登录
     await login()
+
+    // 登录成功后显示用户信息设置弹窗
+    const { isLoggedIn: isNowLoggedIn } = useUserStore.getState()
+    if (isNowLoggedIn) {
+      setShowUserProfile(true)
+    }
+  }
+
+  const handleSaveUserProfile = (nickname: string, avatarUrl: string) => {
+    updateUserInfo(nickname, avatarUrl)
+    console.log('用户信息已保存:', nickname, avatarUrl)
   }
 
   const handleLogout = () => {
@@ -173,6 +188,15 @@ export default function IndexPage() {
 
       {/* 设置弹窗 */}
       <SettingsModal visible={showSettings} onClose={() => setShowSettings(false)} />
+
+      {/* 用户信息设置弹窗 */}
+      <UserProfileModal
+        visible={showUserProfile}
+        onClose={() => setShowUserProfile(false)}
+        onSave={handleSaveUserProfile}
+        initialNickname={userInfo?.nickname || ''}
+        initialAvatarUrl={userInfo?.avatarUrl || ''}
+      />
     </View>
   )
 }
