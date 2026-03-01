@@ -12,7 +12,6 @@ export default function LevelSelectPage() {
   const { userInfo, unlockedLevels, levelImages } = useUserStore()
   const { initSettings } = useSettingsStore()
   const [displayLevels, setDisplayLevels] = useState(20)  // 默认显示20关，最多100关
-  const [visibleLevels, setVisibleLevels] = useState<Set<number>>(new Set())  // 可见的关卡（懒加载）
 
   useEffect(() => {
     // 如果图片未预加载，跳回首页
@@ -27,15 +26,20 @@ export default function LevelSelectPage() {
     // 检查已解锁的关卡（确保显示最新的解锁状态）
     const { checkUnlockedLevels } = useUserStore.getState()
     checkUnlockedLevels()
+
+    // 调试信息：检查缩略图数据
+    console.log('🖼️  关卡选择页面数据:')
+    console.log('- isImagesPreloaded:', isImagesPreloaded)
+    console.log('- levelImageMap length:', Object.keys(levelImageMap).length)
+    console.log('- levelImageMap sample:', Object.keys(levelImageMap).slice(0, 3).map(key => `${key}: ${levelImageMap[key]?.url?.substring(0, 50)}...`))
+    console.log('- userInfo:', userInfo)
+    console.log('- userInfo?.highestLevel:', userInfo?.highestLevel)
+    console.log('- unlockedLevels:', unlockedLevels)
+    console.log('- levelImages:', levelImages)
+    console.log('- levelImages keys:', Object.keys(levelImages))
+    console.log('- levelImages values:', Object.values(levelImages).map(url => url?.substring(0, 50)))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isImagesPreloaded, levelImageMap])
-
-  // 懒加载：当关卡进入可视区域时加载图片
-  const handleLevelVisible = (level: number) => {
-    if (!visibleLevels.has(level)) {
-      setVisibleLevels(prev => new Set(prev).add(level))
-    }
-  }
 
   // 开始指定关卡
   const handleStartLevel = async (level: number) => {
@@ -113,37 +117,35 @@ export default function LevelSelectPage() {
               key={level}
               className={`level-item ${isLocked ? 'locked' : ''} ${isCompleted ? 'completed' : ''}`}
               onClick={() => !isLocked && handleStartLevel(level)}
-              // 使用 onAppear 实现懒加载（小程序端）
-              onAppear={() => handleLevelVisible(level)}
             >
               {isLocked ? (
                 // 锁定关卡显示锁图标
                 <View className="locked-icon">
                   <Lock size={28} color="#9CA3AF" />
                 </View>
-              ) : isCompleted && levelImage && visibleLevels.has(level) ? (
-                // 已过关显示缩略图（自由模式，懒加载）
+              ) : isCompleted && levelImage ? (
+                // 已过关显示缩略图（自由模式）
                 <>
                   <Image
                     className="level-thumbnail"
                     src={levelImage}
                     mode="aspectFill"
                     lazyLoad  // 启用懒加载
+                    onLoad={() => {
+                      console.log(`✅ 关卡 ${level} 缩略图加载成功`)
+                    }}
+                    onError={(err) => {
+                      console.error(`❌ 关卡 ${level} 缩略图加载失败:`, err)
+                    }}
                   />
                   <View className="level-number-overlay">{level}</View>
-                </>
-              ) : isCompleted && levelImage && !visibleLevels.has(level) ? (
-                // 已过关但图片未加载（显示占位符）
-                <>
-                  <View className="thumbnail-placeholder">
-                    <Text className="block placeholder-text">{level}</Text>
-                  </View>
                 </>
               ) : isCompleted ? (
                 // 已过关但没有图片（降级显示）
                 <>
                   <Text className="block level-number">{level}</Text>
                   <Text className="block level-hint">自由模式</Text>
+                  {console.log(`⚠️  关卡 ${level} 已完成但没有图片，savedImage: ${savedImage}, preloadedImage: ${preloadedImage?.url?.substring(0, 50)}`)}
                 </>
               ) : isChallenge ? (
                 // 正在挑战的关卡（正常模式，可挑战）
