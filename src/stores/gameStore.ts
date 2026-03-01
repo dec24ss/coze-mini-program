@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import Taro from '@tarojs/taro'
 import { Network } from '@/network'
+import { useUserStore } from './userStore'
 
 // 拼图碎片类型
 export interface PuzzlePiece {
@@ -269,13 +270,27 @@ export const useGameStore = create<GameState>((set, get) => ({
     const { imageList, levelImageMap } = get()
     const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
 
-    const config = getLevelConfig(level, imageList, levelImageMap)
+    // 获取用户保存的关卡图片
+    const { levelImages } = useUserStore.getState()
+
+    let config = getLevelConfig(level, imageList, levelImageMap)
 
     console.log('==========================================')
     console.log('🎮 startGame 被调用，关卡:', level, '模式:', isFreePlay ? '自由模式' : '正常模式')
     console.log('📋 imageList 长度:', imageList.length)
     console.log('📋 levelImageMap 长度:', Object.keys(levelImageMap).length)
+    console.log('📋 levelImages:', levelImages)
     console.log('📋 当前平台:', isWeapp ? '小程序' : 'H5')
+
+    // 自由模式：优先使用用户过关时保存的网络图片URL
+    if (isFreePlay && levelImages[level]) {
+      console.log('🎮 自由模式，使用用户保存的关卡图片:', levelImages[level])
+      config = {
+        ...config,
+        imageUrl: levelImages[level],  // 使用保存的网络图片URL
+        originalUrl: levelImages[level]  // 保存原始URL用于下载
+      }
+    }
 
     console.log('🎮 开始游戏，关卡:', config.level)
     console.log('🖼️  图片 URL:', config.imageUrl.substring(0, 80))
@@ -285,9 +300,19 @@ export const useGameStore = create<GameState>((set, get) => ({
       config.imageUrl.startsWith('wxfile://') ? '本地路径' : '网络路径'
     )
 
-    // 直接使用 getLevelConfig 返回的图片路径
-    // 小程序端使用本地路径（wxfile://），H5 端使用 Base64 或网络路径
-    const finalImageUrl = config.imageUrl
+    // 小程序端：如果是网络图片URL，需要转换为本地路径
+    // H5端：直接使用网络图片URL
+    let finalImageUrl = config.imageUrl
+    if (isWeapp && !config.imageUrl.startsWith('wxfile://') && !config.imageUrl.startsWith('data:image')) {
+      // 网络图片，使用预加载的本地路径
+      if (levelImageMap[level]) {
+        finalImageUrl = levelImageMap[level].path
+        console.log('🖼️  小程序端使用预加载的本地路径:', finalImageUrl)
+      } else {
+        // 如果没有预加载，使用网络URL（小程序也会自动缓存）
+        console.log('🖼️  小程序端使用网络URL（会自动缓存）:', finalImageUrl)
+      }
+    }
 
     console.log('🖼️  最终图片 URL:', finalImageUrl.substring(0, 80))
     console.log('==========================================')

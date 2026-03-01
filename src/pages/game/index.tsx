@@ -1,6 +1,7 @@
 import { View, Text, Button, Image } from '@tarojs/components'
 import { useEffect, useRef, useState } from 'react'
 import Taro, { useRouter } from '@tarojs/taro'
+import { Network } from '@/network'
 import { useGameStore } from '@/stores/gameStore'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
@@ -269,18 +270,23 @@ export default function GamePage() {
   // 过关后显示提示并自动进入下一关
   useEffect(() => {
     if (isComplete) {
-      // 立即显示过关提示
-      Taro.showToast({
-        title: '恭喜过关！4秒后进入下一关',
-        icon: 'success',
-        duration: 3800
-      })
-
-      // 4秒后自动进入下一关
-      const timer = setTimeout(() => {
+      if (isFreePlayMode) {
+        // 自由模式：直接显示完成弹窗，不显示4秒提示
         handleNextLevelAuto()
-      }, 4000)
-      return () => clearTimeout(timer)
+      } else {
+        // 正常模式：显示4秒提示并自动进入下一关
+        Taro.showToast({
+          title: '恭喜过关！4秒后进入下一关',
+          icon: 'success',
+          duration: 3800
+        })
+
+        // 4秒后自动进入下一关
+        const timer = setTimeout(() => {
+          handleNextLevelAuto()
+        }, 4000)
+        return () => clearTimeout(timer)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isComplete])
@@ -321,7 +327,7 @@ export default function GamePage() {
     }
 
     // 下载图片到本地
-    Taro.downloadFile({
+    Network.downloadFile({
       url: originalImageUrl,
       success: (downloadRes) => {
         console.log('图片下载成功:', downloadRes.tempFilePath)
