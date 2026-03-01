@@ -1,191 +1,93 @@
-/* 排行榜页 - 海洋主题 */
-
 .rank-page {
-  position: relative;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(315deg, #E6F4FF 0%, #FFFFFF 100%);
-  padding: 80rpx 40rpx 160rpx;
-  overflow: hidden;
+  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
+  padding: 20px;
+  position: relative;
 }
 
-/* 背景装饰 */
-.rank-page::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(315deg, #E6F4FF 0%, #FFFFFF 100%);
-  z-index: 0;
-}
-
-/* 海浪动画 */
-.rank-page::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 300rpx;
-  background: linear-gradient(to top, rgba(0, 122, 255, 0.1) 0%, transparent 100%);
-  z-index: 1;
-  animation: wave-flow 10s linear infinite;
-}
-
-@keyframes wave-flow {
-  0% {
-    transform: translateX(-750rpx);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
-/* 设置按钮 */
 .settings-button-top {
   position: absolute;
-  top: 20rpx;
-  left: 20rpx;
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 40rpx;
+  top: 20px;
+  left: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
   background: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: none;
   z-index: 100;
-  transition: all 150ms ease;
-}
-
-.settings-button-top:active {
-  transform: scale(0.95);
 }
 
 .settings-button-top::after {
   border: none;
 }
 
-/* 排行榜头部 */
 .rank-header {
-  margin-bottom: 40rpx;
+  margin-bottom: 24px;
   text-align: center;
-  position: relative;
-  z-index: 10;
-  animation: header-pop-in 300ms ease-out;
-}
-
-@keyframes header-pop-in {
-  0% {
-    opacity: 0;
-    transform: translateY(-20rpx);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .rank-title {
-  font-size: 64rpx;
+  font-size: 56px;
   font-weight: 700;
-  color: #34C759;
-  margin-bottom: 24rpx;
-  line-height: 1.2;
-  text-shadow: 0 2rpx 8rpx rgba(52, 199, 89, 0.2);
+  color: #1F2937;
+  margin-bottom: 16px;
 }
 
-/* 我的排名 */
 .my-rank {
-  background: linear-gradient(135deg, #007AFF 0%, #409EFF 100%);
-  border-radius: 32rpx;
-  padding: 24rpx;
-  box-shadow: 0 8rpx 24rpx -4rpx rgba(0, 122, 255, 0.2);
-  border: 4rpx solid white;
-  margin-bottom: 40rpx;
-  position: relative;
-  z-index: 10;
-}
-
-.my-rank-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 24rpx;
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .my-rank-text {
-  font-size: 48rpx;
+  font-size: 36px;
   font-weight: 600;
-  color: white;
-  line-height: 1.5;
+  color: #3B82F6;
+  margin-bottom: 4px;
 }
 
 .my-level {
-  font-size: 36rpx;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
+  font-size: 28px;
+  color: #6B7280;
 }
 
-/* 排行榜列表 */
 .rank-list {
   flex: 1;
   background: white;
-  border-radius: 32rpx;
-  box-shadow: 0 8rpx 24rpx -4rpx rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  border: 4rpx solid #E5E5EA;
-  position: relative;
-  z-index: 10;
 }
 
-/* 排行榜表头 */
-.rank-item.header {
-  background: #007AFF;
-  padding: 24rpx 16rpx;
-  border-radius: 28rpx 28rpx 0 0;
-}
-
-.rank-item.header .rank-col {
-  font-size: 36rpx;
-  font-weight: 600;
-  color: white;
-}
-
-/* 排行榜项 */
 .rank-item {
   display: flex;
   align-items: center;
-  padding: 24rpx 16rpx;
-  border-bottom: 2rpx solid #E5E5EA;
-  transition: all 200ms ease;
+  padding: 16px;
+  border-bottom: 1px solid #F3F4F6;
 }
 
-.rank-item:active {
-  background: #F5DEB3;
-  transform: translateY(-4rpx);
+.rank-item.header {
+  background: #F9FAFB;
+  font-weight: 600;
+  color: #6B7280;
+  font-size: 24px;
 }
 
-.rank-item:last-child {
-  border-bottom: none;
-  border-radius: 0 0 28rpx 28rpx;
-}
-
-/* 我的排名项 */
 .rank-item.my-item {
-  background: #E6F4FF;
-  border-bottom: 2rpx solid #007AFF;
+  background: #EFF6FF;
 }
 
-/* 排行榜列 */
 .rank-col {
   flex: 1;
   text-align: center;
-  font-size: 32rpx;
+  font-size: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -193,145 +95,103 @@
 
 .rank-col.rank-number {
   flex: 0.8;
-  font-weight: 700;
-  color: #333333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* 前三名特殊样式 */
-.rank-item:nth-child(2) .rank-col.rank-number {
-  color: #FFD700; /* 金色 */
-  font-size: 48rpx;
+.rank-col.user-info {
+  flex: 1.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-.rank-item:nth-child(3) .rank-col.rank-number {
-  color: #C0C0C0; /* 银色 */
-  font-size: 48rpx;
-}
-
-.rank-item:nth-child(4) .rank-col.rank-number {
-  color: #CD7F32; /* 铜色 */
-  font-size: 48rpx;
-}
-
-/* 奖杯图标 */
-.trophy-icon {
-  width: 48rpx;
-  height: 48rpx;
-  margin-right: 8rpx;
-}
-
-.trophy-icon.gold {
-  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-}
-
-.trophy-icon.silver {
-  background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%);
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-}
-
-.trophy-icon.bronze {
-  background: linear-gradient(135deg, #CD7F32 0%, #A0522D 100%);
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-}
-
-/* 头像 */
-.user-avatar {
-  width: 64rpx;
-  height: 64rpx;
+.rank-badge {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
   border-radius: 50%;
-  margin-right: 12rpx;
-  border: 3rpx solid #007AFF;
-}
-
-/* 用户昵称 */
-.user-nickname {
-  font-size: 36rpx;
-  color: #333333;
-  font-weight: 500;
-}
-
-/* 最高关卡 */
-.user-highest {
-  font-size: 32rpx;
-  color: #6B7280;
-  font-weight: 500;
-}
-
-/* 底部按钮 */
-.rank-footer {
-  margin-top: auto;
-  padding-top: 40rpx;
-  position: relative;
-  z-index: 10;
-}
-
-.footer-button {
-  width: 100%;
-  background: linear-gradient(135deg, #FF9500 0%, #FFB700 100%);
+  font-weight: 700;
   color: white;
-  border: 4rpx solid white;
-  border-radius: 48rpx;
-  padding: 20rpx;
-  font-size: 44rpx;
+}
+
+.rank-badge.rank-1 {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+}
+
+.rank-badge.rank-2 {
+  background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+}
+
+.rank-badge.rank-3 {
+  background: linear-gradient(135deg, #CD7F32, #B87333);
+}
+
+.user-avatar-small {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.user-avatar-placeholder {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #3B82F6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
   font-weight: 600;
-  box-shadow: 0 10rpx 25rpx -5rpx rgba(255, 149, 0, 0.3);
-  transition: all 150ms ease;
+  font-size: 14px;
 }
 
-.footer-button:active {
-  transform: translateY(4rpx);
-  box-shadow: 0 4rpx 10rpx -2rpx rgba(255, 149, 0, 0.3);
+.user-name {
+  font-size: 28px;
+  color: #1F2937;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.footer-button::after {
+.level-text {
+  font-size: 28px;
+  font-weight: 600;
+  color: #3B82F6;
+}
+
+.rank-footer {
+  margin-top: 24px;
+}
+
+.back-button {
+  width: 100%;
+  background: #3B82F6;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 14px;
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.back-button::after {
   border: none;
 }
 
-/* 页面入场动画 */
-.rank-page.page-enter {
-  animation: page-enter 300ms ease-out;
+.rank-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-@keyframes page-enter {
-  0% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* 响应式适配 */
-@media screen and (min-width: 768px) {
-  .rank-title {
-    font-size: 32px;
-  }
-
-  .my-rank-text {
-    font-size: 24px;
-  }
-
-  .my-level {
-    font-size: 18px;
-  }
-
-  .rank-col {
-    font-size: 16px;
-  }
-
-  .user-nickname {
-    font-size: 18px;
-  }
-
-  .user-highest {
-    font-size: 16px;
-  }
-
-  .footer-button {
-    font-size: 22px;
-    padding: 10px;
-  }
+.rank-empty text {
+  font-size: 18px;
+  color: #6B7280;
+  margin-bottom: 24px;
 }

@@ -1,69 +1,25 @@
-/* 游戏页 - 海洋主题 */
-
 .game-page {
-  position: relative;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(315deg, #E6F4FF 0%, #FAF5FF 100%);
-  overflow: hidden;
+  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
+  position: relative;
 }
 
-/* 背景层 */
-.game-page::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(315deg, #E6F4FF 0%, #FAF5FF 100%);
-  z-index: 0;
-}
-
-/* 海浪动画层 */
-.game-page::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 400rpx;
-  background: linear-gradient(to top, rgba(0, 122, 255, 0.1) 0%, transparent 100%);
-  z-index: 1;
-  animation: wave-flow 10s linear infinite;
-}
-
-@keyframes wave-flow {
-  0% {
-    transform: translateX(-750rpx);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
-/* 设置按钮 */
 .settings-button-top {
   position: absolute;
-  top: 20rpx;
-  left: 20rpx;
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 40rpx;
+  top: 10px;
+  left: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
   background: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: none;
   z-index: 100;
-  transition: all 150ms ease;
-}
-
-.settings-button-top:active {
-  transform: scale(0.95);
-  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.1);
 }
 
 .settings-button-top::after {
@@ -76,38 +32,32 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
 }
 
 .game-loading text {
-  font-size: 44rpx;
+  font-size: 22px; /* 字体缩小50% */
   color: #6B7280;
 }
 
 /* 顶部信息栏 */
 .game-header {
   position: fixed;
-  top: 150rpx;
+  top: 150px; /* 距离屏幕上边缘150px */
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 32rpx;
-  padding: 24rpx 40rpx;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 32rpx;
-  margin: 0 40rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+  gap: 20px;
+  padding: 16px 20px;
+  background: transparent;
   z-index: 50;
-  border: 4rpx solid #E5E5EA;
 }
 
 .header-text {
-  font-size: 48rpx;
+  font-size: 24px; /* 字体缩小50% */
   font-weight: 700;
-  color: #333333;
-  line-height: 1;
+  color: #1F2937;
 }
 
 /* 游戏容器 */
@@ -116,11 +66,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24rpx;
+  padding: 12px;
   position: relative;
-  padding-top: 280rpx;
-  padding-bottom: 200rpx;
-  z-index: 10;
+  padding-top: 80px; /* 为顶部信息栏留出空间 */
+  padding-bottom: 100px; /* 为底部按钮留出空间 */
 }
 
 /* 原图显示 */
@@ -129,11 +78,9 @@
   max-width: 90vw;
   max-height: 80vh;
   aspect-ratio: 3/4;
-  border-radius: 32rpx;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 10rpx 40rpx -10rpx rgba(0, 0, 0, 0.1);
-  border: 8rpx solid #007AFF;
-  background: white;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 .original-image {
@@ -144,34 +91,25 @@
 /* 原图查看倒计时 */
 .original-image-timer {
   position: absolute;
-  top: 24rpx;
-  right: 24rpx;
-  width: 100rpx;
-  height: 100rpx;
+  top: 16px;
+  right: 16px;
+  width: 50px;
+  height: 50px;
   background: rgba(0, 0, 0, 0.6);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(8rpx);
+  z-index: 10;
 }
 
 .timer-text {
-  font-size: 36rpx;
-  font-weight: 700;
   color: white;
-  line-height: 1;
+  font-size: 20px;
+  font-weight: 700;
 }
 
-/* 拼图容器 */
-.puzzle-container {
-  position: relative;
-  width: 100%;
-  max-width: 600rpx;
-  aspect-ratio: 3/4;
-}
-
-/* 加载遮罩 */
+/* 加载遮罩层 */
 .loading-overlay {
   position: absolute;
   top: 0;
@@ -182,98 +120,128 @@
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0.9);
-  border-radius: 32rpx;
-  z-index: 5;
+  z-index: 100;
+  transition: opacity 0.3s ease-in-out;
 }
 
 .loading-text {
-  font-size: 36rpx;
-  color: #333333;
-  font-weight: 500;
+  font-size: 24px;
+  color: #6B7280;
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
-/* 拼图板 */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* 拼图区域 */
+.puzzle-container {
+  position: relative;
+  width: 100%;
+  max-width: 90vw;
+  max-height: 80vh;
+  aspect-ratio: 3/4;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 拼图板 - 增强光效 */
 .puzzle-board {
+  position: relative;
   width: 100%;
   height: 100%;
-  background: white;
-  border-radius: 32rpx;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16px;
   overflow: hidden;
-  position: relative;
-  box-shadow: 0 10rpx 40rpx -10rpx rgba(0, 0, 0, 0.1);
-  border: 8rpx solid #007AFF;
-  transition: opacity 300ms ease-in-out;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* 完成状态：隐藏所有图块边框 */
+/* 拼图板完成时的光效 */
+.puzzle-board.game-complete {
+  animation: board-glow 2s ease-in-out infinite alternate;
+}
+
+/* 完成全图后，隐藏图块之间的边框，实现无缝拼接 */
 .puzzle-board.game-complete .puzzle-piece-outer {
   border: none !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
 }
 
-/* 拼图网格 */
+.puzzle-board.game-complete .puzzle-piece-inner {
+  border: none !important;
+}
+
+@keyframes board-glow {
+  0% {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(255, 215, 0, 0.3);
+  }
+  100% {
+    box-shadow: 0 20px 50px -5px rgba(0, 0, 0, 0.2), 0 0 0 4px rgba(255, 215, 0, 0.6), 0 0 60px rgba(255, 215, 0, 0.3);
+  }
+}
+
 .puzzle-grid {
+  position: relative;
   width: 100%;
   height: 100%;
-  position: relative;
 }
 
-/* 拼图碎片外层 */
+/* 拼图碎片外层（黑线） */
 .puzzle-piece-outer {
   position: absolute;
-  transition: all 200ms ease-out;
   box-sizing: border-box;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: grab;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  will-change: transform, left, top;
+}
+
+.puzzle-piece-outer:active {
+  cursor: grabbing;
+  transition: none; /* 拖拽时禁用过渡，提升响应速度 */
 }
 
 .puzzle-piece-outer.dragging {
-  opacity: 0.9;
-  z-index: 100;
-  transform: scale(1.1);
-  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.2);
+  z-index: 100; /* 拖动的图块显示在最顶层 */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* 添加阴影突出显示 */
 }
 
-.puzzle-piece-outer.animating {
-  animation: piece-animating 300ms ease-out;
+.puzzle-piece-outer.selected {
+  box-shadow: 0 0 0 3px #3B82F6;
+  z-index: 10;
+  transform: scale(1.02); /* 选中的碎片稍微放大 */
 }
 
-@keyframes piece-animating {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.puzzle-piece-outer.correct {
-  border-color: #34C759 !important;
-  animation: correct-pulse 0.6s ease-out;
-}
-
-@keyframes correct-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 20rpx rgba(52, 199, 89, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(52, 199, 89, 0);
-  }
-}
-
-/* 拼图碎片内层 */
+/* 拼图碎片内层（白边 + 图片） */
 .puzzle-piece-inner {
   position: relative;
+  background-repeat: no-repeat;
   box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* 提示遮罩 */
+.puzzle-piece-inner image {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 提示覆盖层 */
 .hint-overlay {
   position: absolute;
   top: 0;
@@ -281,289 +249,641 @@
   right: 0;
   bottom: 0;
   pointer-events: none;
-  z-index: 2;
+  z-index: 5;
 }
 
 .hint-cell {
   position: absolute;
-  border: 4rpx solid rgba(0, 122, 255, 0.3);
-  border-radius: 8rpx;
   box-sizing: border-box;
-  transition: all 300ms ease;
+  pointer-events: none;
 }
 
 .hint-cell.correct {
-  border-color: rgba(52, 199, 89, 0.5);
-  background: rgba(52, 199, 89, 0.1);
+  border: none;
 }
 
+/* 需要交换的图块提示 - 全屏脉冲光晕效果 */
 .hint-cell.swap-hint {
-  border-color: #FF9500;
-  border-width: 6rpx;
-  animation: swap-hint-glow 1.5s ease-in-out infinite;
-  box-shadow: 0 0 20rpx rgba(255, 149, 0, 0.5);
+  background: transparent;
+  border: none;
+  animation: swap-pulse-glow 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  z-index: 5;
 }
 
-@keyframes swap-hint-glow {
+/* 交换提示 - 全屏脉冲光晕动画 */
+@keyframes swap-pulse-glow {
   0%, 100% {
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.1) 40%, transparent 70%);
     transform: scale(1);
-    opacity: 1;
+  }
+  25% {
+    background: radial-gradient(circle, rgba(147, 197, 253, 0.5) 0%, rgba(147, 197, 253, 0.2) 50%, transparent 80%);
+    transform: scale(1.15);
   }
   50% {
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.6) 0%, rgba(59, 130, 246, 0.3) 60%, transparent 90%);
+    transform: scale(1.25);
+  }
+  75% {
+    background: radial-gradient(circle, rgba(96, 165, 250, 0.5) 0%, rgba(96, 165, 250, 0.2) 50%, transparent 80%);
     transform: scale(1.1);
-    opacity: 0.8;
-  }
-}
-
-/* 提示全屏脉冲光晕效果 */
-.puzzle-board.show-hint::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, transparent 30%, rgba(0, 122, 255, 0.3) 70%, rgba(0, 122, 255, 0.1) 100%);
-  transform: translate(-50%, -50%);
-  animation: pulse-glow 1.5s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 1;
-}
-
-@keyframes pulse-glow {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.3);
-    opacity: 0.3;
   }
 }
 
 /* 底部功能按钮 */
 .game-footer {
   position: fixed;
-  bottom: 60rpx;
+  bottom: 100px; /* 距离屏幕底部100px */
   left: 0;
   right: 0;
-  padding: 0 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 12px;
   z-index: 50;
 }
 
 .footer-buttons-row {
   display: flex;
-  gap: 16rpx;
-  justify-content: center;
-}
-
-.footer-button-wrapper {
-  position: relative;
-  flex: 1;
-  max-width: 240rpx;
+  width: 100%;
+  max-width: 500px;
+  gap: 50px; /* 间距50px */
+  padding: 0 12px;
 }
 
 .footer-button {
-  width: 100%;
-  height: 120rpx;
-  background: #007AFF;
+  flex: 1; /* 宽度自适应 */
+  height: 50px; /* 按钮高度恢复 */
+  background: #3B82F6;
   color: white;
-  border-radius: 40rpx;
-  border: 4rpx solid white;
-  font-size: 40rpx;
+  border-radius: 9999px;
+  font-size: 18px; /* 字体缩小50% */
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.footer-button:active {
+  transform: scale(0.95);
+  box-shadow: 0 5px 15px -5px rgba(59, 130, 246, 0.3);
+}
+
+.footer-button.used {
+  background: #9CA3AF;
+  box-shadow: none;
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+/* 按钮包装器（用于定位角标） */
+.footer-button-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+/* 积分角标 */
+.points-badge {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 10px;
+  background: #EF4444;
+  color: white;
+  border-radius: 22px;
+  font-size: 20px;
   font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10rpx 25rpx -5rpx rgba(0, 122, 255, 0.3);
-  transition: all 150ms ease;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+  z-index: 10;
 }
 
-.footer-button:active {
-  transform: translateY(4rpx);
-  box-shadow: 0 4rpx 10rpx -2rpx rgba(0, 122, 255, 0.3);
-}
-
-.footer-button::after {
-  border: none;
-}
-
-.footer-button.active {
-  background: #34C759;
-  box-shadow: 0 10rpx 25rpx -5rpx rgba(52, 199, 89, 0.3);
-}
-
-/* 积分徽章 */
-.points-badge {
-  position: absolute;
-  top: -8rpx;
-  right: -8rpx;
-  width: 48rpx;
-  height: 48rpx;
-  background: #FF9500;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 3rpx solid white;
-  box-shadow: 0 2rpx 8rpx rgba(255, 149, 0, 0.3);
-  font-size: 28rpx;
-  font-weight: 700;
-  color: white;
-  line-height: 1;
-}
-
-/* 胜利弹窗 */
+/* 过关弹窗 - 更华丽的动画 */
 .victory-modal {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(8rpx);
-  animation: modal-fade-in 300ms ease;
+  z-index: 100;
+  padding: 16px;
+  animation: modal-appear 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-@keyframes modal-fade-in {
+@keyframes modal-appear {
   0% {
     opacity: 0;
+    transform: scale(0.5);
   }
   100% {
     opacity: 1;
+    transform: scale(1);
   }
 }
 
 .victory-content {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 48rpx;
-  padding: 48rpx;
-  width: 80%;
-  max-width: 640rpx;
-  box-shadow: 0 20rpx 60rpx -10rpx rgba(0, 0, 0, 0.2);
-  border: 8rpx solid #007AFF;
-  animation: modal-pop-in 300ms ease;
+  width: 100%;
+  max-width: 340px;
+  background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);
+  border-radius: 24px;
+  padding: 40px 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24rpx;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 60px rgba(255, 215, 0, 0.3);
+  border: 4px solid #ffd700;
+  animation: content-bounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s both;
+  position: relative;
+  overflow: hidden;
 }
 
-@keyframes modal-pop-in {
+/* 胜利内容的装饰性背景 */
+.victory-content::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(255, 215, 0, 0.1), transparent 30%);
+  animation: rotate-bg 4s linear infinite;
+}
+
+@keyframes rotate-bg {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes content-bounce {
   0% {
+    transform: scale(0.3) rotate(-10deg);
     opacity: 0;
-    transform: scale(0.9);
+  }
+  50% {
+    transform: scale(1.15) rotate(5deg);
+  }
+  70% {
+    transform: scale(0.9) rotate(-3deg);
   }
   100% {
+    transform: scale(1) rotate(0deg);
     opacity: 1;
-    transform: scale(1);
   }
 }
 
 .victory-title {
-  font-size: 56rpx;
-  font-weight: 700;
-  color: #007AFF;
+  font-size: 36px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffd700 0%, #ff6b6b 50%, #ffd700 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 24px;
   text-align: center;
-  line-height: 1.3;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  animation: title-glow 2s ease-in-out infinite alternate;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes title-glow {
+  0% {
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+  }
+  100% {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 30px rgba(255, 107, 107, 0.6));
+  }
 }
 
 .victory-time {
-  font-size: 36rpx;
-  color: #333333;
+  font-size: 24px;
+  color: #6B7280;
+  margin-bottom: 16px;
+  font-weight: 600;
+  animation: text-pop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.4s both;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes text-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.victory-desc {
+  font-size: 22px;
+  color: #10B981;
+  margin-bottom: 24px;
   text-align: center;
-  font-weight: 500;
+  font-weight: 700;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: text-pop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.6s both;
+  position: relative;
+  z-index: 1;
 }
 
 .victory-buttons {
-  display: flex;
-  gap: 24rpx;
   width: 100%;
-  margin-top: 16rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: text-pop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.8s both;
+  position: relative;
+  z-index: 1;
 }
 
 .victory-button {
-  flex: 1;
-  height: 120rpx;
-  border-radius: 40rpx;
-  border: 4rpx solid white;
-  font-size: 40rpx;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 150ms ease;
-}
-
-.victory-button::after {
+  width: 100%;
+  border-radius: 9999px;
+  padding: 18px;
+  font-size: 20px;
+  font-weight: 700;
   border: none;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  position: relative;
+  overflow: hidden;
 }
 
-.victory-button:active {
-  transform: translateY(4rpx);
+.victory-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.victory-button:hover::before {
+  left: 100%;
 }
 
 .victory-button.primary {
-  background: linear-gradient(135deg, #FF9500 0%, #FFB700 100%);
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   color: white;
-  box-shadow: 0 10rpx 25rpx -5rpx rgba(255, 149, 0, 0.3);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+.victory-button.primary:active {
+  transform: scale(0.95);
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
 }
 
 .victory-button.secondary {
-  background: linear-gradient(135deg, #007AFF 0%, #409EFF 100%);
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
   color: white;
-  box-shadow: 0 10rpx 25rpx -5rpx rgba(0, 122, 255, 0.3);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
 }
 
-/* 页面入场动画 */
-.game-page.page-enter {
-  animation: page-enter 300ms ease-out;
+.victory-button.secondary:active {
+  transform: scale(0.95);
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
 }
 
-@keyframes page-enter {
+/* 拼图交换动画 - 更夸张华丽 */
+.puzzle-piece-outer.swap-anim {
+  animation: swap-pulse 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* 图块交换动画（使用 state 控制） - 夸张版本 */
+.puzzle-piece-outer.animating {
+  animation: swap-pulse 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* 图块位置正确 - 烟花爆炸效果 */
+.puzzle-piece-outer.correct {
+  animation: correct-fireworks 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 15;
+}
+
+/* 图块位置正确 - 烟花爆炸动画 */
+.puzzle-piece-outer.correct::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.8) 0%, rgba(255, 105, 180, 0.6) 40%, rgba(0, 255, 255, 0.4) 70%, transparent 100%);
+  transform: translate(-50%, -50%);
+  animation: fireworks-expand 0.8s ease-out forwards;
+  pointer-events: none;
+}
+
+/* 图块位置正确 - 星星粒子 */
+.puzzle-piece-outer.correct::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  box-shadow:
+    0 0 10px 2px rgba(255, 215, 0, 0.9),
+    0 0 20px 4px rgba(255, 105, 180, 0.7),
+    0 0 30px 6px rgba(0, 255, 255, 0.5);
+  animation: fireworks-particles 0.8s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes fireworks-expand {
   0% {
-    opacity: 0;
-    transform: scale(0.95);
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  30% {
+    width: 200%;
+    height: 200%;
+    opacity: 0.9;
+  }
+  60% {
+    width: 300%;
+    height: 300%;
+    opacity: 0.6;
   }
   100% {
+    width: 400%;
+    height: 400%;
+    opacity: 0;
+  }
+}
+
+@keyframes fireworks-particles {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+  }
+  25% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.5) rotate(90deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(2) rotate(180deg);
+  }
+  75% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(2.5) rotate(270deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(3) rotate(360deg);
+  }
+}
+
+/* 拼图完成动画（使用 state 控制） - 彩虹炫彩版本 */
+.puzzle-piece-outer.complete {
+  animation: complete-flash 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 20;
+}
+
+/* 交换动画 - 夸张放大缩小 + 颜色闪烁 + 旋转 */
+@keyframes swap-pulse {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+  30% {
+    transform: scale(1.25) rotate(10deg);
+    filter: brightness(1.5) saturate(1.5);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+  60% {
+    transform: scale(0.9) rotate(-10deg);
+    filter: brightness(1.2);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+}
+
+/* 完成动画 - 彩虹炫彩 + 放大缩小 + 旋转 + 粒子爆炸 */
+@keyframes complete-flash {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+    z-index: 20;
+  }
+  15% {
+    transform: scale(1.4) rotate(20deg);
+    filter: brightness(2.5) saturate(3) hue-rotate(0deg);
+    box-shadow: 0 0 40px rgba(255, 215, 0, 1), 0 0 60px rgba(255, 105, 180, 0.8);
+    z-index: 20;
+  }
+  30% {
+    transform: scale(1.2) rotate(-20deg);
+    filter: brightness(2) saturate(2.5) hue-rotate(60deg);
+    box-shadow: 0 0 50px rgba(0, 255, 255, 1), 0 0 70px rgba(255, 165, 0, 0.8);
+    z-index: 20;
+  }
+  50% {
+    transform: scale(1.3) rotate(15deg);
+    filter: brightness(2.2) saturate(2.8) hue-rotate(120deg);
+    box-shadow: 0 0 45px rgba(138, 43, 226, 1), 0 0 65px rgba(255, 0, 128, 0.8);
+    z-index: 20;
+  }
+  70% {
+    transform: scale(1.1) rotate(-10deg);
+    filter: brightness(1.8) saturate(2) hue-rotate(180deg);
+    box-shadow: 0 0 35px rgba(0, 255, 127, 1), 0 0 50px rgba(255, 215, 0, 0.8);
+    z-index: 20;
+  }
+  85% {
+    transform: scale(1.05) rotate(5deg);
+    filter: brightness(1.5) saturate(1.5) hue-rotate(240deg);
+    box-shadow: 0 0 25px rgba(0, 191, 255, 0.8);
+    z-index: 20;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1.2);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+    z-index: 20;
+  }
+}
+
+/* 拼图完成动画 */
+.puzzle-piece-outer.complete-anim {
+  animation: complete-flash 0.6s ease-in-out;
+}
+
+@keyframes complete-flash {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(1.05);
+    filter: brightness(1.3);
+  }
+  50% {
+    transform: scale(1);
+    filter: brightness(1.5);
+  }
+  75% {
+    transform: scale(1.05);
+    filter: brightness(1.3);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+/* 完成时的烟花效果 - 更华丽的版本 */
+.victory-modal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(255, 215, 0, 0.4) 0%, rgba(255, 107, 107, 0.2) 30%, transparent 70%);
+  animation: firework 2s ease-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* 添加多个烟花粒子 */
+.victory-modal::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 30%;
+  width: 10px;
+  height: 10px;
+  background: #ffd700;
+  border-radius: 50%;
+  box-shadow:
+    0 0 20px #ffd700,
+    0 0 40px #ff6b6b,
+    0 0 60px #4ecdc4,
+    50px 50px 0 #ff6b6b,
+    50px 50px 20px #ff6b6b,
+    50px 50px 40px #ffd700,
+    -50px 30px 0 #4ecdc4,
+    -50px 30px 20px #4ecdc4,
+    -50px 30px 40px #ff6b6b,
+    30px -50px 0 #ffd700,
+    30px -50px 20px #ffd700,
+    30px -50px 40px #4ecdc4,
+    -30px -40px 0 #ff6b6b,
+    -30px -40px 20px #ff6b6b,
+    -30px -40px 40px #ffd700;
+  animation: particles 1.5s ease-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes firework {
+  0% {
+    transform: scale(0);
     opacity: 1;
+  }
+  30% {
+    transform: scale(1.3);
+    opacity: 0.9;
+  }
+  60% {
+    transform: scale(1.5);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes particles {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(20px, -30px) scale(1.5);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(40px, -60px) scale(0);
+    opacity: 0;
+  }
+}
+
+/* 闪光效果 */
+.victory-content {
+  animation: victory-shine 0.8s ease-out;
+}
+
+@keyframes victory-shine {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 按钮点击动画 */
+.footer-button:active {
+  animation: button-press 0.1s ease-in-out;
+}
+
+@keyframes button-press {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.92);
+  }
+  100% {
     transform: scale(1);
   }
 }
 
-/* 响应式适配 */
-@media screen and (min-width: 768px) {
-  .header-text {
-    font-size: 24px;
-  }
+/* 拖拽时的缩放动画 */
+.puzzle-piece-outer.dragging {
+  animation: drag-lift 0.2s ease-out;
+}
 
-  .footer-button {
-    height: 60px;
-    border-radius: 20px;
-    font-size: 20px;
+@keyframes drag-lift {
+  0% {
+    transform: scale(1);
   }
-
-  .victory-title {
-    font-size: 28px;
-  }
-
-  .victory-time {
-    font-size: 18px;
-  }
-
-  .victory-button {
-    height: 60px;
-    border-radius: 20px;
-    font-size: 20px;
-  }
-
-  .points-badge {
-    width: 24px;
-    height: 24px;
-    font-size: 14px;
+  100% {
+    transform: scale(1.05);
   }
 }
