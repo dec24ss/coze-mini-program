@@ -44,19 +44,19 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     Taro.setStorageSync('vibrationEnabled', newValue.toString())
   },
 
-  // 播放音效（使用在线音效文件 - 活泼风格）
+  // 播放音效（使用在线音效文件 - 柔和风格）
   playSound: (type: 'success' | 'error' | 'click' | 'swap' | 'whoosh' | 'snap') => {
     const { soundEnabled } = get()
     if (!soundEnabled) return
 
-    // 使用在线音效文件（更活泼的风格）
+    // 使用在线音效文件（柔和风格 - 钢琴/木琴/八音盒）
     const soundUrls: Record<string, string> = {
-      click: 'https://assets.mixkit.co/active_storage/sfx/2821/2821-preview.mp3', // 清脆的点击声
-      success: 'https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3', // 活泼的成功音效
-      error: 'https://assets.mixkit.co/active_storage/sfx/2573/2573-preview.mp3', // 可爱的错误音效
-      swap: 'https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3', // 轻快的交换音效
-      whoosh: 'https://assets.mixkit.co/active_storage/sfx/2574/2574-preview.mp3', // 活泼的嗖声
-      snap: 'https://assets.mixkit.co/active_storage/sfx/2575/2575-preview.mp3' // 可爱的啪嗒声
+      click: 'https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3', // 柔和的点击声（钢琴）
+      success: 'https://assets.mixkit.co/active_storage/sfx/1436/1436-preview.mp3', // 温暖的成功音效（木琴）
+      error: 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3', // 温柔的错误音效（八音盒）
+      swap: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3', // 柔和的交换音效（钢琴）
+      whoosh: 'https://assets.mixkit.co/active_storage/sfx/2573/2573-preview.mp3', // 温柔的嗖声（木琴）
+      snap: 'https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3' // 温柔的啪嗒声（八音盒）
     }
 
     const soundUrl = soundUrls[type] || soundUrls.click

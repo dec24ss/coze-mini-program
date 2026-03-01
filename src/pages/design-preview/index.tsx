@@ -1,4 +1,4 @@
-import Taro, { useRouter } from '@tarojs/taro'
+import Taro from '@tarojs/taro'
 import { View, Text, Image, Button } from '@tarojs/components'
 import { useState, useEffect } from 'react'
 import { Network } from '@/network'
@@ -14,7 +14,6 @@ interface DesignScheme {
 }
 
 export default function DesignPreviewPage() {
-  const router = useRouter()
   const [schemes, setSchemes] = useState<DesignScheme[]>([
     {
       id: 'A',
@@ -87,6 +86,7 @@ export default function DesignPreviewPage() {
         ))
       }
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleSelectScheme = (schemeId: string) => {
