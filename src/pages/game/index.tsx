@@ -255,8 +255,9 @@ export default function GamePage() {
     }
 
     // 正式模式：更新进度和积分
-    // 保存当前关卡对应的图片
-    await updateHighestLevel(currentLevel, imageUrl)
+    // 保存当前关卡对应的图片（使用网络地址，而不是本地路径）
+    const { originalImageUrl } = useGameStore.getState()
+    await updateHighestLevel(currentLevel, originalImageUrl)
     // 过关获得1积分
     addPoints(1)
     Taro.showToast({ title: '获得 1 积分！', icon: 'none' })

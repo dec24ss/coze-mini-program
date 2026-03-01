@@ -23,6 +23,9 @@ export default function LevelSelectPage() {
     }
     // 初始化设置
     initSettings()
+    // 检查已解锁的关卡（确保显示最新的解锁状态）
+    const { checkUnlockedLevels } = useUserStore.getState()
+    checkUnlockedLevels()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isImagesPreloaded, levelImageMap])
 
@@ -117,6 +120,12 @@ export default function LevelSelectPage() {
                     mode="aspectFill"
                   />
                   <View className="level-number-overlay">{level}</View>
+                </>
+              ) : isCompleted ? (
+                // 已过关但没有图片（降级显示）
+                <>
+                  <Text className="block level-number">{level}</Text>
+                  <Text className="block level-hint">自由模式</Text>
                 </>
               ) : isChallenge ? (
                 // 正在挑战的关卡（正常模式，可挑战）
