@@ -92,6 +92,10 @@ export const useUserStore = create<UserState>((set, get) => ({
           }
         })
 
+        console.log('后端响应:', response)
+        console.log('响应状态码:', response.statusCode)
+        console.log('响应数据:', response.data)
+
         if (response.data?.data) {
           const apiUser = response.data.data
           const userInfo: UserInfo = {
@@ -128,6 +132,9 @@ export const useUserStore = create<UserState>((set, get) => ({
       }
     } catch (error) {
       console.error('微信登录失败:', error)
+      console.error('错误类型:', error?.constructor?.name)
+      console.error('错误消息:', error?.message)
+      console.error('错误堆栈:', error?.stack)
       set({ isLoading: false })
       Taro.showToast({ title: '登录失败', icon: 'none' })
     }
