@@ -210,4 +210,22 @@ export class UsersService {
       throw new Error('上传头像失败');
     }
   }
+
+  // 备份所有用户数据
+  async backupUsers(): Promise<any[]> {
+    const client = getSupabaseClient();
+
+    const { data, error } = await client
+      .from('users')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('备份用户数据失败:', error);
+      throw new Error('备份用户数据失败');
+    }
+
+    console.log(`✅ 用户数据备份成功，共 ${data?.length || 0} 条记录`);
+    return data || [];
+  }
 }
