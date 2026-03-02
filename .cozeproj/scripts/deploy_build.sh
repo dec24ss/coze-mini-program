@@ -16,13 +16,4 @@ pnpm install
 echo "Building the Taro project..."
 pnpm build
 
-echo "Copying server build artifacts to root dist directory for deployment..."
-if [ -d "server/dist" ]; then
-    mkdir -p dist
-    cp -r server/dist/* dist/
-    echo "✅ Server build artifacts copied to dist/"
-else
-    echo "⚠️ Warning: server/dist directory not found"
-fi
-
 echo "Build completed successfully! Assets are in /dist"

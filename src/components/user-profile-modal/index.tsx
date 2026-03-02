@@ -22,7 +22,6 @@ export default function UserProfileModal({
   const [nickname, setNickname] = useState(initialNickname)
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl)
   const [isUploading, setIsUploading] = useState(false)
-  const [isAvatarUploaded, setIsAvatarUploaded] = useState(false) // 标记头像是否已成功上传
 
   const handleChooseAvatar = async (e) => {
     const { avatarUrl: selectedAvatarUrl } = e.detail
@@ -34,81 +33,46 @@ export default function UserProfileModal({
     Taro.showLoading({ title: '上传头像...' })
 
     try {
-      console.log('=== 开始上传头像 ===')
-      console.log('本地头像路径:', selectedAvatarUrl)
-
-      // 检查 openid
-      const openid = Taro.getStorageSync('openid')
-      console.log('openid:', openid)
-
-      if (!openid) {
-        throw new Error('用户未登录，无法上传头像')
-      }
-
       // 使用 Network.uploadFile 上传文件
-      console.log('正在上传到服务器...')
       const response = await Network.uploadFile({
         url: '/api/users/upload-avatar',
         filePath: selectedAvatarUrl,
         name: 'file',
         formData: {
-          openid: openid,
+          openid: Taro.getStorageSync('openid'),
           fileName: 'avatar.jpg'
         }
       })
 
       console.log('头像上传响应:', response)
-      console.log('响应状态码:', response.statusCode)
-      console.log('响应数据:', response.data)
 
-      if (response.statusCode === 200 && response.data) {
-        // 解析 JSON 响应
-        let result
-        try {
-          result = JSON.parse(response.data)
-          console.log('解析后的结果:', result)
-        } catch (parseError) {
-          console.error('JSON 解析失败:', parseError)
-          throw new Error('服务器响应格式错误')
-        }
-
+      if (response.data) {
+        const result = JSON.parse(response.data)
         if (result.code === 200 && result.data?.avatarUrl) {
           // 使用后端返回的对象存储 URL
           setAvatarUrl(result.data.avatarUrl)
-          setIsAvatarUploaded(true) // 标记头像已成功上传
-          console.log('✓ 头像上传成功')
-          console.log('对象存储 URL:', result.data.avatarUrl)
+          console.log('头像上传成功，对象存储 URL:', result.data.avatarUrl)
           Taro.showToast({
             title: '头像上传成功',
             icon: 'success'
           })
         } else {
-          console.error('服务器返回错误:', result)
           throw new Error(result.msg || '上传失败')
         }
       } else {
-        console.error('HTTP 错误:', response.statusCode)
-        throw new Error(`上传失败: HTTP ${response.statusCode}`)
+        throw new Error('上传失败')
       }
     } catch (error) {
-      console.error('❌ 上传头像失败')
-      console.error('错误类型:', error?.constructor?.name)
-      console.error('错误消息:', error?.message)
-      console.error('错误详情:', error)
-
-      setIsAvatarUploaded(false) // 上传失败，标记为未上传
-
+      console.error('上传头像失败:', error)
       Taro.showToast({
-        title: '头像上传失败: ' + error.message,
-        icon: 'none',
-        duration: 3000
+        title: '头像上传失败',
+        icon: 'none'
       })
-      // 上传失败时，清空头像（避免保存本地路径）
-      setAvatarUrl('')
+      // 上传失败时，回退到使用本地路径
+      setAvatarUrl(selectedAvatarUrl)
     } finally {
       setIsUploading(false)
       Taro.hideLoading()
-      console.log('=== 头像上传流程结束 ===')
     }
   }
 
@@ -125,10 +89,9 @@ export default function UserProfileModal({
       return
     }
 
-    // 如果用户选择了头像但上传失败，提示重新上传
-    if (!isAvatarUploaded && avatarUrl && avatarUrl.startsWith('wxfile://')) {
+    if (!avatarUrl) {
       Taro.showToast({
-        title: '头像上传失败，请重新选择',
+        title: '请选择头像',
         icon: 'none'
       })
       return

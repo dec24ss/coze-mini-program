@@ -9,14 +9,13 @@ interface SupabaseCredentials {
 }
 
 function loadEnv(): void {
-  if (envLoaded) {
+  if (envLoaded || (process.env.COZE_SUPABASE_URL && process.env.COZE_SUPABASE_ANON_KEY)) {
     return;
   }
 
   try {
-    // 优先从 .env 文件加载（覆盖系统环境变量）
     try {
-      require('dotenv').config({ override: true });
+      require('dotenv').config();
       if (process.env.COZE_SUPABASE_URL && process.env.COZE_SUPABASE_ANON_KEY) {
         envLoaded = true;
         return;
