@@ -4,13 +4,19 @@ const schema = require('./schema');
 const path = require('path');
 const fs = require('fs');
 
-// 数据库文件路径（存储在项目根目录的 data 文件夹中）
-const DB_PATH = path.join(process.cwd(), 'data', 'puzzle-game.db');
-const DB_DIR = path.dirname(DB_PATH);
+// 数据库文件路径
+// 在部署环境（FaaS）中使用 /tmp 目录，在开发环境使用 data 目录
+const isFaaS = process.env.FAAS_ENV || !fs.existsSync(path.join(process.cwd(), 'data'));
+const DB_DIR = isFaaS ? '/tmp' : path.join(process.cwd(), 'data');
+const DB_PATH = path.join(DB_DIR, 'puzzle-game.db');
 
-// 确保 data 目录存在
-if (!fs.existsSync(DB_DIR)) {
+console.log('🔍 检测运行环境:', isFaaS ? 'FaaS 部署环境' : '开发环境');
+console.log(`📁 数据库路径: ${DB_PATH}`);
+
+// 确保 data 目录存在（仅在开发环境）
+if (!isFaaS && !fs.existsSync(DB_DIR)) {
   fs.mkdirSync(DB_DIR, { recursive: true });
+  console.log(`✅ 已创建目录: ${DB_DIR}`);
 }
 
 // 创建数据库连接
