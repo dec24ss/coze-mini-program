@@ -16,7 +16,13 @@ export default function GamePage() {
   }
   // 平台检测
   const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
-  const { playSound, playVibration } = useSettingsStore()
+  const { playSound, playVibration, initSettings } = useSettingsStore()
+
+  // 初始化设置（只在组件挂载时执行一次）
+  useEffect(() => {
+    initSettings()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const {
     currentLevel,

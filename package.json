@@ -19,8 +19,7 @@
     "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix",
     "new": "taro new",
     "preview:weapp": "taro build --type weapp --preview",
-    "tsc": "npx tsc --noEmit --skipLibCheck",
-    "download-images": "node scripts/download-images.js"
+    "tsc": "npx tsc --noEmit --skipLibCheck"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [

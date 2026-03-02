@@ -3,7 +3,6 @@ import Taro from '@tarojs/taro'
 import { useEffect, useState } from 'react'
 import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
-import { getEnvInfo } from '@/config/env'
 import SettingsModal from '@/components/settings-modal'
 import UserProfileModal from '@/components/user-profile-modal'
 import './index.css'
@@ -154,23 +153,10 @@ export default function IndexPage() {
     })
   }
 
-  // 长按标题进入开发工具（仅开发环境）
-  const handleLongPressTitle = () => {
-    const env = getEnvInfo()
-    if (env.enableDebug) {
-      Taro.navigateTo({ url: '/pages/dev-tools/index' })
-    }
-  }
-
   return (
     <View className="home-page">
       <View className="home-content">
-        <Text
-          className="block home-title"
-          onLongPress={handleLongPressTitle}
-        >
-          海海拼图大作战
-        </Text>
+        <Text className="block home-title">海海拼图大作战</Text>
         <Text className="block home-subtitle">拖拽碎片，完成拼图</Text>
 
         {/* 用户信息区域 - 仅登录后显示 */}
