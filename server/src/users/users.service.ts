@@ -2,6 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { db } from '@/storage/database/sqlite/db';
 import { users } from '@/storage/database/sqlite/schema';
 import { eq, desc } from 'drizzle-orm';
+import { S3Storage } from 'coze-coding-dev-sdk';
+
+// 初始化 S3Storage
+const storage = new S3Storage({
+  endpointUrl: process.env.COZE_BUCKET_ENDPOINT_URL,
+  accessKey: "",
+  secretKey: "",
+  bucketName: process.env.COZE_BUCKET_NAME,
+  region: "cn-beijing",
+});
 
 export interface UserData {
   openid: string;
@@ -137,5 +147,39 @@ export class UsersService {
     const newPoints = (user.points || 0) - points;
     await this.updateUser(openid, { points: newPoints });
     return { success: true, points: newPoints };
+  }
+
+  // 上传头像到对象存储
+  async uploadAvatar(fileBuffer: Buffer, fileName: string, openid: string): Promise<string> {
+    try {
+      console.log(`开始上传头像: ${fileName}, 大小: ${fileBuffer.length} bytes`);
+
+      // 上传文件到对象存储
+      const fileKey = await storage.uploadFile({
+        fileContent: fileBuffer,
+        fileName: `avatars/${openid}_${fileName}`,
+        contentType: 'image/jpeg',
+      });
+
+      console.log(`头像上传成功，fileKey: ${fileKey}`);
+
+      // 生成签名 URL（有效期 30 天）
+      const avatarUrl = await storage.generatePresignedUrl({
+        key: fileKey,
+        expireTime: 2592000, // 30 天
+      });
+
+      console.log(`头像 URL 生成成功: ${avatarUrl}`);
+
+      // 更新用户的头像 URL
+      await this.updateUser(openid, { avatar_url: avatarUrl });
+
+      console.log(`用户头像已更新: openid=${openid}`);
+
+      return avatarUrl;
+    } catch (error) {
+      console.error('上传头像失败:', error);
+      throw new Error('上传头像失败');
+    }
   }
 }

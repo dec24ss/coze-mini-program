@@ -1,6 +1,7 @@
 import { View, Text, Input, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState } from 'react'
+import { Network } from '@/network'
 import './index.css'
 
 interface UserProfileModalProps {
@@ -20,11 +21,59 @@ export default function UserProfileModal({
 }: UserProfileModalProps) {
   const [nickname, setNickname] = useState(initialNickname)
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl)
+  const [isUploading, setIsUploading] = useState(false)
 
-  const handleChooseAvatar = (e) => {
+  const handleChooseAvatar = async (e) => {
     const { avatarUrl: selectedAvatarUrl } = e.detail
-    setAvatarUrl(selectedAvatarUrl)
-    console.log('用户选择头像:', selectedAvatarUrl)
+
+    console.log('用户选择头像（本地路径）:', selectedAvatarUrl)
+
+    // 显示上传提示
+    setIsUploading(true)
+    Taro.showLoading({ title: '上传头像...' })
+
+    try {
+      // 使用 Network.uploadFile 上传文件
+      const response = await Network.uploadFile({
+        url: '/api/users/upload-avatar',
+        filePath: selectedAvatarUrl,
+        name: 'file',
+        formData: {
+          openid: Taro.getStorageSync('openid'),
+          fileName: 'avatar.jpg'
+        }
+      })
+
+      console.log('头像上传响应:', response)
+
+      if (response.data) {
+        const result = JSON.parse(response.data)
+        if (result.code === 200 && result.data?.avatarUrl) {
+          // 使用后端返回的对象存储 URL
+          setAvatarUrl(result.data.avatarUrl)
+          console.log('头像上传成功，对象存储 URL:', result.data.avatarUrl)
+          Taro.showToast({
+            title: '头像上传成功',
+            icon: 'success'
+          })
+        } else {
+          throw new Error(result.msg || '上传失败')
+        }
+      } else {
+        throw new Error('上传失败')
+      }
+    } catch (error) {
+      console.error('上传头像失败:', error)
+      Taro.showToast({
+        title: '头像上传失败',
+        icon: 'none'
+      })
+      // 上传失败时，回退到使用本地路径
+      setAvatarUrl(selectedAvatarUrl)
+    } finally {
+      setIsUploading(false)
+      Taro.hideLoading()
+    }
   }
 
   const handleNicknameChange = (e) => {
@@ -81,8 +130,9 @@ export default function UserProfileModal({
               className="avatar-button"
               openType="chooseAvatar"
               onChooseAvatar={handleChooseAvatar}
+              disabled={isUploading}
             >
-              {avatarUrl ? '更换' : '选择头像'}
+              {isUploading ? '上传中...' : (avatarUrl ? '更换' : '选择头像')}
             </Button>
           </View>
         </View>

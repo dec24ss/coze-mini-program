@@ -1,5 +1,6 @@
-import { Controller, Post, Get, Body, Param } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { UsersService, UserData } from './users.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 export class UsersController {
@@ -66,5 +67,34 @@ export class UsersController {
       rank: index + 1,
     }));
     return { code: 200, msg: 'success', data: rankedList };
+  }
+
+  // 上传头像
+  @Post('upload-avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadAvatar(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: { openid: string; fileName?: string },
+  ) {
+    if (!file) {
+      return { code: 400, msg: '文件不能为空', data: null };
+    }
+
+    if (!body.openid) {
+      return { code: 400, msg: 'openid 不能为空', data: null };
+    }
+
+    try {
+      const avatarUrl = await this.usersService.uploadAvatar(
+        file.buffer,
+        body.fileName || file.originalname || 'avatar.jpg',
+        body.openid,
+      );
+
+      return { code: 200, msg: 'success', data: { avatarUrl } };
+    } catch (error) {
+      console.error('上传头像失败:', error);
+      return { code: 500, msg: '上传头像失败', data: null };
+    }
   }
 }

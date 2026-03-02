@@ -114,6 +114,9 @@ export const useUserStore = create<UserState>((set, get) => ({
           const savedUnlockedLevels = Taro.getStorageSync('unlockedLevels')
           const unlockedLevels = savedUnlockedLevels ? Math.max(parseInt(savedUnlockedLevels), 1) : 1
 
+          // 保存 openid 到本地存储
+          Taro.setStorageSync('openid', apiUser.openid)
+
           set({
             userInfo,
             isLoggedIn: true,
@@ -189,6 +192,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     Taro.removeStorageSync('unlockedLevels')
     Taro.removeStorageSync('points')
     Taro.removeStorageSync('levelImages')  // 清除关卡图片缓存
+    Taro.removeStorageSync('openid')  // 清除 openid
     console.log('用户退出登录，已清除关卡图片缓存')
   },
 

@@ -3,6 +3,7 @@ import { AppModule } from '@/app.module';
 import * as express from 'express';
 import { HttpStatusInterceptor } from '@/interceptors/http-status.interceptor';
 import * as path from 'path';
+import { memoryStorage } from 'multer';
 
 function parsePort(): number {
   const args = process.argv.slice(2);
@@ -26,6 +27,11 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+  // 配置 Multer 用于文件上传（使用内存存储）
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+  app.use('/upload', express.static(path.join(__dirname, '../public')));
 
   // 提供静态文件服务（图片）
   // 使用相对于编译后文件的位置：从 dist 向上一级到 server，然后访问 public
