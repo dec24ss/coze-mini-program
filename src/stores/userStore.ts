@@ -92,9 +92,11 @@ export const useUserStore = create<UserState>((set, get) => ({
           }
         })
 
-        console.log('后端响应:', response)
-        console.log('响应状态码:', response.statusCode)
-        console.log('响应数据:', response.data)
+        console.log('📡 后端完整响应:', JSON.stringify(response, null, 2))
+        console.log('📡 响应状态码:', response.statusCode)
+        console.log('📡 响应数据类型:', typeof response.data)
+        console.log('📡 响应数据:', response.data)
+        console.log('📡 response.data?.data:', response.data?.data)
 
         if (response.data?.data) {
           const apiUser = response.data.data

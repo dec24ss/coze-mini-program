@@ -260,6 +260,12 @@ export const useGameStore = create<GameState>((set, get) => ({
         method: 'GET'
       })
 
+      console.log('📡 图片列表完整响应:', JSON.stringify(response, null, 2))
+      console.log('📡 响应状态码:', response.statusCode)
+      console.log('📡 响应数据类型:', typeof response.data)
+      console.log('📡 响应数据:', response.data)
+      console.log('📡 response.data?.data:', response.data?.data)
+
       if (response.data?.data?.images) {
         const serverImages = response.data.data.images
         const serverVersion = response.data.data.version || '' // 获取服务器版本号
