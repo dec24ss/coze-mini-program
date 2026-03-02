@@ -120,16 +120,27 @@ export class ImageService implements OnModuleInit {
   // 注意：编译后 image.service.ts 在 dist/image/ 目录，需要上2级到 dist，再上1级到 server，然后到 public/images
   private readonly imagesDir = path.join(__dirname, '../../public/images')
   private readonly imagesUrlBase = '/api/images'
+  private useLocalImages = false // 标记是否使用本地图片
 
   async onModuleInit() {
     console.log('🖼️  图片服务已启动，将异步下载图片资源...')
-    await this.ensureImagesDir()
-    // 异步下载，不阻塞服务器启动
-    setTimeout(() => {
-      this.downloadAllImages().catch((error) => {
-        console.error('❌ 下载图片失败:', error)
-      })
-    }, 1000)
+    
+    // 先检查是否可以使用本地存储
+    try {
+      await this.ensureImagesDir()
+      this.useLocalImages = true
+      console.log('✅ 本地图片存储可用')
+      // 异步下载，不阻塞服务器启动
+      setTimeout(() => {
+        this.downloadAllImages().catch((error) => {
+          console.error('❌ 下载图片失败:', error)
+        })
+      }, 1000)
+    } catch (error) {
+      console.warn('⚠️  本地图片存储不可用（文件系统只读），将使用外部 CDN URL')
+      console.warn('⚠️  不再尝试下载图片到本地')
+      this.useLocalImages = false
+    }
   }
 
   private async ensureImagesDir(): Promise<void> {
@@ -261,6 +272,12 @@ export class ImageService implements OnModuleInit {
   }
 
   getAllImages(): string[] {
+    // 如果本地存储不可用，直接返回原始 CDN URL
+    if (!this.useLocalImages) {
+      console.log('📡 使用外部 CDN URL 作为图片源')
+      return PAINTING_URLS
+    }
+
     try {
       const files = fs.readdirSync(this.imagesDir)
       return files
@@ -268,8 +285,9 @@ export class ImageService implements OnModuleInit {
         .map(file => `${this.imagesUrlBase}/${file}`)
     } catch (error) {
       console.error('读取图片目录失败:', error)
-      console.error('⚠️  将使用外部 CDN URL 作为图片源')
-      // 返回原始 URL 作为后备方案
+      console.error('⚠️  降级使用外部 CDN URL 作为图片源')
+      // 降级使用原始 URL 作为后备方案
+      this.useLocalImages = false
       return PAINTING_URLS
     }
   }
