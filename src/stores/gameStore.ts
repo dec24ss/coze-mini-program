@@ -362,7 +362,37 @@ export const useGameStore = create<GameState>((set, get) => ({
         console.log(`✅ 所有图片加载完成`)
         console.log(`- 成功: ${loadedCount - failedCount}/${serverImages.length}`)
         console.log(`- 失败: ${failedCount}/${serverImages.length}`)
-        console.log(`==========================================`)
+        console.log('==========================================')
+
+        // 如果所有图片都加载失败，显示错误提示
+        if (failedCount === serverImages.length) {
+          console.error('==========================================')
+          console.error('❌ 所有图片加载失败！')
+          console.error('❌ 可能的原因：')
+          console.error('  1. 网络连接问题')
+          console.error('  2. 图片源域名未在小程序后台配置白名单')
+          console.error('  3. 服务器图片目录为空')
+          console.error('==========================================')
+
+          Taro.showModal({
+            title: '图片加载失败',
+            content: '所有图片加载失败，请检查网络连接或联系开发者',
+            showCancel: false,
+            confirmText: '重试',
+            success: (res) => {
+              if (res.confirm) {
+                // 重新加载图片
+                get().preloadImages()
+              }
+            }
+          })
+
+          set({
+            isImagesLoading: false,
+            isImagesPreloaded: false
+          })
+          return
+        }
 
         // 预先规划每一关用哪张图片（包含URL和本地路径）
         // 前100关使用前100张图片，如果图片不够则循环使用

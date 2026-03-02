@@ -237,17 +237,43 @@ export class ImageService implements OnModuleInit {
     })
   }
 
-  // 生成随机图片列表（每次返回不同的图片）
-  // 优化：使用更小的尺寸（900x1200）和质量参数，加快加载速度
+  // 生成随机图片列表（使用本地图片，避免微信小程序域名白名单问题）
   getRandomImages(count: number = 100): string[] {
-    // 使用时间戳作为随机种子，确保每次请求都生成不同的图片
-    const randomSeed = Date.now()
+    console.log('📦 getRandomImages 被调用，请求图片数量:', count)
 
-    // 生成指定数量的随机图片 URL
-    return Array.from({ length: count }, (_, i) => {
-      // 使用 ?random 参数确保每次都不同，并设置质量参数
-      return `https://picsum.photos/900/1200?random=${randomSeed}_${i}&quality=75`
-    })
+    try {
+      // 尝试读取本地图片目录
+      const files = fs.readdirSync(this.imagesDir)
+      const imageFiles = files.filter(file => file.endsWith('.jpg'))
+
+      console.log(`📁 本地图片目录: ${this.imagesDir}`)
+      console.log(`📁 本地图片数量: ${imageFiles.length}`)
+
+      if (imageFiles.length > 0) {
+        // 使用本地图片（生成随机顺序）
+        const shuffled = [...imageFiles].sort(() => Math.random() - 0.5)
+        const selectedFiles = shuffled.slice(0, count)
+
+        // 重复使用图片直到达到请求数量
+        const result: string[] = []
+        for (let i = 0; i < count; i++) {
+          const fileIndex = i % selectedFiles.length
+          result.push(`${this.imagesUrlBase}/${selectedFiles[fileIndex]}`)
+        }
+
+        console.log(`✅ 返回 ${result.length} 张本地图片`)
+        return result
+      } else {
+        console.warn('⚠️  本地图片目录为空，使用默认图片列表')
+        // 使用预设的图片列表（从 PAINTING_URLS）
+        return PAINTING_URLS.slice(0, count)
+      }
+    } catch (error) {
+      console.error('❌ 读取本地图片目录失败:', error)
+      console.error('⚠️  使用预设图片列表')
+      // 降级：使用预设的图片列表
+      return PAINTING_URLS.slice(0, count)
+    }
   }
 
   // 获取图片版本号（用于支持增量更新）
