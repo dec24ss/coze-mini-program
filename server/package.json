@@ -8,8 +8,7 @@
     "dev": "nest start --watch",
     "start": "nest start",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
-    "postinstall": "node -e \"const { getSupabaseClient } = require('./dist/storage/database/supabase-client'); const client = getSupabaseClient(); client.from('health_check').select('*').limit(1); console.log('Supabase connection ready')\" || echo 'Supabase connection check skipped'"
+    "start:prod": "node dist/main"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.958.0",
@@ -21,9 +20,6 @@
     "@types/multer": "^2.0.0",
     "coze-coding-dev-sdk": "^0.7.16",
     "dotenv": "^17.2.3",
-    "drizzle-kit": "^0.31.8",
-    "drizzle-orm": "^0.45.1",
-    "drizzle-zod": "^0.8.3",
     "express": "5.2.1",
     "multer": "^2.1.0",
     "pg": "^8.16.3",
