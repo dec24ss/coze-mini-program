@@ -153,18 +153,25 @@ export const useUserStore = create<UserState>((set, get) => ({
       return
     }
 
-    const newUserInfo = {
-      ...userInfo,
-      nickname,
-      avatarUrl,
-      hasSetProfile: true
-    }
+    console.log('📤 开始更新用户信息:')
+    console.log('  - nickname:', nickname)
+    console.log('  - avatarUrl:', avatarUrl)
+    console.log('  - avatarUrl 类型:', avatarUrl ? avatarUrl.substring(0, 50) : '空')
+    console.log('  - 是否是本地路径:', avatarUrl?.startsWith('wxfile://') || avatarUrl?.startsWith('file://'))
 
-    set({ userInfo: newUserInfo })
+    // 如果是本地路径，提示用户先上传头像
+    if (avatarUrl && (avatarUrl.startsWith('wxfile://') || avatarUrl.startsWith('file://'))) {
+      console.warn('⚠️ 检测到本地路径，建议先上传头像到服务器')
+      Taro.showToast({
+        title: '请先上传头像',
+        icon: 'none',
+        duration: 2000
+      })
+    }
 
     // 同步更新到后端
     try {
-      await Network.request({
+      const response = await Network.request({
         url: '/api/users/update',
         method: 'POST',
         data: {
@@ -173,12 +180,48 @@ export const useUserStore = create<UserState>((set, get) => ({
           avatar_url: avatarUrl
         }
       })
+
+      console.log('📡 后端更新响应:', response)
+      console.log('📡 响应数据:', response.data)
+
+      // 如果后端返回了更新后的用户数据，使用后端返回的数据
+      if (response.data?.data) {
+        const updatedUser = response.data.data
+        const newUserInfo = {
+          ...userInfo,
+          nickname: updatedUser.nickname || nickname,
+          avatarUrl: updatedUser.avatar_url || avatarUrl,
+          highestLevel: updatedUser.highest_level || userInfo.highestLevel,
+          points: updatedUser.points || userInfo.points,
+          hasSetProfile: true
+        }
+        set({ userInfo: newUserInfo })
+        console.log('✅ 用户信息已更新（使用后端返回的数据）:', newUserInfo)
+      } else {
+        // 如果后端没有返回数据，使用前端传入的数据
+        const newUserInfo = {
+          ...userInfo,
+          nickname,
+          avatarUrl,
+          hasSetProfile: true
+        }
+        set({ userInfo: newUserInfo })
+        console.log('✅ 用户信息已更新（使用前端数据）:', newUserInfo)
+      }
       console.log('用户信息已同步到数据库')
     } catch (error) {
-      console.error('同步用户信息失败:', error)
+      console.error('❌ 同步用户信息失败:', error)
+      // 即使失败也更新本地状态
+      const newUserInfo = {
+        ...userInfo,
+        nickname,
+        avatarUrl,
+        hasSetProfile: true
+      }
+      set({ userInfo: newUserInfo })
     }
 
-    console.log('用户信息已更新:', newUserInfo)
+    console.log('用户信息已更新:', nickname, avatarUrl)
   },
 
   // 退出登录

@@ -22,6 +22,7 @@ export default function UserProfileModal({
   const [nickname, setNickname] = useState(initialNickname)
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl)
   const [isUploading, setIsUploading] = useState(false)
+  const [isAvatarUploaded, setIsAvatarUploaded] = useState(false) // 标记头像是否已成功上传
 
   const handleChooseAvatar = async (e) => {
     const { avatarUrl: selectedAvatarUrl } = e.detail
@@ -74,6 +75,7 @@ export default function UserProfileModal({
         if (result.code === 200 && result.data?.avatarUrl) {
           // 使用后端返回的对象存储 URL
           setAvatarUrl(result.data.avatarUrl)
+          setIsAvatarUploaded(true) // 标记头像已成功上传
           console.log('✓ 头像上传成功')
           console.log('对象存储 URL:', result.data.avatarUrl)
           Taro.showToast({
@@ -94,13 +96,15 @@ export default function UserProfileModal({
       console.error('错误消息:', error?.message)
       console.error('错误详情:', error)
 
+      setIsAvatarUploaded(false) // 上传失败，标记为未上传
+
       Taro.showToast({
         title: '头像上传失败: ' + error.message,
         icon: 'none',
         duration: 3000
       })
-      // 上传失败时，回退到使用本地路径
-      setAvatarUrl(selectedAvatarUrl)
+      // 上传失败时，清空头像（避免保存本地路径）
+      setAvatarUrl('')
     } finally {
       setIsUploading(false)
       Taro.hideLoading()
@@ -121,9 +125,10 @@ export default function UserProfileModal({
       return
     }
 
-    if (!avatarUrl) {
+    // 如果用户选择了头像但上传失败，提示重新上传
+    if (!isAvatarUploaded && avatarUrl && avatarUrl.startsWith('wxfile://')) {
       Taro.showToast({
-        title: '请选择头像',
+        title: '头像上传失败，请重新选择',
         icon: 'none'
       })
       return

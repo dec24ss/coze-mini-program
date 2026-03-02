@@ -43,9 +43,14 @@ export default function RankPage() {
       fetchRankList().then(() => {
         // 调试：打印排行榜数据
         const currentRankList = useUserStore.getState().rankList
-        console.log('排行榜数据:', currentRankList)
+        console.log('🏆 排行榜数据:', currentRankList)
         currentRankList.forEach((item, index) => {
-          console.log(`用户 ${index + 1}: 昵称=${item.nickname}, 原始头像URL=${item.avatarUrl}, 有效头像URL=${getAvatarUrl(item.nickname, item.avatarUrl)}`)
+          console.log(`👤 用户 ${index + 1}:`)
+          console.log(`  - 昵称: ${item.nickname}`)
+          console.log(`  - 原始头像URL: ${item.avatarUrl}`)
+          console.log(`  - 头像URL类型: ${item.avatarUrl ? (item.avatarUrl.startsWith('http') ? '网络路径' : '其他') : '空'}`)
+          console.log(`  - 头像URL是否有效: ${isValidAvatarUrl(item.avatarUrl)}`)
+          console.log(`  - 最终头像URL: ${getAvatarUrl(item.nickname, item.avatarUrl)}`)
         })
       })
     }
