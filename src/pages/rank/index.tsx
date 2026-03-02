@@ -52,7 +52,8 @@ export default function RankPage() {
               )}
             </View>
             <View className="rank-col user-info">
-              {item.avatarUrl ? (
+              {/* 只显示自己的头像，其他用户使用占位符 */}
+              {item.openid === userInfo?.openid && item.avatarUrl ? (
                 <Image className="user-avatar-small" src={item.avatarUrl} mode="aspectFill" />
               ) : (
                 <View className="user-avatar-placeholder">

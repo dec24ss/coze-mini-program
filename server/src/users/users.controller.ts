@@ -56,10 +56,10 @@ export class UsersController {
     return { code: 200, msg: 'success', data: result };
   }
 
-  // 获取排行榜
+  // 获取排行榜（前100名）
   @Get('rank/list')
   async getRankList() {
-    const list = await this.usersService.getRankList(10);
+    const list = await this.usersService.getRankList(100);
     // 添加排名
     const rankedList = list.map((item, index) => ({
       ...item,
