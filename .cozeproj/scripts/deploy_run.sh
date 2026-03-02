@@ -7,32 +7,39 @@ rebuild_native_modules() {
     
     # 切换到项目根目录
     cd "${COZE_WORKSPACE_PATH}"
+    echo "📍 当前工作目录: $(pwd)"
+    echo "📍 COZE_WORKSPACE_PATH: ${COZE_WORKSPACE_PATH}"
     
-    # 检查 better-sqlite3 是否存在（在根目录或 server 目录）
-    BETTER_SQLITE3_PATH=""
-    
-    if [ -d "node_modules/.pnpm/better-sqlite3" ]; then
-        BETTER_SQLITE3_PATH="${COZE_WORKSPACE_PATH}"
-        echo "📦 在根目录找到 better-sqlite3"
-    elif [ -d "server/node_modules/.pnpm/better-sqlite3" ]; then
-        BETTER_SQLITE3_PATH="${COZE_WORKSPACE_PATH}/server"
-        echo "📦 在 server 目录找到 better-sqlite3"
-    else
-        echo "⚠️  未找到 better-sqlite3 目录"
-        ls -la "${COZE_WORKSPACE_PATH}/node_modules/.pnpm" 2>/dev/null | head -20 || echo "node_modules/.pnpm 不存在"
-        ls -la "${COZE_WORKSPACE_PATH}/server/node_modules/.pnpm" 2>/dev/null | head -20 || echo "server/node_modules/.pnpm 不存在"
-        return 1
+    # 先尝试在根目录重新编译
+    if [ -f "pnpm-lock.yaml" ] || [ -f "package.json" ]; then
+        echo "📦 在项目根目录重新编译 better-sqlite3..."
+        if pnpm rebuild better-sqlite3; then
+            echo "✅ better-sqlite3 编译完成（根目录）"
+            return 0
+        fi
     fi
     
-    # 在找到的目录中重新编译
-    cd "${BETTER_SQLITE3_PATH}"
-    echo "📦 重新编译 better-sqlite3（确保 Node.js 版本匹配）..."
-    echo "当前目录: $(pwd)"
-    pnpm rebuild better-sqlite3
-    echo "✅ better-sqlite3 编译完成"
+    # 如果失败，尝试在 server 目录重新编译
+    if [ -d "server" ] && ([ -f "server/pnpm-lock.yaml" ] || [ -f "server/package.json" ]); then
+        echo "📦 在 server 目录重新编译 better-sqlite3..."
+        cd server
+        if pnpm rebuild better-sqlite3; then
+            echo "✅ better-sqlite3 编译完成（server 目录）"
+            return 0
+        fi
+    fi
     
-    # 切换回 server 目录以启动服务
-    cd "${COZE_WORKSPACE_PATH}/server"
+    # 如果都失败，输出错误信息
+    echo "⚠️  重新编译失败"
+    echo "📂 列出 node_modules 内容（前 30 行）:"
+    ls -la "${COZE_WORKSPACE_PATH}/node_modules" 2>/dev/null | head -30 || echo "node_modules 不存在"
+    
+    if [ -d "${COZE_WORKSPACE_PATH}/server/node_modules" ]; then
+        echo "📂 列出 server/node_modules 内容（前 30 行）:"
+        ls -la "${COZE_WORKSPACE_PATH}/server/node_modules" 2>/dev/null | head -30 || echo "server/node_modules 不存在"
+    fi
+    
+    return 1
 }
 
 start_service() {
@@ -44,4 +51,7 @@ start_service() {
 
 echo "Starting HTTP service for deploy..."
 rebuild_native_modules
+
+# 切换回 server 目录以启动服务
+cd "${COZE_WORKSPACE_PATH}/server"
 start_service
