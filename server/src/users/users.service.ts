@@ -4,7 +4,12 @@ import { users } from '@/storage/database/sqlite/schema';
 import { eq, desc } from 'drizzle-orm';
 import { S3Storage } from 'coze-coding-dev-sdk';
 
-// 初始化 S3Storage
+// 初始化 S3Storage（添加调试日志）
+console.log('=== 对象存储配置 ===');
+console.log('COZE_BUCKET_ENDPOINT_URL:', process.env.COZE_BUCKET_ENDPOINT_URL);
+console.log('COZE_BUCKET_NAME:', process.env.COZE_BUCKET_NAME);
+console.log('所有环境变量:', Object.keys(process.env).filter(key => key.includes('BUCKET') || key.includes('STORAGE')));
+
 const storage = new S3Storage({
   endpointUrl: process.env.COZE_BUCKET_ENDPOINT_URL,
   accessKey: "",
@@ -152,34 +157,54 @@ export class UsersService {
   // 上传头像到对象存储
   async uploadAvatar(fileBuffer: Buffer, fileName: string, openid: string): Promise<string> {
     try {
-      console.log(`开始上传头像: ${fileName}, 大小: ${fileBuffer.length} bytes`);
+      console.log('=== 开始上传头像 ===');
+      console.log('openid:', openid);
+      console.log('fileName:', fileName);
+      console.log('文件大小:', fileBuffer.length, 'bytes');
+
+      // 检查对象存储是否已初始化
+      console.log('对象存储端点:', process.env.COZE_BUCKET_ENDPOINT_URL);
+      console.log('对象存储桶名:', process.env.COZE_BUCKET_NAME);
+
+      if (!process.env.COZE_BUCKET_ENDPOINT_URL || !process.env.COZE_BUCKET_NAME) {
+        throw new Error('对象存储环境变量未配置');
+      }
 
       // 上传文件到对象存储
+      console.log('正在上传到对象存储...');
       const fileKey = await storage.uploadFile({
         fileContent: fileBuffer,
         fileName: `avatars/${openid}_${fileName}`,
         contentType: 'image/jpeg',
       });
 
-      console.log(`头像上传成功，fileKey: ${fileKey}`);
+      console.log('✓ 头像上传成功');
+      console.log('fileKey:', fileKey);
 
       // 生成签名 URL（有效期 30 天）
+      console.log('正在生成签名 URL...');
       const avatarUrl = await storage.generatePresignedUrl({
         key: fileKey,
         expireTime: 2592000, // 30 天
       });
 
-      console.log(`头像 URL 生成成功: ${avatarUrl}`);
+      console.log('✓ 头像 URL 生成成功');
+      console.log('avatarUrl:', avatarUrl);
 
       // 更新用户的头像 URL
+      console.log('正在更新数据库...');
       await this.updateUser(openid, { avatar_url: avatarUrl });
 
-      console.log(`用户头像已更新: openid=${openid}`);
+      console.log('✓ 数据库更新成功');
+      console.log('=== 头像上传流程完成 ===');
 
       return avatarUrl;
     } catch (error) {
-      console.error('上传头像失败:', error);
-      throw new Error('上传头像失败');
+      console.error('❌ 上传头像失败');
+      console.error('错误类型:', error?.constructor?.name);
+      console.error('错误消息:', error?.message);
+      console.error('错误堆栈:', error?.stack);
+      throw new Error('上传头像失败: ' + error.message);
     }
   }
 }

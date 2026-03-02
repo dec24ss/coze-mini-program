@@ -76,25 +76,43 @@ export class UsersController {
     @UploadedFile() file: Express.Multer.File,
     @Body() body: { openid: string; fileName?: string },
   ) {
+    console.log('=== 收到头像上传请求 ===');
+    console.log('openid:', body.openid);
+    console.log('fileName:', body.fileName);
+    console.log('file:', file ? '存在' : '不存在');
+
     if (!file) {
+      console.error('文件不能为空');
       return { code: 400, msg: '文件不能为空', data: null };
     }
 
     if (!body.openid) {
+      console.error('openid 不能为空');
       return { code: 400, msg: 'openid 不能为空', data: null };
     }
 
+    console.log('文件信息:');
+    console.log('- 原始文件名:', file.originalname);
+    console.log('- 文件大小:', file.size, 'bytes');
+    console.log('- MIME 类型:', file.mimetype);
+    console.log('- Buffer 长度:', file.buffer ? file.buffer.length : 0);
+
     try {
+      console.log('开始调用上传服务...');
       const avatarUrl = await this.usersService.uploadAvatar(
         file.buffer,
         body.fileName || file.originalname || 'avatar.jpg',
         body.openid,
       );
 
+      console.log('✓ 上传成功');
+      console.log('返回的 avatarUrl:', avatarUrl);
+
       return { code: 200, msg: 'success', data: { avatarUrl } };
     } catch (error) {
-      console.error('上传头像失败:', error);
-      return { code: 500, msg: '上传头像失败', data: null };
+      console.error('❌ 上传头像失败');
+      console.error('错误:', error);
+      return { code: 500, msg: '上传头像失败: ' + error.message, data: null };
     }
   }
 }
