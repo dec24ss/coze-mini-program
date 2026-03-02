@@ -4,8 +4,8 @@ const schema = require('./schema');
 const path = require('path');
 const fs = require('fs');
 
-// 数据库文件路径（存储在项目根目录的 data 文件夹中）
-const DB_PATH = path.join(process.cwd(), 'data', 'puzzle-game.db');
+// 数据库文件路径（使用 /tmp 目录确保在生产环境中可写）
+const DB_PATH = path.join('/tmp', 'puzzle-game.db');
 const DB_DIR = path.dirname(DB_PATH);
 
 // 确保 data 目录存在
