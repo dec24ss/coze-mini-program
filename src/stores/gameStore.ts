@@ -213,6 +213,9 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // 预加载图片（使用 Taro.getImageInfo 真正缓存图片，支持版本号管理和离线模式）
   preloadImages: async () => {
+    console.log('==========================================')
+    console.log('🖼️  开始预加载图片...')
+    console.log('==========================================')
     set({ isImagesLoading: true, imagesLoaded: 0, imageList: [], isImagesPreloaded: false })
 
     try {
@@ -226,6 +229,10 @@ export const useGameStore = create<GameState>((set, get) => ({
         // 尝试从本地存储加载缓存的图片
         const cachedLevelImageMap = Taro.getStorageSync('levelImageMap') || {}
         const cachedImageList = Taro.getStorageSync('imageList') || []
+
+        console.log(`📦 本地缓存数据：`)
+        console.log(`- levelImageMap 长度: ${Object.keys(cachedLevelImageMap).length}`)
+        console.log(`- imageList 长度: ${cachedImageList.length}`)
 
         if (Object.keys(cachedLevelImageMap).length > 0 && cachedImageList.length > 0) {
           console.log(`✅ 从本地缓存加载了 ${Object.keys(cachedLevelImageMap).length} 张图片`)
@@ -260,6 +267,9 @@ export const useGameStore = create<GameState>((set, get) => ({
         method: 'GET'
       })
 
+      console.log('🌐 服务器响应状态:', response.statusCode)
+      console.log('🌐 服务器响应数据:', response.data)
+
       if (response.data?.data?.images) {
         const serverImages = response.data.data.images
         const serverVersion = response.data.data.version || '' // 获取服务器版本号
@@ -274,11 +284,13 @@ export const useGameStore = create<GameState>((set, get) => ({
           // 清除本地缓存
           Taro.removeStorageSync('levelImageMap')
           Taro.removeStorageSync('imageList')
+          Taro.removeStorageSync('imageVersion')
         }
 
         const loadedImages: string[] = []
         const loadedPaths: string[] = []  // 新增：保存本地路径
         let loadedCount = 0
+        let failedCount = 0
 
         // 分批大小：每次加载 10 张图片
         const BATCH_SIZE = 10
@@ -298,14 +310,17 @@ export const useGameStore = create<GameState>((set, get) => ({
                 src: url
               })
 
+              console.log(`✅ 图片 ${index + 1} 加载成功，本地路径:`, res.path)
+
               // 保存原始 URL 和本地路径
               loadedImages[index] = url
               loadedPaths[index] = res.path  // 保存本地路径
               loadedCount++
               set({ imagesLoaded: loadedCount })
-              console.log(`✅ 图片 ${index + 1} 加载完成，本地路径:`, res.path)
             } catch (error) {
               retryCount++
+              console.error(`❌ 图片 ${index + 1} 加载失败 (尝试 ${retryCount}/${maxRetries}):`, error)
+
               if (retryCount <= maxRetries) {
                 console.log(`🔄 图片 ${index + 1} 加载失败，正在重试 ${retryCount}/${maxRetries}...`)
                 // 延迟后重试（指数退避：1s, 2s, 4s）
@@ -313,6 +328,7 @@ export const useGameStore = create<GameState>((set, get) => ({
                 return tryLoadImage()
               } else {
                 console.error(`❌ 图片 ${index + 1} 加载失败，已重试 ${maxRetries} 次，跳过:`, error)
+                failedCount++
                 // 加载失败也继续，使用原始 URL
                 loadedImages[index] = url
                 loadedPaths[index] = url  // 降级使用 URL
@@ -342,7 +358,11 @@ export const useGameStore = create<GameState>((set, get) => ({
           }
         }
 
-        console.log(`✅ 所有图片加载完成，成功 ${loadedCount}/${serverImages.length}`)
+        console.log(`==========================================`)
+        console.log(`✅ 所有图片加载完成`)
+        console.log(`- 成功: ${loadedCount - failedCount}/${serverImages.length}`)
+        console.log(`- 失败: ${failedCount}/${serverImages.length}`)
+        console.log(`==========================================`)
 
         // 预先规划每一关用哪张图片（包含URL和本地路径）
         // 前100关使用前100张图片，如果图片不够则循环使用
@@ -353,11 +373,13 @@ export const useGameStore = create<GameState>((set, get) => ({
             url: loadedImages[imageIndex],
             path: loadedPaths[imageIndex]
           }
-          console.log(`📋 关卡 ${i + 1} 使用图片 ${imageIndex + 1}:`, {
-            url: loadedImages[imageIndex].substring(0, 50),
-            path: loadedPaths[imageIndex],
-            pathType: loadedPaths[imageIndex].startsWith('wxfile://') ? '本地路径' : '网络路径'
-          })
+          if (i < 5) { // 只打印前5关
+            console.log(`📋 关卡 ${i + 1} 使用图片 ${imageIndex + 1}:`, {
+              url: loadedImages[imageIndex].substring(0, 50),
+              path: loadedPaths[imageIndex],
+              pathType: loadedPaths[imageIndex].startsWith('wxfile://') ? '本地路径' : '网络路径'
+            })
+          }
         }
 
         console.log('✅ levelImageMap 已生成，长度:', Object.keys(levelImageMap).length)
@@ -384,10 +406,16 @@ export const useGameStore = create<GameState>((set, get) => ({
           imageVersion: serverVersion  // 保存版本号到状态
         })
       } else {
+        console.error('❌ 服务器返回数据格式错误:', response.data)
         throw new Error('服务器返回数据格式错误')
       }
     } catch (error) {
+      console.error('==========================================')
       console.error('❌ 获取图片列表失败:', error)
+      console.error('❌ 错误类型:', error?.constructor?.name)
+      console.error('❌ 错误消息:', error?.message)
+      console.error('==========================================')
+
       // 失败时使用默认图片
       set({
         imageList: [],
@@ -395,6 +423,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         isImagesLoading: false,
         isImagesPreloaded: false
       })
+
+      Taro.showToast({ title: '图片加载失败，请重试', icon: 'none', duration: 3000 })
     }
   },
 

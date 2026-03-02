@@ -198,21 +198,36 @@ export const useUserStore = create<UserState>((set, get) => ({
 
   // 更新最高关卡
   updateHighestLevel: async (level: number, imageUrl?: string) => {
+    console.log('==========================================')
+    console.log('📈 updateHighestLevel 被调用')
+    console.log('📊 当前关卡:', level)
+    console.log('🖼️  图片URL:', imageUrl?.substring(0, 50) || '无')
+    console.log('==========================================')
+
     const { userInfo, isLoggedIn } = get()
 
     if (!isLoggedIn || !userInfo) {
-      console.log('用户未登录，无法更新最高关卡')
+      console.error('❌ 用户未登录，无法更新最高关卡')
       return
     }
 
+    console.log('👤 当前用户信息:', {
+      openid: userInfo.openid,
+      nickname: userInfo.nickname,
+      highestLevel: userInfo.highestLevel
+    })
+
     // 只有当新关卡大于当前最高关卡时才更新
     if (level > userInfo.highestLevel) {
+      console.log(`✅ 需要更新最高关卡: ${userInfo.highestLevel} -> ${level}`)
+
       const newUserInfo = { ...userInfo, highestLevel: level }
 
       // 保存关卡图片映射
       const newLevelImages = { ...get().levelImages }
       if (imageUrl) {
         newLevelImages[level] = imageUrl
+        console.log(`💾 保存关卡 ${level} 图片`)
       }
 
       set({
@@ -223,15 +238,18 @@ export const useUserStore = create<UserState>((set, get) => ({
       // 保存到本地存储
       Taro.setStorageSync('highestLevel', level.toString())
       Taro.setStorageSync('levelImages', JSON.stringify(newLevelImages))
+      console.log('💾 已保存到本地存储')
 
       // 同时更新解锁的关卡（下一关）
       const newUnlockedLevels = Math.max(get().unlockedLevels, level + 1)
       set({ unlockedLevels: newUnlockedLevels })
       Taro.setStorageSync('unlockedLevels', newUnlockedLevels.toString())
+      console.log(`💾 解锁关卡: ${newUnlockedLevels}`)
 
       // 同步更新到后端数据库
       try {
-        await Network.request({
+        console.log('🌐 开始同步到后端数据库...')
+        const response = await Network.request({
           url: '/api/users/update-level',
           method: 'POST',
           data: {
@@ -239,16 +257,37 @@ export const useUserStore = create<UserState>((set, get) => ({
             highest_level: level
           }
         })
-        console.log(`最高关卡已同步到数据库: ${level}`)
+
+        console.log('✅ 后端响应状态:', response.statusCode)
+        console.log('✅ 后端响应数据:', response.data)
+
+        if (response.data?.code === 200) {
+          console.log(`✅ 最高关卡已成功同步到数据库: ${level}`)
+        } else {
+          console.warn('⚠️  后端返回非成功状态:', response.data)
+          // 不影响本地更新，因为本地存储已保存
+        }
       } catch (error) {
-        console.error('同步最高关卡到数据库失败:', error)
-        // 失败不影响本地更新
+        console.error('==========================================')
+        console.error('❌ 同步最高关卡到数据库失败')
+        console.error('❌ 错误类型:', error?.constructor?.name)
+        console.error('❌ 错误消息:', error?.message)
+        console.error('❌ 错误堆栈:', error?.stack)
+        console.error('==========================================')
+        // 失败不影响本地更新，本地存储已保存
+        console.log('💡 本地存储已保存，离线模式仍可正常使用')
+
+        // 提示用户
+        Taro.showToast({
+          title: '云端同步失败，已保存到本地',
+          icon: 'none',
+          duration: 3000
+        })
       }
 
-      console.log(`用户最高关卡更新为: ${level}，解锁关卡: ${newUnlockedLevels}`)
-      if (imageUrl) {
-        console.log(`关卡 ${level} 图片已保存`)
-      }
+      console.log(`✅ 用户最高关卡更新为: ${level}，解锁关卡: ${newUnlockedLevels}`)
+    } else {
+      console.log(`⚠️  无需更新最高关卡: ${level} <= ${userInfo.highestLevel}`)
     }
   },
 

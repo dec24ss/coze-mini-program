@@ -2,23 +2,30 @@ import { View, Text, Image } from '@tarojs/components'
 import { useEffect, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { useGameStore } from '@/stores/gameStore'
+import { useSettingsStore } from '@/stores/settingsStore'
 import './index.css'
 
 const TOTAL_IMAGES = 100 // 固定100张图片（对应100个关卡）
 
 export default function LoadingPage() {
   const { preloadImages, imagesLoaded, imageList } = useGameStore()
+  const { initSettings } = useSettingsStore()
   const [totalImages] = useState(TOTAL_IMAGES)
 
   useEffect(() => {
+    // 初始化设置（预加载音效，避免音效延迟）
+    console.log('🔊 初始化设置，预加载音效...')
+    initSettings()
+
     // 预加载图片
     preloadImages().then(() => {
+      console.log('✅ 图片预加载完成')
       // 图片加载完成后跳转到首页
       setTimeout(() => {
         Taro.redirectTo({ url: '/pages/index/index' })
       }, 500)
     })
-  }, [preloadImages])
+  }, [preloadImages, initSettings])
 
   // 计算加载进度百分比
   const progressPercent = totalImages > 0
