@@ -14,7 +14,7 @@
 **影响**：图片加载失败
 
 **详细说明**：
-- 项目使用的图片来源于维基百科（`https://upload.wikimedia.org/...`）
+- 项目使用的图片来源于 Picsum Photos（`https://picsum.photos/...`）
 - 微信小程序正式版必须在公众平台配置域名白名单才能加载外部资源
 - 开发版可以在开发者工具中勾选"不校验合法域名"绕过此限制
 - 线上版无法绕过，必须严格配置
@@ -44,14 +44,14 @@
 
 **downloadFile 合法域名**：
 ```
-https://upload.wikimedia.org
+https://picsum.photos
 https://api.dicebear.com
 https://images.unsplash.com
 https://assets.mixkit.co
 ```
 
 **说明**：
-- `upload.wikimedia.org` - 拼图图片（世界名画）
+- `picsum.photos` - 拼图图片（随机高质量图片，共100张）
 - `api.dicebear.com` - 用户默认头像生成
 - `images.unsplash.com` - 备用图片
 - `assets.mixkit.co` - 游戏音效文件

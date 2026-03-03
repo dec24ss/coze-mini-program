@@ -47,17 +47,17 @@
 **用途**：加载图片资源、音效文件
 
 **需要添加的域名**：
-- 维基百科图片（拼图图片）：`https://upload.wikimedia.org`
-- DiceBear默认头像：`https://api.dicebear.com`
-- Unsplash备用图片：`https://images.unsplash.com`
-- Mixkit音效文件：`https://assets.mixkit.co`
+- Picsum 拼图图片：`https://picsum.photos`
+- DiceBear 默认头像：`https://api.dicebear.com`
+- Unsplash 备用图片：`https://images.unsplash.com`
+- Mixkit 音效文件：`https://assets.mixkit.co`
 - 对象存储域名（如配置了）：`https://your-bucket.s3.region.amazonaws.com`
 
 **配置步骤**：
 1. 在「服务器域名」中找到「downloadFile合法域名」
 2. 添加以下域名：
    ```
-   https://upload.wikimedia.org
+   https://picsum.photos
    https://api.dicebear.com
    https://images.unsplash.com
    https://assets.mixkit.co
@@ -81,7 +81,7 @@ https://egutrdawrbziyklwnuov.supabase.co
 
 ### downloadFile 合法域名
 ```
-https://upload.wikimedia.org
+https://picsum.photos
 https://api.dicebear.com
 https://images.unsplash.com
 https://assets.mixkit.co
@@ -90,7 +90,7 @@ https://assets.mixkit.co
 **注意**：
 - 请将 `https://your-server.com` 替换为你实际的后端服务器域名
 - 各域名用途说明：
-  - `upload.wikimedia.org` - 拼图图片（世界名画）
+  - `picsum.photos` - 拼图图片（随机高质量图片，共100张）
   - `api.dicebear.com` - 用户默认头像生成
   - `images.unsplash.com` - 备用图片
   - `assets.mixkit.co` - 游戏音效文件

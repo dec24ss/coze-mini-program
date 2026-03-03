@@ -130,14 +130,14 @@ https://egutrdawrbziyklwnuov.supabase.co
 
 **downloadFile 合法域名**：
 ```
-https://upload.wikimedia.org
+https://picsum.photos
 https://api.dicebear.com
 https://images.unsplash.com
 https://assets.mixkit.co
 ```
 
 **各域名用途说明**：
-- `upload.wikimedia.org` - 拼图图片（世界名画）
+- `picsum.photos` - 拼图图片（随机高质量图片，共100张）
 - `api.dicebear.com` - 用户默认头像生成
 - `images.unsplash.com` - 备用图片
 - `assets.mixkit.co` - 游戏音效文件
@@ -407,7 +407,7 @@ pm2 restart puzzle-game-server
 - [ ] **微信小程序域名白名单已配置**（⚠️ 线上版必须！）
   - [ ] request 合法域名已添加后端API域名和Supabase域名
   - [ ] uploadFile 合法域名已添加后端API域名和Supabase域名
-  - [ ] downloadFile 合法域名已添加图片域名（upload.wikimedia.org、api.dicebear.com）
+  - [ ] downloadFile 合法域名已添加图片域名（picsum.photos、api.dicebear.com）
 - [ ] **后端服务正常运行**（可访问 http://localhost:3000/api）
 - [ ] **微信小程序 AppID 已配置**（在 `project.config.json` 中）
 - [ ] **对象存储配置**（如需头像上传功能）

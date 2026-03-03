@@ -38,7 +38,7 @@
 
 | 域名 | 用途 | 必需 |
 |------|------|------|
-| `https://upload.wikimedia.org` | 拼图图片（世界名画，共100张） | ✅ 必需 |
+| `https://picsum.photos` | 拼图图片（随机高质量图片，共100张） | ✅ 必需 |
 | `https://api.dicebear.com` | 用户默认头像生成 | ✅ 必需 |
 | `https://images.unsplash.com` | 备用图片 | ⚠️ 建议 |
 | `https://assets.mixkit.co` | 游戏音效文件 | ✅ 必需 |
@@ -71,7 +71,7 @@ https://egutrdawrbziyklwnuov.supabase.co
 
 #### downloadFile 合法域名
 ```
-https://upload.wikimedia.org
+https://picsum.photos
 https://api.dicebear.com
 https://images.unsplash.com
 https://assets.mixkit.co
@@ -87,7 +87,7 @@ https://assets.mixkit.co
 - [ ] request 域名已添加 Supabase 域名
 - [ ] uploadFile 域名已添加后端服务器域名
 - [ ] uploadFile 域名已添加 Supabase 域名
-- [ ] downloadFile 域名已添加维基百科图片域名
+- [ ] downloadFile 域名已添加 Picsum 图片域名
 - [ ] downloadFile 域名已添加 DiceBear 头像域名
 - [ ] downloadFile 域名已添加 Unsplash 图片域名
 - [ ] downloadFile 域名已添加 Mixkit 音效域名
