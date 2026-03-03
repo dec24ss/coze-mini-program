@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import Taro from '@tarojs/taro'
 import { Network } from '@/network'
+import { API_ENDPOINTS } from '@/config/api'
 
 // 用户信息
 export interface UserInfo {
@@ -81,17 +82,11 @@ export const useUserStore = create<UserState>((set, get) => ({
       if (loginRes.code) {
         console.log('微信登录成功，code:', loginRes.code)
 
-        // 构建登录 API URL
-        const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
-        const loginUrl = isWeapp
-          ? 'http://localhost:3000/api/users/login'  // 小程序环境使用 localhost
-          : '/api/users/login'  // H5 环境使用代理
-
-        console.log('登录 API URL:', loginUrl)
+        console.log('登录 API URL:', API_ENDPOINTS.LOGIN)
 
         // 调用后端登录 API
         const response = await Network.request({
-          url: loginUrl,
+          url: API_ENDPOINTS.LOGIN,
           method: 'POST',
           data: {
             openid: loginRes.code,
@@ -193,10 +188,8 @@ export const useUserStore = create<UserState>((set, get) => ({
 
     // 同步更新到后端
     try {
-      const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
-      const updateUrl = isWeapp ? 'http://localhost:3000/api/users/update' : '/api/users/update'
       await Network.request({
-        url: updateUrl,
+        url: API_ENDPOINTS.UPDATE_USER_INFO,
         method: 'POST',
         data: {
           openid: userInfo.openid,
@@ -264,10 +257,8 @@ export const useUserStore = create<UserState>((set, get) => ({
 
       // 同步更新到后端数据库
       try {
-        const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
-        const updateLevelUrl = isWeapp ? 'http://localhost:3000/api/users/update-level' : '/api/users/update-level'
         await Network.request({
-          url: updateLevelUrl,
+          url: API_ENDPOINTS.UPDATE_HIGHEST_LEVEL,
           method: 'POST',
           data: {
             openid: userInfo.openid,
@@ -291,9 +282,8 @@ export const useUserStore = create<UserState>((set, get) => ({
   fetchRankList: async () => {
     try {
       const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
-      const rankUrl = isWeapp ? 'http://localhost:3000/api/users/rank/list' : '/api/users/rank/list'
       const response = await Network.request({
-        url: rankUrl,
+        url: API_ENDPOINTS.GET_RANK_LIST,
         method: 'GET'
       })
 
@@ -363,10 +353,8 @@ export const useUserStore = create<UserState>((set, get) => ({
 
     // 同步更新到后端数据库
     try {
-      const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
-      const addPointsUrl = isWeapp ? 'http://localhost:3000/api/users/add-points' : '/api/users/add-points'
       await Network.request({
-        url: addPointsUrl,
+        url: API_ENDPOINTS.ADD_POINTS,
         method: 'POST',
         data: {
           openid: userInfo.openid,
@@ -404,9 +392,8 @@ export const useUserStore = create<UserState>((set, get) => ({
     // 同步更新到后端数据库
     try {
       const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
-      const consumePointsUrl = isWeapp ? 'http://localhost:3000/api/users/consume-points' : '/api/users/consume-points'
       await Network.request({
-        url: consumePointsUrl,
+        url: API_ENDPOINTS.CONSUME_POINTS,
         method: 'POST',
         data: {
           openid: userInfo.openid,
