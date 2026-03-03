@@ -67,29 +67,7 @@ pnpm install
 
 #### 1.2 配置环境变量
 
-**⚠️ 重要：必须配置前端环境变量！**
-
-在项目根目录创建 `.env.local` 文件（用于前端构建）：
-
-```bash
-# 项目域名（后端API地址）
-# 本地开发：http://localhost:3000
-# 生产环境：https://your-server.com（⚠️ 必须修改为你的实际后端服务器地址！）
-PROJECT_DOMAIN=http://localhost:3000
-```
-
-**生产环境配置示例**：
-```bash
-# 假设你的后端部署在 https://api.example.com
-PROJECT_DOMAIN=https://api.example.com
-```
-
-**⚠️ 注意**：
-- 如果不配置 `PROJECT_DOMAIN`，API请求会失败
-- 生产环境必须使用HTTPS协议
-- 域名需要在微信小程序后台配置白名单（见下一步）
-
-在 `server/.env` 文件中配置后端环境变量：
+在项目根目录创建 `.env` 文件：
 
 ```bash
 # Supabase 配置（必填）
@@ -101,50 +79,7 @@ COZE_BUCKET_ENDPOINT_URL=
 COZE_BUCKET_NAME=
 ```
 
-#### 1.3 微信小程序域名白名单配置（⚠️ 线上版必做！）
-
-**问题现象**：开发版正常，线上版图片和数据库加载失败
-
-**原因**：微信小程序正式版必须在公众平台配置域名白名单
-
-**详细配置指南**：请参考 [`docs/WECHAT_DOMAIN_CONFIG.md`](docs/WECHAT_DOMAIN_CONFIG.md)
-
-**快速配置**：
-
-1. 登录微信公众平台：https://mp.weixin.qq.com
-2. 进入「开发」→「开发管理」→「开发设置」→「服务器域名」
-
-3. 配置以下域名：
-
-**request 合法域名**：
-```
-https://your-server.com
-https://egutrdawrbziyklwnuov.supabase.co
-```
-
-**uploadFile 合法域名**：
-```
-https://your-server.com
-https://egutrdawrbziyklwnuov.supabase.co
-```
-
-**downloadFile 合法域名**：
-```
-https://picsum.photos
-https://api.dicebear.com
-https://images.unsplash.com
-https://assets.mixkit.co
-```
-
-**各域名用途说明**：
-- `picsum.photos` - 拼图图片（随机高质量图片，共100张）
-- `api.dicebear.com` - 用户默认头像生成
-- `images.unsplash.com` - 备用图片
-- `assets.mixkit.co` - 游戏音效文件
-
-**注意**：请将 `https://your-server.com` 替换为你实际的后端服务器域名。
-
-#### 1.4 数据库配置
+#### 1.3 数据库配置
 
 确保 Supabase 数据库中已创建 users 表：
 
@@ -401,18 +336,14 @@ pm2 restart puzzle-game-server
 
 ### 部署前检查清单
 
-- [ ] **前端环境变量已配置**（`.env.local` 文件，设置 `PROJECT_DOMAIN`）
-- [ ] **后端环境变量已配置**（`server/.env` 文件，设置 Supabase 配置）
-- [ ] **数据库表已创建**（users 表已通过 `coze-coding-ai db upgrade` 同步）
-- [ ] **微信小程序域名白名单已配置**（⚠️ 线上版必须！）
-  - [ ] request 合法域名已添加后端API域名和Supabase域名
-  - [ ] uploadFile 合法域名已添加后端API域名和Supabase域名
-  - [ ] downloadFile 合法域名已添加图片域名（picsum.photos、api.dicebear.com）
-- [ ] **后端服务正常运行**（可访问 http://localhost:3000/api）
-- [ ] **微信小程序 AppID 已配置**（在 `project.config.json` 中）
-- [ ] **对象存储配置**（如需头像上传功能）
-- [ ] **防火墙端口已开放**（3000 端口）
-- [ ] **SSL 证书已配置**（生产环境必须使用 HTTPS）
+- [ ] 环境变量已配置
+- [ ] 数据库表已创建
+- [ ] 域名白名单已配置
+- [ ] 后端服务正常运行
+- [ ] 微信小程序 AppID 已配置
+- [ ] 对象存储配置（如需头像上传）
+- [ ] 防火墙端口已开放（3000）
+- [ ] SSL 证书已配置（生产环境）
 
 ### 部署后检查清单
 
