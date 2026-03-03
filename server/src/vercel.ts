@@ -1,39 +1,38 @@
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
-import { Server } from 'http';
-import * as express from 'express';
+import express from 'express';
 
-let cachedServer: Server;
+let app: any;
 
 async function bootstrap() {
-  if (!cachedServer) {
+  if (!app) {
     const expressApp = express();
-    const app = await NestFactory.create(
+    const nestApp = await NestFactory.create(
       AppModule,
       new ExpressAdapter(expressApp),
     );
 
-    app.enableCors({
+    nestApp.enableCors({
       origin: true,
       credentials: true,
     });
-    app.setGlobalPrefix('api');
+    nestApp.setGlobalPrefix('api');
 
     // 配置中间件
-    app.use(express.json({ limit: '50mb' }));
-    app.use(express.urlencoded({ limit: '50mb', extended: true }));
+    nestApp.use(express.json({ limit: '50mb' }));
+    nestApp.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-    await app.init();
+    await nestApp.init();
 
-    cachedServer = expressApp as any;
+    app = expressApp;
   }
 
-  return cachedServer;
+  return app;
 }
 
 // Vercel Serverless Function 导出
-export default async (req: any, res: any) => {
-  const app = await bootstrap();
-  app(req, res);
-};
+export default async function handler(req: any, res: any) {
+  const expressApp = await bootstrap();
+  expressApp(req, res);
+}
