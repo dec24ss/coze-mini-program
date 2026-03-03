@@ -1,6 +1,7 @@
 import { View, Text, Input, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState } from 'react'
+import { Network } from '@/network'
 import './index.css'
 
 interface UserProfileModalProps {
@@ -32,24 +33,34 @@ export default function UserProfileModal({
     Taro.showLoading({ title: '上传头像...' })
 
     try {
-      // 使用腾讯云存储上传文件
-      const result = await Taro.cloud.uploadFile({
-        cloudPath: `avatars/${Date.now()}.jpg`,
-        filePath: selectedAvatarUrl
+      // 使用 Network.uploadFile 上传文件
+      const response = await Network.uploadFile({
+        url: '/api/users/upload-avatar',
+        filePath: selectedAvatarUrl,
+        name: 'file',
+        formData: {
+          openid: Taro.getStorageSync('openid'),
+          fileName: 'avatar.jpg'
+        }
       })
 
-      console.log('头像上传响应:', result)
+      console.log('头像上传响应:', response)
 
-      if (result.fileID) {
-        // 使用腾讯云存储的文件 ID
-        setAvatarUrl(result.fileID)
-        console.log('头像上传成功，云存储 ID:', result.fileID)
-        Taro.showToast({
-          title: '头像上传成功',
-          icon: 'success'
-        })
+      if (response.data) {
+        const result = JSON.parse(response.data)
+        if (result.code === 200 && result.data?.avatarUrl) {
+          // 使用后端返回的对象存储 URL
+          setAvatarUrl(result.data.avatarUrl)
+          console.log('头像上传成功，对象存储 URL:', result.data.avatarUrl)
+          Taro.showToast({
+            title: '头像上传成功',
+            icon: 'success'
+          })
+        } else {
+          throw new Error(result.msg || '上传失败')
+        }
       } else {
-        throw new Error('上传失败：未返回文件 ID')
+        throw new Error('上传失败')
       }
     } catch (error) {
       console.error('上传头像失败:', error)

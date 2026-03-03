@@ -8,20 +8,6 @@ export default ({ children }: PropsWithChildren<any>) => {
   useLaunch(() => {
     enableWxDebugIfNeeded();
     injectH5Styles();
-
-    // 初始化腾讯云开发环境
-    // 🔴 部署后需要替换为你的腾讯云环境 ID
-    if (Taro.getEnv() === Taro.ENV_TYPE.WEAPP) {
-      try {
-        Taro.cloud.init({
-          env: 'cloudbase-8g1wqiy0823dea4a',  // 腾讯云环境 ID
-          traceUser: true
-        })
-        console.log('腾讯云开发环境初始化成功')
-      } catch (error) {
-        console.error('腾讯云开发环境初始化失败:', error)
-      }
-    }
   });
 
   return children;

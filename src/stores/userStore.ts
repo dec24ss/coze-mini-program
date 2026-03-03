@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import Taro from '@tarojs/taro'
 import { Network } from '@/network'
-import { callCloudFunction, CLOUD_FUNCTIONS } from '@/config/api'
 
 // 用户信息
 export interface UserInfo {
@@ -82,59 +81,55 @@ export const useUserStore = create<UserState>((set, get) => ({
       if (loginRes.code) {
         console.log('微信登录成功，code:', loginRes.code)
 
-        console.log('调用云函数:', CLOUD_FUNCTIONS.LOGIN)
-
-        // 调用腾讯云函数
-        const cloudRes = await callCloudFunction(CLOUD_FUNCTIONS.LOGIN, {
-          openid: loginRes.code,
-          nickname: userNickname,
-          avatar_url: userAvatarUrl
+        // 调用后端登录 API
+        const response = await Network.request({
+          url: '/api/users/login',
+          method: 'POST',
+          data: {
+            openid: loginRes.code,
+            nickname: userNickname,
+            avatar_url: userAvatarUrl
+          }
         })
 
-        console.log('云函数响应:', cloudRes)
+        console.log('后端响应:', response)
+        console.log('响应状态码:', response.statusCode)
+        console.log('响应数据:', response.data)
 
-        // 检查云函数调用结果
-        if (!cloudRes.result) {
-          throw new Error('云函数调用失败：未返回结果')
+        if (response.data?.data) {
+          const apiUser = response.data.data
+          const userInfo: UserInfo = {
+            openid: apiUser.openid,
+            nickname: apiUser.nickname || '拼图玩家',
+            avatarUrl: apiUser.avatar_url || '',
+            highestLevel: apiUser.highest_level || 0,
+            points: apiUser.points || 0
+          }
+
+          // 从本地存储读取关卡图片映射（本地缓存）
+          const savedLevelImages = Taro.getStorageSync('levelImages')
+          const levelImages = savedLevelImages ? JSON.parse(savedLevelImages) : {}
+
+          // 从本地存储读取解锁的关卡（优先使用本地数据，确保游戏进度不会丢失）
+          const savedUnlockedLevels = Taro.getStorageSync('unlockedLevels')
+          const unlockedLevels = savedUnlockedLevels ? Math.max(parseInt(savedUnlockedLevels), 1) : 1
+
+          // 保存 openid 到本地存储
+          Taro.setStorageSync('openid', apiUser.openid)
+
+          set({
+            userInfo,
+            isLoggedIn: true,
+            isLoading: false,
+            unlockedLevels,
+            levelImages
+          })
+
+          console.log('用户登录成功:', userInfo)
+          console.log('已加载关卡图片映射:', Object.keys(levelImages).length, '个关卡')
+        } else {
+          throw new Error('登录失败：服务器返回数据格式错误')
         }
-
-        const { code, msg, data } = cloudRes.result
-
-        if (code !== 200) {
-          console.error('云函数返回错误:', code, msg)
-          throw new Error(`登录失败: ${msg || '未知错误'}`)
-        }
-
-        const apiUser = data
-        const userInfo: UserInfo = {
-          openid: apiUser.openid,
-          nickname: apiUser.nickname || '拼图玩家',
-          avatarUrl: apiUser.avatar_url || '',
-          highestLevel: apiUser.highest_level || 0,
-          points: apiUser.points || 0
-        }
-
-        // 从本地存储读取关卡图片映射（本地缓存）
-        const savedLevelImages = Taro.getStorageSync('levelImages')
-        const levelImages = savedLevelImages ? JSON.parse(savedLevelImages) : {}
-
-        // 从本地存储读取解锁的关卡（优先使用本地数据，确保游戏进度不会丢失）
-        const savedUnlockedLevels = Taro.getStorageSync('unlockedLevels')
-        const unlockedLevels = savedUnlockedLevels ? Math.max(parseInt(savedUnlockedLevels), 1) : 1
-
-        // 保存 openid 到本地存储
-        Taro.setStorageSync('openid', apiUser.openid)
-
-        set({
-          userInfo,
-          isLoggedIn: true,
-          isLoading: false,
-          unlockedLevels,
-          levelImages
-        })
-
-        console.log('用户登录成功:', userInfo)
-        console.log('已加载关卡图片映射:', Object.keys(levelImages).length, '个关卡')
       } else {
         throw new Error('登录失败：未获取到微信登录 code')
       }
@@ -168,7 +163,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     // 同步更新到后端
     try {
       await Network.request({
-        url: API_ENDPOINTS.UPDATE_USER_INFO,
+        url: '/api/users/update',
         method: 'POST',
         data: {
           openid: userInfo.openid,
@@ -237,7 +232,7 @@ export const useUserStore = create<UserState>((set, get) => ({
       // 同步更新到后端数据库
       try {
         await Network.request({
-          url: API_ENDPOINTS.UPDATE_HIGHEST_LEVEL,
+          url: '/api/users/update-level',
           method: 'POST',
           data: {
             openid: userInfo.openid,
@@ -260,9 +255,8 @@ export const useUserStore = create<UserState>((set, get) => ({
   // 获取排行榜（从 Supabase 获取真实数据）
   fetchRankList: async () => {
     try {
-      const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
       const response = await Network.request({
-        url: API_ENDPOINTS.GET_RANK_LIST,
+        url: '/api/users/rank/list',
         method: 'GET'
       })
 
@@ -333,7 +327,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     // 同步更新到后端数据库
     try {
       await Network.request({
-        url: API_ENDPOINTS.ADD_POINTS,
+        url: '/api/users/add-points',
         method: 'POST',
         data: {
           openid: userInfo.openid,
@@ -370,9 +364,8 @@ export const useUserStore = create<UserState>((set, get) => ({
 
     // 同步更新到后端数据库
     try {
-      const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
       await Network.request({
-        url: API_ENDPOINTS.CONSUME_POINTS,
+        url: '/api/users/consume-points',
         method: 'POST',
         data: {
           openid: userInfo.openid,

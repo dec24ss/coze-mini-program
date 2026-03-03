@@ -1,453 +1,687 @@
-# 拼图小游戏 - 扣子编程 + 腾讯云开发版本
+# Coze Mini Program
 
-一个基于 Taro + React + TypeScript 开发的拼图小游戏，在扣子编程环境中开发，使用腾讯云开发（云函数 + 云数据库 + 云存储）实现后端功能。
+这是一个基于 [Taro 4](https://docs.taro.zone/docs/) + [Nest.js](https://nestjs.com/) 的前后端分离项目，由扣子编程 CLI 创建。
 
----
+## 技术栈
 
-## 🎯 部署方式
+- **整体框架**: Taro 4.1.9
+- **语言**: TypeScript 5.4.5
+- **渲染**: React 18.0.0
+- **样式**: TailwindCSS 4.1.18
+- **Tailwind 适配层**: weapp-tailwindcss 4.9.2
+- **状态管理**: Zustand 5.0.9
+- **图标库**: lucide-react 0.511.0
+- **工程化**: Vite 4.2.0
+- **包管理**: pnpm
+- **运行时**: Node.js >= 18
+- **服务端**: NestJS 10.4.15
+- **数据库 ORM**: Drizzle ORM 0.45.1
+- **类型校验**: Zod 4.3.5
 
-**扣子编程**（开发环境）：
-- 代码编辑和管理
-- 项目编译和构建
-
-**腾讯云开发**（后端服务）：
-- 云函数（业务逻辑）
-- 云数据库（数据存储）
-- 云存储（文件存储）
-
-**微信小程序**（运行环境）：
-- 用户交互界面
-
----
-
-## 🚀 快速开始（15 分钟）
-
-- **跨端支持**：同时支持微信小程序和 H5
-- **云开发集成**：使用腾讯云开发（云函数 + 云数据库 + 云存储）
-- **排行榜功能**：实时查看玩家排名
-- **积分系统**：完成游戏获得积分，积分可兑换道具
-- **关卡系统**：多个难度关卡，循序渐进
-- **用户系统**：支持用户登录、头像上传、昵称设置
-
----
-
-## 🚀 技术栈
-
-### 前端
-
-- **框架**：Taro 4.1.9
-- **语言**：TypeScript 5.4.5
-- **UI 库**：React 18.0.0
-- **样式**：TailwindCSS 4.1.18 + weapp-tailwindcss 4.9.2
-- **状态管理**：Zustand 5.0.9
-- **图标库**：lucide-react-taro 1.2.0
-- **构建工具**：Vite 4.2.0
-
-### 后端
-
-- **云服务**：腾讯云开发
-- **云函数**：Node.js 16.13
-- **云数据库**：NoSQL 文档数据库
-- **云存储**：对象存储服务
-
----
-
-## 📦 项目结构
+## 项目结构
 
 ```
-├── cloudfunctions/          # 云函数目录
-│   ├── login/               # 登录云函数
-│   ├── updateUserInfo/      # 更新用户信息
-│   ├── updateHighestLevel/  # 更新最高关卡
-│   ├── getRankList/         # 获取排行榜
-│   ├── addPoints/           # 添加积分
-│   └── consumePoints/       # 消耗积分
-├── config/                  # Taro 构建配置
-├── src/                     # 前端源码
-│   ├── pages/               # 页面组件
-│   │   ├── index/           # 首页
-│   │   ├── game/            # 游戏页
-│   │   ├── level-select/    # 关卡选择
-│   │   └── leaderboard/     # 排行榜
-│   ├── components/          # 公共组件
-│   │   └── user-profile-modal/  # 用户信息弹窗
-│   ├── stores/              # 状态管理
-│   │   ├── userStore.ts     # 用户状态
-│   │   └── gameStore.ts     # 游戏状态
-│   ├── config/              # 配置文件
-│   │   └── api.ts           # API 配置
-│   ├── utils/               # 工具函数
-│   │   ├── h5-styles.ts     # H5 样式工具
-│   │   └── wx-debug.ts      # 微信调试工具
-│   ├── app.ts               # 应用入口
-│   ├── app.config.ts        # 应用配置
-│   └── app.css              # 全局样式
-├── dist/                    # 编译输出（小程序）
-├── dist-web/                # 编译输出（H5）
-├── project.config.json      # 微信小程序配置
-├── cloudbaserc.json         # 腾讯云开发配置
-└── package.json             # 项目依赖
+├── .cozeproj/                # Coze 平台配置
+│   └── scripts/              # 构建和运行脚本
+├── config/                   # Taro 构建配置
+│   ├── index.ts              # 主配置文件
+│   ├── dev.ts                # 开发环境配置
+│   └── prod.ts               # 生产环境配置
+├── server/                   # NestJS 后端服务
+│   └── src/  
+│       ├── main.ts           # 服务入口
+│       ├── app.module.ts     # 根模块
+│       ├── app.controller.ts # 应用控制器
+│       └── app.service.ts    # 应用服务
+├── src/                      # 前端源码
+│   ├── pages/                # 页面组件
+│   ├── utils/                # 工具函数
+│   ├── app.ts                # 应用入口
+│   ├── app.config.ts         # 应用配置
+│   └── app.css               # 全局样式
+├── types/                    # TypeScript 类型定义
+├── key/                      # 小程序密钥（CI 上传用）
+├── .env.local                # 环境变量
+└── project.config.json       # 微信小程序项目配置
 ```
 
----
-
-## 🎯 功能模块
-
-### 1. 用户系统
-
-- 用户登录（微信授权）
-- 用户信息管理（昵称、头像）
-- 用户数据持久化（云数据库）
-
-### 2. 游戏系统
-
-- 关卡选择（简单、普通、困难）
-- 拼图游戏核心逻辑
-- 移动动画效果
-- 完成检测
-
-### 3. 排行榜系统
-
-- 实时排行榜
-- 按最高关卡和积分排序
-- 排名展示
-
-### 4. 积分系统
-
-- 完成关卡获得积分
-- 积分兑换道具
-- 积分记录
-
----
-
-### 快速开始（扣子编程 + 腾讯云）
-
-在扣子编程终端中执行：
-
-```bash
-# 1. 安装依赖
-pnpm install
-
-# 2. 编译小程序
-pnpm build:weapp
-
-# 3. 下载 dist 和 cloudfunctions 目录到本地
-
-# 4. 用微信开发者工具打开项目
-
-# 5. 配置腾讯云开发并上传云函数
-```
-
-详见：`COZE_QUICK_START.md`（15 分钟快速部署）
-
-### 标准部署（本地开发）
-
-### 环境要求
-
-- Node.js >= 18
-- pnpm >= 9.0.0
-- 微信开发者工具（小程序开发）
+## 快速开始
 
 ### 安装依赖
 
 ```bash
-# 克隆项目
-git clone https://github.com/dec24ss/coze-mini-program.git
-
-# 进入项目目录
-cd coze-mini-program
-
-# 安装依赖
 pnpm install
 ```
 
-### 开发模式
+### 本地开发
+
+同时启动 H5 前端和 NestJS 后端：
 
 ```bash
-# 启动 H5 开发模式
-pnpm dev:web
-
-# 启动小程序开发模式
-pnpm dev:weapp
+pnpm dev
 ```
 
-### 编译构建
+- 前端地址：http://localhost:5000
+- 后端地址：http://localhost:3000
+
+单独启动：
 
 ```bash
-# 编译小程序
-pnpm build:weapp
-
-# 编译 H5
-pnpm build:web
-
-# 编译所有
-pnpm build
+pnpm dev:web      # 仅 H5 前端
+pnpm dev:weapp    # 仅微信小程序
+pnpm dev:server   # 仅后端服务
 ```
 
----
+### 构建
 
-### 云函数（腾讯云开发）
+```bash
+pnpm build        # 构建所有（H5 + 小程序 + 后端）
+pnpm build:web    # 仅构建 H5，输出到 dist-web
+pnpm build:weapp  # 仅构建微信小程序，输出到 dist
+pnpm build:server # 仅构建后端
+```
 
-| 云函数 | 说明 | 参数 | 返回 |
-|--------|------|------|------|
-| `login` | 用户登录 | `openid`, `nickname`, `avatar_url` | 用户信息 |
-| `updateUserInfo` | 更新用户信息 | `openid`, `nickname`, `avatar_url` | 更新结果 |
-| `updateHighestLevel` | 更新最高关卡 | `openid`, `level` | 更新结果 |
-| `getRankList` | 获取排行榜 | `limit` | 排行榜列表 |
-| `addPoints` | 添加积分 | `openid`, `points` | 积分变更 |
-| `consumePoints` | 消耗积分 | `openid`, `points` | 积分变更 |
+### 预览小程序
 
-### 数据库（腾讯云开发）
+```bash
+pnpm preview:weapp # 构建并生成预览小程序二维码
+```
 
-**集合名称**：`users`
+## 前端核心开发规范
 
-**字段结构**：
+### 新建页面流程
 
-```json
-{
-  "_id": "自动生成",
-  "openid": "用户唯一标识",
-  "nickname": "用户昵称",
-  "avatar_url": "头像 URL",
-  "highest_level": 0,
-  "points": 0,
-  "created_at": "创建时间",
-  "updated_at": "更新时间"
+1. 在 \`src/pages/\` 下创建页面目录
+2. 创建 \`index.tsx\`（页面组件）
+3. 创建 \`index.config.ts\`（页面配置）
+4. 创建 \`index.css\`（页面样式，可选）
+5. 在 \`src/app.config.ts\` 的 \`pages\` 数组中注册页面路径
+
+或使用 Taro 脚手架命令：
+
+```bash
+pnpm new      # 交互式创建页面/组件
+```
+
+### 常用 Taro 组件
+
+引入方式
+
+```typescript
+import { Text } from '@tarojs/components'
+```
+- 基础组件
+  - Text
+  - Icon
+  - Progress
+  - RichText
+- 表单组件
+  - Button
+  - Checkbox
+  - CheckboxGroup
+  - Editor
+  - Form
+  - Input
+  - Label
+  - Picker
+  - PickerView
+  - PickerViewColumn
+  - Radio
+  - RadioGroup
+  - Slider
+  - Switch
+  - Textarea
+- 导航组件
+  - FunctionalPageNavigator
+  - NavigationBar
+  - Navigator
+  - TabItem
+  - Tabs
+- 媒体组件
+  - Camera
+  - Image
+  - Video
+- 视图容器
+  - ScrollView
+  - Swiper
+  - SwiperItem
+  - View
+
+### 路径别名
+
+项目配置了 `@/*` 路径别名指向 `src/*`：
+
+```typescript
+import { SomeComponent } from '@/components/SomeComponent'
+import { useUserStore } from '@/stores/user'
+```
+
+### 代码模板
+
+#### 页面组件 (TypeScript + React)
+
+```tsx
+// src/pages/example/index.tsx
+import { View, Text } from '@tarojs/components'
+import { useLoad, useDidShow } from '@tarojs/taro'
+import type { FC } from 'react'
+import './index.css'
+
+const ExamplePage: FC = () => {
+  useLoad(() => {
+    console.log('Page loaded.')
+  })
+
+  useDidShow(() => {
+    console.log('Page showed.')
+  })
+
+  return (
+    <View className="flex flex-col items-center p-4">
+      <Text className="text-lg font-bold">Hello Taro!</Text>
+    </View>
+  )
+}
+
+export default ExamplePage
+```
+
+#### 页面配置
+
+```typescript
+// src/pages/example/index.config.ts
+import { definePageConfig } from '@tarojs/taro'
+
+export default definePageConfig({
+  navigationBarTitleText: '示例页面',
+  enablePullDownRefresh: true,
+  backgroundTextStyle: 'dark',
+})
+```
+
+#### 应用配置
+
+```typescript
+// src/app.config.ts
+import { defineAppConfig } from '@tarojs/taro'
+
+export default defineAppConfig({
+  pages: [
+    'pages/index/index',
+    'pages/example/index',
+  ],
+  window: {
+    backgroundTextStyle: 'light',
+    navigationBarBackgroundColor: '#fff',
+    navigationBarTitleText: 'App',
+    navigationBarTextStyle: 'black',
+  },
+  // TabBar 配置 (可选)
+  // tabBar: {
+  //   list: [
+  //     { pagePath: 'pages/index/index', text: '首页' },
+  //   ],
+  // },
+})
+```
+
+### 发送请求
+
+**IMPORTANT: 禁止直接使用 Taro.request、Taro.uploadFile、Taro.downloadFile，使用 Network.request、Network.uploadFile、Network.downloadFile 替代。**
+
+Network 是对 Taro.request、Taro.uploadFile、Taro.downloadFile 的封装，自动添加项目域名前缀，参数与 Taro 一致。
+
+✅ 正确使用方式
+
+```typescript
+import { Network } from '@/network'
+
+// GET 请求
+const data = await Network.request({ 
+  url: '/api/hello' 
+})
+
+// POST 请求
+const result = await Network.request({
+  url: '/api/user/login',
+  method: 'POST',
+  data: { username, password }
+})
+
+// 文件上传
+await Network.uploadFile({
+  url: '/api/upload',
+  filePath: tempFilePath,
+  name: 'file'
+})
+
+// 文件下载
+await Network.downloadFile({
+  url: '/api/download/file.pdf'
+})
+```
+
+❌ 错误用法
+
+```typescript
+import Taro from '@tarojs/taro'
+
+// ❌ 会导致自动域名拼接无法生效，除非是特殊指定域名
+const data = await Network.request({ 
+  url: 'http://localhost/api/hello' 
+})
+
+// ❌ 不要直接使用 Taro.request
+await Taro.request({ url: '/api/hello' })
+
+// ❌ 不要直接使用 Taro.uploadFile
+await Taro.uploadFile({ url: '/api/upload', filePath, name: 'file' })
+```
+
+### Zustand 状态管理
+
+```typescript
+// src/stores/user.ts
+import { create } from 'zustand'
+
+interface UserState {
+  userInfo: UserInfo | null
+  token: string
+  setUserInfo: (info: UserInfo) => void
+  setToken: (token: string) => void
+  logout: () => void
+}
+
+interface UserInfo {
+  id: string
+  name: string
+  avatar: string
+}
+
+export const useUserStore = create<UserState>((set) => ({
+  userInfo: null,
+  token: '',
+  setUserInfo: (info) => set({ userInfo: info }),
+  setToken: (token) => set({ token }),
+  logout: () => set({ userInfo: null, token: '' }),
+}))
+```
+
+### Taro 生命周期 Hooks
+
+```typescript
+import {
+  useLoad,             // 页面加载 (onLoad)
+  useReady,            // 页面初次渲染完成 (onReady)
+  useDidShow,          // 页面显示 (onShow)
+  useDidHide,          // 页面隐藏 (onHide)
+  usePullDownRefresh,  // 下拉刷新 (onPullDownRefresh)
+  useReachBottom,      // 触底加载 (onReachBottom)
+  useShareAppMessage,  // 分享 (onShareAppMessage)
+  useRouter,           // 获取路由参数
+} from '@tarojs/taro'
+```
+
+### 路由导航
+
+```typescript
+import Taro from '@tarojs/taro'
+
+// 保留当前页面，跳转到新页面
+Taro.navigateTo({ url: '/pages/detail/index?id=1' })
+
+// 关闭当前页面，跳转到新页面
+Taro.redirectTo({ url: '/pages/detail/index' })
+
+// 跳转到 tabBar 页面
+Taro.switchTab({ url: '/pages/index/index' })
+
+// 返回上一页
+Taro.navigateBack({ delta: 1 })
+
+// 获取路由参数
+const router = useRouter()
+const { id } = router.params
+```
+
+### 图标使用 (lucide-react)
+
+项目集成了 [lucide-react](https://lucide.dev/) 图标库，提供丰富的 SVG 图标：
+
+```tsx
+import { View } from '@tarojs/components'
+import { Home, Settings, User, Search, Heart, Star } from 'lucide-react'
+
+const IconDemo = () => {
+  return (
+    <View className="flex gap-4">
+      <Home size={24} color="#333" />
+      <Settings size={24} className="text-blue-500" />
+      <User size={20} strokeWidth={1.5} />
+      <Search size={24} />
+      <Heart size={24} fill="red" color="red" />
+      <Star size={24} className="text-yellow-500" />
+    </View>
+  )
 }
 ```
 
-### 存储（腾讯云开发）
+常用属性：
+- `size` - 图标大小（默认 24）
+- `color` - 图标颜色
+- `strokeWidth` - 线条粗细（默认 2）
+- `className` - 支持 Tailwind 类名
 
-**目录名称**：`avatars`
+更多图标请访问：https://lucide.dev/icons
 
----
+### Tailwind CSS 样式开发
 
-## 📚 文档
+IMPORTANT：必须使用 tailwindcss 实现样式，只有在必要情况下才能 fallback 到 css / less
 
-| 文档 | 说明 |
-|------|------|
-| `COZE_QUICK_START.md` | 扣子编程快速部署指南（推荐，15 分钟） |
-| `COZE_CLOUD_DEPLOYMENT.md` | 扣子编程详细部署指南 |
-| `COZE_DEPLOYMENT_SUMMARY.md` | 扣子编程部署总结 |
-| `PROJECT_EXPORT_GUIDE.md` | 项目导出和部署指南 |
-| `PROJECT_CHECKLIST.md` | 项目检查清单 |
-| `README.md` | 项目说明文档 |
+> 项目已集成 Tailwind CSS 4.x + weapp-tailwindcss，支持跨端原子化样式：
 
----
+```tsx
+<View className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+  <Text className="text-2xl font-bold text-blue-600 mb-4">标题</Text>
+  <View className="w-full px-4">
+    <Button className="w-full bg-blue-500 text-white rounded-lg py-3">
+      按钮
+    </Button>
+  </View>
+</View>
+```
 
-## 🔄 日常开发流程（扣子编程）
+### 性能优化
 
-1. 在扣子编程中修改 `src/` 目录下的代码
-2. 重新编译：`pnpm build:weapp`
-3. 下载 `dist` 目录到本地
-4. 刷新微信开发者工具
-5. 测试功能
+#### 图片懒加载
 
----
+```tsx
+import { Image } from '@tarojs/components'
 
-## 📱 微信小程序部署（腾讯云开发）
+<Image src={imageUrl} lazyLoad mode="aspectFill" />
+```
 
-### 环境 ID
+#### 虚拟列表
 
-**环境 ID**：`cloudbase-8g1wqiy0823dea4a`
+```tsx
+import { VirtualList } from '@tarojs/components'
 
-### 云函数
+<VirtualList
+  height={500}
+  itemData={list}
+  itemCount={list.length}
+  itemSize={100}
+  renderItem={({ index, style, data }) => (
+    <View style={style}>{data[index].name}</View>
+  )}
+/>
+```
 
-| 云函数 | 说明 | 参数 |
-|--------|------|------|
-| `login` | 用户登录 | `openid`, `nickname`, `avatar_url` |
-| `updateUserInfo` | 更新用户信息 | `openid`, `nickname`, `avatar_url` |
-| `updateHighestLevel` | 更新最高关卡 | `openid`, `level` |
-| `getRankList` | 获取排行榜 | `limit` |
-| `addPoints` | 添加积分 | `openid`, `points` |
-| `consumePoints` | 消耗积分 | `openid`, `points` |
+#### 分包加载
 
-### 数据库
+```typescript
+// src/app.config.ts
+export default defineAppConfig({
+  pages: ['pages/index/index'],
+  subPackages: [
+    {
+      root: 'packageA',
+      pages: ['pages/detail/index'],
+    },
+  ],
+})
+```
 
-**集合名称**：`users`
+### 小程序限制
 
-**字段结构**：
+| 限制项   | 说明                                     |
+| -------- | ---------------------------------------- |
+| 主包体积 | ≤ 2MB                                    |
+| 总包体积 | ≤ 20MB                                   |
+| 域名配置 | 生产环境需在小程序后台配置合法域名       |
+| 本地开发 | 需在微信开发者工具开启「不校验合法域名」 |
 
-```json
-{
-  "_id": "自动生成",
-  "openid": "用户唯一标识",
-  "nickname": "用户昵称",
-  "avatar_url": "头像 URL",
-  "highest_level": 0,
-  "points": 0,
-  "created_at": "创建时间",
-  "updated_at": "更新时间"
+### 权限配置
+
+```typescript
+// src/app.config.ts
+export default defineAppConfig({
+  // ...其他配置
+  permission: {
+    'scope.userLocation': {
+      desc: '你的位置信息将用于小程序位置接口的效果展示'
+    }
+  },
+  requiredPrivateInfos: ['getLocation', 'chooseAddress']
+})
+```
+
+### 位置服务
+
+```typescript
+// 需先在 app.config.ts 中配置 permission
+async function getLocation(): Promise<Taro.getLocation.SuccessCallbackResult> {
+  return await Taro.getLocation({ type: 'gcj02' })
 }
 ```
 
-### 存储
+## 后端核心开发规范
 
-**目录名称**：`avatars`
+本项目后端基于 NestJS + TypeScript 构建，提供高效、可扩展的服务端能力。
 
----
+### 项目结构
 
-## 📱 微信小程序部署
-
-### 1. 编译小程序
-
-```bash
-pnpm build:weapp
+```sh
+.
+├── server/                   # NestJS 后端服务
+│   └── src/
+│       ├── main.ts           # 服务入口
+│       ├── app.module.ts     # 根模块
+│       ├── app.controller.ts # 根控制器
+│       └── app.service.ts    # 根服务
 ```
 
-### 2. 用微信开发者工具打开
+### 开发命令
 
-1. 打开微信开发者工具
-2. 导入项目
-3. 选择项目根目录（`coze-mini-program`）
-4. 填写 AppID
-5. 点击导入
+```sh
+pnpm dev:server // 启动开发服务 (热重载, 默认端口 3000)
+pnpm build:server // 构建生产版本
+```
 
-### 3. 关联云开发环境
+### 新建模块流程 (CLI)
 
-1. 点击顶部菜单 "云开发"
-2. 点击 "开通"
-3. 选择环境：`cloudbase-8g1wqiy0823dea4a`
-4. 点击 "确定"
+快速生成样板代码：
 
-### 4. 上传云函数
+```bash
+cd server
 
-在微信开发者工具中：
+# 生成完整的 CRUD 资源 (包含 Module, Controller, Service, DTO, Entity)
+npx nest g resource modules/product
 
-1. 右键 `cloudfunctions` 目录
-2. 选择 "新建 Node.js 云函数"
-3. 输入云函数名称
-4. 复制对应的云函数代码
-5. 保存文件
-6. 右键云函数文件夹
-7. 选择 "上传并部署：云端安装依赖"
+# 仅生成特定部分
+npx nest g module modules/order
+npx nest g controller modules/order
+npx nest g service modules/order
+```
 
-### 5. 创建数据库和存储
+### 环境变量配置
 
-在腾讯云控制台中：
+在 server/ 根目录创建 .env 文件：
 
-1. 创建数据库集合 `users`，权限：所有用户可读写
-2. 创建存储目录 `avatars`
+```sh
+## 服务端口
+PORT=3000
 
-### 6. 测试功能
+## 微信小程序配置
+WX_APP_ID=你的AppID
+WX_APP_SECRET=你的AppSecret
 
-在微信开发者工具控制台测试：
+## JWT 密钥
+JWT_SECRET=your-super-secret-key
+```
 
-```javascript
-// 测试登录
-wx.cloud.callFunction({
-  name: 'login',
-  data: {
-    openid: 'test_001',
-    nickname: '测试用户',
-    avatar_url: ''
+在代码中使用 @nestjs/config 读取环境变量：
+
+```typescript
+import { ConfigService } from '@nestjs/config';
+
+// 在 Service 中注入
+constructor(private configService: ConfigService) {}
+
+getWxConfig() {
+  return {
+    appId: this.configService.get<string>('WX_APP_ID'),
+    secret: this.configService.get<string>('WX_APP_SECRET'),
+  };
+}
+```
+
+### 标准响应封装
+
+建议使用拦截器 (Interceptor) 统一 API 响应格式：
+
+```typeScript
+// src/common/interceptors/transform.interceptor.ts
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+export interface Response<T> {
+  code: number;
+  data: T;
+  message: string;
+}
+
+@Injectable()
+export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
+    return next.handle().pipe(
+      map((data) => ({
+        code: 200,
+        data,
+        message: 'success',
+      })),
+    );
   }
-}).then(res => {
-  console.log('✅ 登录成功:', res.result)
-})
-
-// 测试排行榜
-wx.cloud.callFunction({
-  name: 'getRankList',
-  data: { limit: 10 }
-}).then(res => {
-  console.log('✅ 排行榜数据:', res.result)
-})
+}
 ```
 
----
+在 main.ts 中全局注册：
 
-## 📚 详细文档
-
-| 文档 | 说明 |
-|------|------|
-| `PROJECT_EXPORT_GUIDE.md` | 项目导出和部署指南 |
-| `PROJECT_CHECKLIST.md` | 项目检查清单 |
-| `CLOUD_SETUP_GUIDE.md` | 云开发配置详细步骤 |
-| `QUICK_START.md` | 快速部署指南 |
-| `TENCENT_CLOUD_DEPLOYMENT.md` | 腾讯云官方文档风格 |
-
----
-
-## 🔧 开发规范
-
-### 代码风格
-
-- 使用 TypeScript 进行类型检查
-- 使用 ESLint 进行代码检查
-- 遵循 React Hooks 规范
-- 使用 TailwindCSS 进行样式开发
-
-### 命名规范
-
-- 文件名：kebab-case（如 `user-profile.tsx`）
-- 组件名：PascalCase（如 `UserProfile`）
-- 变量/函数：camelCase（如 `getUserInfo`）
-- 常量：UPPER_SNAKE_CASE（如 `API_BASE_URL`）
-
-### 提交规范
-
-```bash
-feat: 新功能
-fix: 修复 bug
-style: 样式调整
-docs: 文档更新
-refactor: 代码重构
-test: 测试相关
-chore: 构建/工具相关
+```typescript
+app.useGlobalInterceptors(new TransformInterceptor());
 ```
 
----
+### 微信登录后端实现
 
-## 🆘 常见问题
+```typescript
+// src/modules/auth/auth.service.ts
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+import { lastValueFrom } from 'rxjs';
 
-### 问题 1：编译失败
+@Injectable()
+export class AuthService {
+  constructor(
+    private httpService: HttpService,
+    private configService: ConfigService,
+  ) {}
 
-**解决方案**：
-```bash
-# 清理缓存
-rm -rf node_modules pnpm-lock.yaml
+  async code2Session(code: string) {
+    const appId = this.configService.get('WX_APP_ID');
+    const secret = this.configService.get('WX_APP_SECRET');
+    const url = `https://api.weixin.qq.com/sns/jscode2session?appid=${appId}&secret=${secret}&js_code=${code}&grant_type=authorization_code`;
 
-# 重新安装
-pnpm install
+    const { data } = await lastValueFrom(this.httpService.get(url));
 
-# 重新编译
-pnpm build:weapp
+    if (data.errcode) {
+      throw new UnauthorizedException(`微信登录失败: ${data.errmsg}`);
+    }
+
+    return data; // 包含 openid, session_key
+  }
+}
 ```
 
-### 问题 2：云函数调用失败
+### 异常处理
 
-**解决方案**：
-1. 检查云开发环境是否已关联
-2. 检查云函数是否已上传
-3. 检查环境 ID 是否正确
+使用全局异常过滤器 (Filter) 统一错误响应：
 
-### 问题 3：数据库操作失败
+```typescript
+// src/common/filters/http-exception.filter.ts
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
+import { Response } from 'express';
 
-**解决方案**：
-1. 检查数据库集合是否已创建
-2. 检查权限是否设置为"所有用户可读写"
-3. 查看云函数日志
+@Catch(HttpException)
+export class HttpExceptionFilter implements ExceptionFilter {
+  catch(exception: HttpException, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const status = exception.getStatus();
+    const exceptionResponse = exception.getResponse();
 
----
+    response.status(status).json({
+      code: status,
+      message: typeof exceptionResponse === 'string' ? exceptionResponse : (exceptionResponse as any).message,
+      data: null,
+    });
+  }
+}
+```
 
-## 📄 许可证
+在 main.ts 中注册：
 
-MIT License
+```
+app.useGlobalFilters(new HttpExceptionFilter());
+```
 
----
+### 数据库 (Drizzle ORM)
 
-## 🤝 贡献
+推荐使用 [Drizzle ORM](https://orm.drizzle.team/)，已预安装。
 
-欢迎提交 Issue 和 Pull Request！
+### 类型校验 (Zod)
 
----
+项目集成了 [Zod](https://zod.dev/) 用于运行时类型校验。
 
-## 📮 联系方式
+#### 定义 Schema
 
-- 项目地址：https://github.com/dec24ss/coze-mini-program
-- 问题反馈：提交 Issue
+```typescript
+import { z } from 'zod';
 
----
+// 基础类型
+const userSchema = z.object({
+  id: z.number(),
+  name: z.string().min(1).max(50),
+  email: z.string().email(),
+  age: z.number().int().positive().optional(),
+});
 
-**祝你游戏愉快！** 🎮✨
+// 从 schema 推导 TypeScript 类型
+type User = z.infer<typeof userSchema>;
+```
+
+#### 请求校验
+
+```typescript
+// src/modules/user/dto/create-user.dto.ts
+import { z } from 'zod';
+
+export const createUserSchema = z.object({
+  nickname: z.string().min(1, '昵称不能为空').max(20, '昵称最多20个字符'),
+  avatar: z.string().url('头像必须是有效的URL').optional(),
+  phone: z.string().regex(/^1[3-9]\d{9}$/, '手机号格式不正确').optional(),
+});
+
+export type CreateUserDto = z.infer<typeof createUserSchema>;
+
+// 在 Controller 中使用
+@Post()
+create(@Body() body: unknown) {
+  const result = createUserSchema.safeParse(body);
+  if (!result.success) {
+    throw new BadRequestException(result.error.errors);
+  }
+  return this.userService.create(result.data);
+}
+```
