@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import Taro from '@tarojs/taro'
 import { Network } from '@/network'
-import { API_ENDPOINTS } from '@/config/api'
+import { callCloudFunction, CLOUD_FUNCTIONS } from '@/config/api'
 
 // 用户信息
 export interface UserInfo {
@@ -82,51 +82,30 @@ export const useUserStore = create<UserState>((set, get) => ({
       if (loginRes.code) {
         console.log('微信登录成功，code:', loginRes.code)
 
-        console.log('登录 API URL:', API_ENDPOINTS.LOGIN)
+        console.log('调用云函数:', CLOUD_FUNCTIONS.LOGIN)
 
-        // 调用后端登录 API
-        const response = await Network.request({
-          url: API_ENDPOINTS.LOGIN,
-          method: 'POST',
-          data: {
-            openid: loginRes.code,
-            nickname: userNickname,
-            avatar_url: userAvatarUrl
-          }
+        // 调用腾讯云函数
+        const cloudRes = await callCloudFunction(CLOUD_FUNCTIONS.LOGIN, {
+          openid: loginRes.code,
+          nickname: userNickname,
+          avatar_url: userAvatarUrl
         })
 
-        console.log('后端响应:', response)
-        console.log('响应状态码:', response.statusCode)
-        console.log('响应数据:', response.data)
-        console.log('响应数据类型:', typeof response.data)
-        console.log('response.data.data:', response.data?.data)
+        console.log('云函数响应:', cloudRes)
 
-        // 检查 HTTP 状态码
-        if (response.statusCode !== 200) {
-          console.error('HTTP 状态码错误:', response.statusCode)
-          throw new Error(`服务器返回错误: HTTP ${response.statusCode}`)
+        // 检查云函数调用结果
+        if (!cloudRes.result) {
+          throw new Error('云函数调用失败：未返回结果')
         }
 
-        // 检查响应数据格式
-        if (!response.data) {
-          console.error('响应数据为空')
-          throw new Error('登录失败：服务器未返回数据')
+        const { code, msg, data } = cloudRes.result
+
+        if (code !== 200) {
+          console.error('云函数返回错误:', code, msg)
+          throw new Error(`登录失败: ${msg || '未知错误'}`)
         }
 
-        // 检查业务状态码
-        if (response.data.code !== 200) {
-          console.error('业务状态码错误:', response.data.code, response.data.msg)
-          throw new Error(`登录失败: ${response.data.msg || '未知错误'}`)
-        }
-
-        // 检查数据字段
-        if (!response.data.data) {
-          console.error('响应数据中缺少 data 字段')
-          console.error('完整响应:', JSON.stringify(response.data))
-          throw new Error('登录失败：服务器返回数据格式错误')
-        }
-
-        const apiUser = response.data.data
+        const apiUser = data
         const userInfo: UserInfo = {
           openid: apiUser.openid,
           nickname: apiUser.nickname || '拼图玩家',

@@ -1,32 +1,28 @@
-// 后端 API 配置
-// 在 Render 部署成功后，将 RENDER_API_URL 替换为实际的域名
+// 腾讯云开发 API 配置
+// 在腾讯云开发环境中，使用云函数调用方式
 
 const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
 
-// 🔴 部署后请修改这里：将域名替换为你的 Render 域名
-// 例如：https://coze-mini-program-api-abc123.onrender.com
-const RENDER_API_URL = 'https://coze-mini-program-api-xxx.onrender.com'
+// 🔴 部署到腾讯云后，需要在小程序中初始化云开发
+// 在 app.tsx 中添加：
+// Taro.cloud.init({
+//   env: 'your-env-id'
+// })
 
-// 本地开发环境（开发时使用）
-const LOCAL_API_URL = 'http://localhost:3000'
+// 导出云函数调用方式
+export const callCloudFunction = (name: string, data: any) => {
+  return Taro.cloud.callFunction({
+    name,
+    data
+  })
+}
 
-// 根据环境自动选择
-export const API_BASE_URL = isWeapp ? RENDER_API_URL : ''
-
-// 导出所有 API 端点
-export const API_ENDPOINTS = {
-  // 用户相关
-  LOGIN: `${API_BASE_URL}/api/users/login`,
-  UPDATE_USER_INFO: `${API_BASE_URL}/api/users/update`,
-  UPDATE_HIGHEST_LEVEL: `${API_BASE_URL}/api/users/highest-level`,
-  ADD_POINTS: `${API_BASE_URL}/api/users/points/add`,
-  CONSUME_POINTS: `${API_BASE_URL}/api/users/points/consume`,
-  GET_POINTS: `${API_BASE_URL}/api/users/points`,
-  GET_RANK_LIST: `${API_BASE_URL}/api/users/ranklist`,
-
-  // 文件上传
-  UPLOAD_AVATAR: `${API_BASE_URL}/api/users/upload-avatar`,
-
-  // 健康检查
-  HEALTH: `${API_BASE_URL}/api/health`,
+// 导出所有云函数名称
+export const CLOUD_FUNCTIONS = {
+  LOGIN: 'login',
+  UPDATE_USER_INFO: 'updateUserInfo',
+  UPDATE_HIGHEST_LEVEL: 'updateHighestLevel',
+  GET_RANK_LIST: 'getRankList',
+  ADD_POINTS: 'addPoints',
+  CONSUME_POINTS: 'consumePoints'
 }
