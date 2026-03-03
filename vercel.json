@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "name": "coze-mini-program",
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "nodejs20.x",
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  },
+  "env": {
+    "COZE_SUPABASE_URL": "@coze-supabase-url",
+    "COZE_SUPABASE_ANON_KEY": "@coze-supabase-anon-key"
+  }
+}
