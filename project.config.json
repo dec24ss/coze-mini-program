@@ -1,15 +1,25 @@
 {
-  "miniprogramRoot": "./",
+  "miniprogramRoot": "dist/",
   "projectname": "coze-mini-program",
-  "description": "test",
-  "appid": "touristappid",
+  "description": "拼图小游戏 - 腾讯云开发版本",
+  "appid": "your_appid_here",
   "setting": {
-    "urlCheck": true,
-    "es6": false,
-    "enhance": false,
-    "compileHotReLoad": false,
-    "postcss": false,
-    "minified": false
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "compileHotReLoad": true,
+    "postcss": true,
+    "minified": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
   },
-  "compileType": "miniprogram"
+  "compileType": "miniprogram",
+  "libVersion": "2.19.4",
+  "cloudfunctionRoot": "cloudfunctions/",
+  "cloudfunctionTemplateRoot": "cloudfunctionTemplate/",
+  "cloudbaseRoot": "./",
+  "condition": {}
 }

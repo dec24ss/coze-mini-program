@@ -1,329 +1,254 @@
-# 快速部署指南（腾讯云开发环境）
+# 快速开始指南
 
-环境 ID：`db-2gaczaywd186652b`
-
----
-
-## 📋 前置条件
-
-- ✅ 腾讯云开发环境已创建
-- ✅ 环境 ID 已配置
-- ✅ 微信开发者工具已安装
+本指南帮助你在 10 分钟内快速启动项目。
 
 ---
 
-## 🚀 快速部署（5步完成）
+## 🎯 目标
 
-### 步骤 1：关联云开发环境（2分钟）
-
-1. 打开微信开发者工具
-2. 打开你的小程序项目
-3. 点击顶部菜单 **云开发**
-4. 点击 **开通**
-5. 选择环境：`db-2gaczaywd186652b`
-6. 点击 **确定**
+- 克隆项目
+- 安装依赖
+- 编译小程序
+- 用微信开发者工具打开
+- 测试基本功能
 
 ---
 
-### 步骤 2：创建数据库集合（1分钟）
+## ⏱️ 预计时间
 
-1. 打开腾讯云控制台：https://console.cloud.tencent.com/tcb
-2. 选择环境：`db-2gaczaywd186652b`
-3. 进入 **数据库** 标签
-4. 点击 **新建集合**
-5. 集合名称：`users`
-6. 权限设置：**所有用户可读写**
-7. 点击 **确定**
+**总时间**：10 分钟
 
 ---
 
-### 步骤 3：创建存储目录（1分钟）
+## 🚀 快速开始
 
-1. 在腾讯云控制台
-2. 进入 **存储** 标签
-3. 点击 **新建文件夹**
-4. 文件夹名称：`avatars`
-5. 点击 **确定**
+### 步骤 1：克隆项目（2 分钟）
 
----
-
-### 步骤 4：上传云函数（5分钟）
-
-#### 4.1 上传 login 云函数
-
-1. 在微信开发者工具中
-2. 项目根目录右键
-3. 选择 **新建 Node.js 云函数**
-4. 函数名称：`login`
-5. 打开 `cloudfunctions/login/index.js`
-6. 复制以下代码并粘贴：
-
-```javascript
-const cloud = require('wx-server-sdk')
-const db = cloud.database()
-
-cloud.init({
-  env: cloud.DYNAMIC_CURRENT_ENV
-})
-
-exports.main = async (event, context) => {
-  const { openid, nickname, avatar_url } = event
-
-  try {
-    const { data: existingUsers } = await db.collection('users')
-      .where({ openid })
-      .get()
-
-    if (existingUsers.length > 0) {
-      return {
-        code: 200,
-        msg: 'success',
-        data: existingUsers[0]
-      }
-    }
-
-    const newUser = {
-      openid,
-      nickname: nickname || '拼图玩家',
-      avatar_url: avatar_url || '',
-      highest_level: 0,
-      points: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-
-    const { data: createdUser } = await db.collection('users').add({
-      data: newUser
-    })
-
-    return {
-      code: 200,
-      msg: 'success',
-      data: {
-        _id: createdUser._id,
-        ...newUser
-      }
-    }
-  } catch (error) {
-    console.error('登录失败:', error)
-    return {
-      code: 500,
-      msg: '登录失败：' + error.message,
-      data: null
-    }
-  }
-}
-```
-
-7. 右键点击云函数文件夹
-8. 选择 **上传并部署：云端安装依赖**
-9. 等待部署完成
-
-#### 4.2 重复上传其他云函数
-
-按照相同步骤上传以下云函数：
-
-| 云函数名称 | 代码文件 |
-|-----------|---------|
-| `updateUserInfo` | `cloudfunctions/updateUserInfo/index.js` |
-| `updateHighestLevel` | `cloudfunctions/updateHighestLevel/index.js` |
-| `getRankList` | `cloudfunctions/getRankList/index.js` |
-| `addPoints` | `cloudfunctions/addPoints/index.js` |
-| `consumePoints` | `cloudfunctions/consumePoints/index.js` |
-
----
-
-### 步骤 5：编译和上传小程序（3分钟）
-
-#### 5.1 编译小程序
-
-在项目根目录执行：
+在 Windows CMD 或 PowerShell 中执行：
 
 ```bash
+# 进入桌面
+cd Desktop
+
+# 克隆项目
+git clone https://github.com/dec24ss/coze-mini-program.git
+
+# 进入项目目录
+cd coze-mini-program
+```
+
+---
+
+### 步骤 2：安装依赖（3 分钟）
+
+```bash
+# 检查 pnpm 是否安装
+pnpm --version
+
+# 如果没有安装 pnpm
+npm install -g pnpm
+
+# 安装项目依赖
+pnpm install
+```
+
+**预期输出**：
+```
+Packages: +123
+Progress: resolved 123, reused 0, downloaded 123, added 123
+Done in 30s
+```
+
+---
+
+### 步骤 3：编译小程序（2 分钟）
+
+```bash
+# 编译小程序
 pnpm build:weapp
 ```
 
-#### 5.2 上传小程序
+**预期输出**：
+```
+📦 Compiling...
+✅ Compile success in 30s
+📦 Output: dist/
+```
 
-1. 打开微信开发者工具
-2. 点击右上角 **上传** 按钮
-3. 填写版本号：`1.0.0`
-4. 填写项目备注：`腾讯云开发版本`
-5. 点击 **上传**
-
-#### 5.3 提交审核（可选）
-
-1. 登录微信公众平台
-2. 进入 **版本管理**
-3. 找到刚上传的版本
-4. 点击 **提交审核**
-5. 填写审核信息
-6. 等待审核通过
+**检查点**：
+- 确认 `dist` 目录已生成
+- 确认 `dist` 目录下有 `app.json` 文件
 
 ---
 
-## 🧪 测试功能
+### 步骤 4：用微信开发者工具打开（1 分钟）
 
-### 测试 1：用户登录
+1. **打开微信开发者工具**
+2. **点击导入项目**
+3. **选择项目目录**
+   - 路径：`Desktop\coze-mini-program`
+4. **填写项目信息**
+   - 项目名称：`拼图小游戏`
+   - AppID：使用测试号（或你的小程序 AppID）
+   - 开发模式：**小程序**
+   - 后端服务：**不使用云服务**
+5. **点击导入**
 
-在微信开发者工具控制台中执行：
-
-```javascript
-wx.cloud.callFunction({
-  name: 'login',
-  data: {
-    openid: 'test_001',
-    nickname: '测试用户',
-    avatar_url: ''
-  }
-}).then(res => {
-  console.log('✅ 登录成功:', res.result)
-}).catch(err => {
-  console.error('❌ 登录失败:', err)
-})
-```
-
-预期输出：
-```
-✅ 登录成功: { code: 200, msg: 'success', data: { ... } }
-```
+**预期结果**：
+- 微信开发者工具成功加载项目
+- 显示首页（欢迎界面）
 
 ---
 
-### 测试 2：获取排行榜
+### 步骤 5：测试基本功能（2 分钟）
 
-```javascript
-wx.cloud.callFunction({
-  name: 'getRankList',
-  data: {
-    limit: 10
-  }
-}).then(res => {
-  console.log('✅ 排行榜数据:', res.result)
-}).catch(err => {
-  console.error('❌ 获取排行榜失败:', err)
-})
-```
+#### 测试 1：查看页面
 
-预期输出：
-```
-✅ 排行榜数据: { code: 200, msg: 'success', data: [...] }
-```
+在微信开发者工具中：
+
+1. 点击模拟器中的页面
+2. 检查页面是否正常显示
+3. 检查样式是否正常
+
+**预期结果**：
+- 页面正常显示
+- 样式正确
+
+#### 测试 2：检查控制台
+
+在微信开发者工具中：
+
+1. 点击 "调试器" 标签
+2. 点击 "Console" 标签
+3. 查看是否有错误信息
+
+**预期结果**：
+- 控制台没有错误信息
+- 可能看到一些日志信息
+
+#### 测试 3：查看项目结构
+
+在微信开发者工具中：
+
+1. 点击 "编辑器" 标签
+2. 查看左侧文件树
+3. 确认文件结构正确
+
+**预期结果**：
+- 显示 `dist/` 目录
+- 显示 `cloudfunctions/` 目录
+- 显示 `project.config.json` 文件
 
 ---
 
-### 测试 3：测试游戏功能
+## ✅ 检查清单
 
-1. 在微信开发者工具中预览小程序
-2. 扫码进入小程序
-3. 点击登录
-4. 选择关卡开始游戏
-5. 完成拼图
-6. 查看排行榜
+完成以下检查项：
+
+- [ ] 项目已克隆到本地
+- [ ] 依赖已安装
+- [ ] 小程序已编译（`dist` 目录存在）
+- [ ] 微信开发者工具已打开项目
+- [ ] 页面正常显示
+- [ ] 控制台无错误信息
+- [ ] 项目结构正确
 
 ---
 
-## ⚠️ 常见问题
+## 🎉 恭喜！
 
-### 问题 1：云开发未关联
+你已经成功启动了项目！
 
-**错误**：`云开发未初始化`
+**下一步**：
+
+1. 配置云开发环境
+2. 上传云函数
+3. 创建数据库和存储
+4. 测试完整功能
+
+详见：`PROJECT_EXPORT_GUIDE.md`
+
+---
+
+## 🆘 常见问题
+
+### 问题 1：安装依赖失败
+
+**错误信息**：
+```
+Error: Cannot find module 'xxx'
+```
 
 **解决方案**：
-1. 在微信开发者工具中点击 **云开发**
-2. 点击 **开通**
-3. 选择环境：`db-2gaczaywd186652b`
+```bash
+# 清理缓存
+rm -rf node_modules pnpm-lock.yaml
+
+# 重新安装
+pnpm install
+```
 
 ---
 
-### 问题 2：云函数调用失败
+### 问题 2：编译失败
 
-**错误**：`云函数不存在`
+**错误信息**：
+```
+Error: Compile failed
+```
 
 **解决方案**：
-1. 检查云函数是否已上传
-2. 右键云函数文件夹
-3. 选择 **上传并部署：云端安装依赖**
+```bash
+# 清理编译输出
+rm -rf dist
+
+# 重新编译
+pnpm build:weapp
+```
 
 ---
 
-### 问题 3：数据库操作失败
+### 问题 3：微信开发者工具显示空白
 
-**错误**：`集合不存在`
+**可能原因**：
+- `dist` 目录未生成
+- `project.config.json` 配置错误
 
 **解决方案**：
-1. 在腾讯云控制台创建 `users` 集合
-2. 权限设置为 **所有用户可读写**
+1. 检查 `dist` 目录是否存在
+2. 检查 `project.config.json` 中的 `miniprogramRoot` 是否为 `dist/`
+3. 重新编译：`pnpm build:weapp`
+4. 刷新微信开发者工具
 
 ---
 
-### 问题 4：云存储上传失败
+### 问题 4：pnpm 未安装
 
-**错误**：`存储空间未开通`
+**错误信息**：
+```
+Command 'pnpm' not found
+```
 
 **解决方案**：
-1. 在腾讯云控制台创建 `avatars` 文件夹
-2. 权限设置为 **所有用户可读写**
+```bash
+# 安装 pnpm
+npm install -g pnpm
 
----
-
-## 📊 云函数列表
-
-| 云函数 | 功能 | 状态 |
-|--------|------|------|
-| `login` | 用户登录 | ✅ 已创建 |
-| `updateUserInfo` | 更新用户信息 | ⏳ 待上传 |
-| `updateHighestLevel` | 更新最高关卡 | ⏳ 待上传 |
-| `getRankList` | 获取排行榜 | ⏳ 待上传 |
-| `addPoints` | 添加积分 | ⏳ 待上传 |
-| `consumePoints` | 消耗积分 | ⏳ 待上传 |
-
----
-
-## 🎯 完成检查清单
-
-部署完成后，请确认以下事项：
-
-- [ ] 云开发环境已关联
-- [ ] 数据库集合 `users` 已创建
-- [ ] 云存储目录 `avatars` 已创建
-- [ ] 6 个云函数已上传
-- [ ] 小程序已编译
-- [ ] 小程序已上传
-- [ ] 登录功能测试通过
-- [ ] 排行榜功能测试通过
-- [ ] 游戏功能测试正常
+# 验证安装
+pnpm --version
+```
 
 ---
 
 ## 📚 相关文档
 
-- **详细部署指南**：`TENCENT_CLOUD_DEPLOYMENT.md`
-- **腾讯云开发控制台**：https://console.cloud.tencent.com/tcb
-- **腾讯云开发文档**：https://docs.cloudbase.net/
+| 文档 | 说明 |
+|------|------|
+| `PROJECT_EXPORT_GUIDE.md` | 完整的项目导出和部署指南 |
+| `PROJECT_CHECKLIST.md` | 项目检查清单 |
+| `CLOUD_SETUP_GUIDE.md` | 云开发配置详细步骤 |
+| `README.md` | 项目说明文档 |
 
 ---
 
-## 🆘 获取帮助
-
-如果遇到问题：
-
-1. 查看本指南的 **常见问题** 章节
-2. 查看云函数日志
-3. 查看数据库日志
-4. 随时告诉我你的问题！
-
----
-
-## 🎉 开始部署吧！
-
-**预计时间**：10-15 分钟
-
-**立即开始**：
-1. 打开微信开发者工具
-2. 关联云开发环境
-3. 创建数据库和存储
-4. 上传云函数
-5. 编译和上传小程序
-
-**祝你部署顺利！** 🚀
+**祝你开发顺利！** 🚀
