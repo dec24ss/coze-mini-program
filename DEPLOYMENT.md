@@ -132,7 +132,15 @@ https://egutrdawrbziyklwnuov.supabase.co
 ```
 https://upload.wikimedia.org
 https://api.dicebear.com
+https://images.unsplash.com
+https://assets.mixkit.co
 ```
+
+**各域名用途说明**：
+- `upload.wikimedia.org` - 拼图图片（世界名画）
+- `api.dicebear.com` - 用户默认头像生成
+- `images.unsplash.com` - 备用图片
+- `assets.mixkit.co` - 游戏音效文件
 
 **注意**：请将 `https://your-server.com` 替换为你实际的后端服务器域名。
 

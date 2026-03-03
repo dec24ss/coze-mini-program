@@ -44,11 +44,13 @@
 
 ### 3. downloadFile 合法域名（文件下载）
 
-**用途**：加载图片资源
+**用途**：加载图片资源、音效文件
 
 **需要添加的域名**：
-- 维基百科图片：`https://upload.wikimedia.org`
+- 维基百科图片（拼图图片）：`https://upload.wikimedia.org`
 - DiceBear默认头像：`https://api.dicebear.com`
+- Unsplash备用图片：`https://images.unsplash.com`
+- Mixkit音效文件：`https://assets.mixkit.co`
 - 对象存储域名（如配置了）：`https://your-bucket.s3.region.amazonaws.com`
 
 **配置步骤**：
@@ -57,6 +59,8 @@
    ```
    https://upload.wikimedia.org
    https://api.dicebear.com
+   https://images.unsplash.com
+   https://assets.mixkit.co
    ```
 
 ---
@@ -79,9 +83,17 @@ https://egutrdawrbziyklwnuov.supabase.co
 ```
 https://upload.wikimedia.org
 https://api.dicebear.com
+https://images.unsplash.com
+https://assets.mixkit.co
 ```
 
-**注意**：请将 `https://your-server.com` 替换为你实际的后端服务器域名。
+**注意**：
+- 请将 `https://your-server.com` 替换为你实际的后端服务器域名
+- 各域名用途说明：
+  - `upload.wikimedia.org` - 拼图图片（世界名画）
+  - `api.dicebear.com` - 用户默认头像生成
+  - `images.unsplash.com` - 备用图片
+  - `assets.mixkit.co` - 游戏音效文件
 
 ---
 
