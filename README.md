@@ -249,7 +249,7 @@ pnpm build
 
 ### 环境 ID
 
-**环境 ID**：`db-2gaczaywd186652b`
+**环境 ID**：`cloudbase-8g1wqiy0823dea4a`
 
 ### 云函数
 
@@ -307,7 +307,7 @@ pnpm build:weapp
 
 1. 点击顶部菜单 "云开发"
 2. 点击 "开通"
-3. 选择环境：`db-2gaczaywd186652b`
+3. 选择环境：`cloudbase-8g1wqiy0823dea4a`
 4. 点击 "确定"
 
 ### 4. 上传云函数

@@ -6,7 +6,7 @@
 
 **部署方式**：扣子编程 + 腾讯云开发
 
-**环境 ID**：`db-2gaczaywd186652b`
+**环境 ID**：`cloudbase-8g1wqiy0823dea4a`
 
 **项目地址**：https://github.com/dec24ss/coze-mini-program
 
@@ -50,7 +50,7 @@
   - `cloudbaseRoot: "./"`
 
 - [x] `cloudbaserc.json` 已配置
-  - 环境 ID：`db-2gaczaywd186652b`
+  - 环境 ID：`cloudbase-8g1wqiy0823dea4a`
   - 6 个云函数配置
   - 数据库和存储配置
 
@@ -109,7 +109,7 @@ pnpm build:weapp
 
 ### 步骤 5：配置腾讯云开发（3 分钟）
 
-- 关联云开发环境：`db-2gaczaywd186652b`
+- 关联云开发环境：`cloudbase-8g1wqiy0823dea4a`
 - 创建数据库集合 `users`
 
 ### 步骤 6：上传云函数（8 分钟）
@@ -177,7 +177,7 @@ pnpm build:weapp
 
 ### 腾讯云开发
 
-- [ ] 环境已创建：`db-2gaczaywd186652b`
+- [ ] 环境已创建：`cloudbase-8g1wqiy0823dea4a`
 - [ ] 数据库集合 `users` 已创建
 - [ ] 存储目录 `avatars` 已创建
 - [ ] 6 个云函数已上传
@@ -205,7 +205,7 @@ pnpm build:weapp
 
 1. 检查云开发环境是否已关联
 2. 检查云函数是否已上传
-3. 检查环境 ID：`db-2gaczaywd186652b`
+3. 检查环境 ID：`cloudbase-8g1wqiy0823dea4a`
 
 ### 问题 3：数据库操作失败
 
@@ -315,6 +315,6 @@ pnpm build:weapp
 
 **项目已完成，可以部署！** 🎉✨
 
-**环境 ID**：`db-2gaczaywd186652b`
+**环境 ID**：`cloudbase-8g1wqiy0823dea4a`
 **部署方式**：扣子编程 + 腾讯云开发
 **预计部署时间**：15 分钟

@@ -33,7 +33,7 @@
 
 - 已注册腾讯云账号
 - 已开通云开发服务
-- 已创建环境 ID：`db-2gaczaywd186652b`
+- 已创建环境 ID：`cloudbase-8g1wqiy0823dea4a`
 
 ### 3. 微信小程序
 
@@ -140,7 +140,7 @@ tar -czf weapp-dist.tar.gz dist/
 
 1. 点击顶部菜单 "云开发"
 2. 点击 "开通"
-3. 选择环境：`db-2gaczaywd186652b`
+3. 选择环境：`cloudbase-8g1wqiy0823dea4a`
 4. 点击 "确定"
 
 #### 6.2 创建数据库集合
@@ -148,7 +148,7 @@ tar -czf weapp-dist.tar.gz dist/
 在腾讯云控制台中：
 
 1. 打开腾讯云控制台：https://console.cloud.tencent.com/tcb
-2. 选择环境：`db-2gaczaywd186652b`
+2. 选择环境：`cloudbase-8g1wqiy0823dea4a`
 3. 进入 **数据库**
 4. 点击 **新建集合**
 5. 集合名称：`users`
@@ -352,7 +352,7 @@ console.log(rankResult.result.data)
 
 ### 1. 环境 ID
 
-**环境 ID**：`db-2gaczaywd186652b`
+**环境 ID**：`cloudbase-8g1wqiy0823dea4a`
 
 确保以下文件中的环境 ID 正确：
 - `cloudbaserc.json`
@@ -366,7 +366,7 @@ console.log(rankResult.result.data)
 if (Taro.getEnv() === Taro.ENV_TYPE.WEAPP) {
   try {
     Taro.cloud.init({
-      env: 'db-2gaczaywd186652b',  // 确认环境 ID 正确
+      env: 'cloudbase-8g1wqiy0823dea4a',  // 确认环境 ID 正确
       traceUser: true
     })
     console.log('腾讯云开发环境初始化成功')
@@ -423,7 +423,7 @@ Error: cloud function is not found
 **解决方案**：
 1. 检查云开发环境是否已关联
 2. 检查云函数是否已上传
-3. 检查环境 ID 是否正确：`db-2gaczaywd186652b`
+3. 检查环境 ID 是否正确：`cloudbase-8g1wqiy0823dea4a`
 4. 在微信开发者工具中查看云函数日志
 
 ---

@@ -8,7 +8,7 @@
 
 **项目名称**：拼图小游戏 - 腾讯云开发版本
 
-**环境 ID**：`db-2gaczaywd186652b`
+**环境 ID**：`cloudbase-8g1wqiy0823dea4a`
 
 **技术栈**：
 - 前端：Taro + React + TypeScript + Tailwind CSS
@@ -96,7 +96,7 @@ pnpm build:weapp
 
 1. **点击顶部菜单 "云开发"**
 2. **点击 "开通"**
-3. **选择环境**：`db-2gaczaywd186652b`
+3. **选择环境**：`cloudbase-8g1wqiy0823dea4a`
 4. **点击 "确定"**
 
 如果提示环境不存在，请前往腾讯云控制台创建环境。
@@ -155,7 +155,7 @@ New-Item -ItemType File -Force -Path cloudfunctions\login\index.js
 #### 6.1 创建数据库集合
 
 1. 打开腾讯云控制台：https://console.cloud.tencent.com/tcb
-2. 选择环境：`db-2gaczaywd186652b`
+2. 选择环境：`cloudbase-8g1wqiy0823dea4a`
 3. 进入 **数据库**
 4. 点击 **新建集合**
 5. 集合名称：`users`
@@ -277,7 +277,7 @@ wx.cloud.callFunction({
 
 ```json
 {
-  "envId": "db-2gaczaywd186652b",
+  "envId": "cloudbase-8g1wqiy0823dea4a",
   ...
 }
 ```
@@ -296,7 +296,7 @@ wx.cloud.callFunction({
 if (Taro.getEnv() === Taro.ENV_TYPE.WEAPP) {
   try {
     Taro.cloud.init({
-      env: 'db-2gaczaywd186652b',  // 腾讯云环境 ID
+      env: 'cloudbase-8g1wqiy0823dea4a',  // 腾讯云环境 ID
       traceUser: true
     })
     console.log('腾讯云开发环境初始化成功')
@@ -349,7 +349,7 @@ pnpm dev:weapp
 ### 项目配置
 
 - [ ] `project.config.json` 已配置（`miniprogramRoot: dist/`）
-- [ ] `cloudbaserc.json` 环境 ID 正确：`db-2gaczaywd186652b`
+- [ ] `cloudbaserc.json` 环境 ID 正确：`cloudbase-8g1wqiy0823dea4a`
 - [ ] `src/app.ts` 云开发初始化代码正确
 - [ ] AppID 已替换为你的小程序 AppID
 
@@ -427,7 +427,7 @@ Error: cloud function is not found
 **解决方案**：
 1. 检查云开发环境是否已关联
 2. 检查云函数是否已上传
-3. 检查环境 ID 是否正确：`db-2gaczaywd186652b`
+3. 检查环境 ID 是否正确：`cloudbase-8g1wqiy0823dea4a`
 4. 在微信开发者工具中查看云函数日志
 
 ---

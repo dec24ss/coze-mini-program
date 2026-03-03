@@ -89,14 +89,14 @@
 **操作说明**：
 1. 在微信开发者工具中，点击顶部菜单"云开发"
 2. 点击"开通"
-3. 选择环境：`db-2gaczaywd186652b`
+3. 选择环境：`cloudbase-8g1wqiy0823dea4a`
 4. 点击"确定"
 
 #### 5.2 创建数据库集合（2 分钟）
 
 **操作说明**：
 1. 打开腾讯云控制台：https://console.cloud.tencent.com/tcb
-2. 选择环境：`db-2gaczaywd186652b`
+2. 选择环境：`cloudbase-8g1wqiy0823dea4a`
 3. 进入"数据库"
 4. 点击"新建集合"
 5. 集合名称：`users`
@@ -212,7 +212,7 @@ wx.cloud.callFunction({
 
 ## 🎯 关键信息
 
-**环境 ID**：`db-2gaczaywd186652b`
+**环境 ID**：`cloudbase-8g1wqiy0823dea4a`
 
 **需要下载的文件/目录**：
 - `dist/` 目录（小程序编译产物）
@@ -253,7 +253,7 @@ wx.cloud.callFunction({
 
 **解决方案**：
 - 检查云开发环境是否已关联
-- 检查环境 ID 是否正确：`db-2gaczaywd186652b`
+- 检查环境 ID 是否正确：`cloudbase-8g1wqiy0823dea4a`
 - 查看云函数日志排查错误
 
 ### 问题 4：数据库操作失败

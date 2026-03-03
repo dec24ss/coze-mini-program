@@ -2,7 +2,7 @@
 
 本指南将一步步指导你完成腾讯云开发环境的配置。
 
-**环境 ID**：`db-2gaczaywd186652b`
+**环境 ID**：`cloudbase-8g1wqiy0823dea4a`
 
 ---
 
@@ -10,7 +10,7 @@
 
 在开始之前，请确保：
 - [ ] 已安装微信开发者工具
-- [ ] 已在腾讯云创建了环境（ID：`db-2gaczaywd186652b`）
+- [ ] 已在腾讯云创建了环境（ID：`cloudbase-8g1wqiy0823dea4a`）
 - [ ] 已拉取最新的代码（包含云函数代码）
 
 ---
@@ -31,12 +31,12 @@
 
 3. **开通云开发**
    - 点击 **开通** 按钮
-   - 选择环境：`db-2gaczaywd186652b`
+   - 选择环境：`cloudbase-8g1wqiy0823dea4a`
    - 点击 **确定**
 
 4. **验证关联成功**
    - 看到 **云开发控制台** 界面
-   - 顶部显示环境 ID：`db-2gaczaywd186652b`
+   - 顶部显示环境 ID：`cloudbase-8g1wqiy0823dea4a`
 
 ---
 
@@ -71,7 +71,7 @@
    - 登录腾讯云账号
 
 2. **选择环境**
-   - 在环境列表中找到：`db-2gaczaywd186652b`
+   - 在环境列表中找到：`cloudbase-8g1wqiy0823dea4a`
    - 点击进入
 
 3. **进入数据库**
@@ -742,7 +742,7 @@ pnpm build:weapp
 
 **解决方案**：
 1. 检查 `src/app.ts` 中的初始化代码
-2. 确认环境 ID 正确：`db-2gaczaywd186652b`
+2. 确认环境 ID 正确：`cloudbase-8g1wqiy0823dea4a`
 3. 重新编译小程序
 
 ---
@@ -812,7 +812,7 @@ Module not found: Can't resolve '@/xxx'
 配置完成后，请确认以下事项：
 
 ### 环境配置
-- [ ] 云开发环境已关联（`db-2gaczaywd186652b`）
+- [ ] 云开发环境已关联（`cloudbase-8g1wqiy0823dea4a`）
 - [ ] 环境配置文件已更新（`cloudbaserc.json`）
 - [ ] 前端初始化代码已更新（`src/app.ts`）
 

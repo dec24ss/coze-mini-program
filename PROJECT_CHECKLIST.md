@@ -2,7 +2,7 @@
 
 本清单用于确保项目可以顺利导出和用微信开发者工具开发。
 
-**环境 ID**：`db-2gaczaywd186652b`
+**环境 ID**：`cloudbase-8g1wqiy0823dea4a`
 
 ---
 
@@ -62,7 +62,7 @@
 ### 4. cloudbaserc.json
 
 检查点：
-- [x] 环境 ID 正确：`db-2gaczaywd186652b`
+- [x] 环境 ID 正确：`cloudbase-8g1wqiy0823dea4a`
 - [x] 云函数配置正确
 - [x] 数据库配置正确
 - [x] 存储配置正确
@@ -75,7 +75,7 @@
 
 检查点：
 - [x] 腾讯云开发初始化代码
-- [x] 环境 ID 正确：`db-2gaczaywd186652b`
+- [x] 环境 ID 正确：`cloudbase-8g1wqiy0823dea4a`
 - [x] 平台检测正确
 - [x] 导入正确
 - [x] 错误处理正确
@@ -194,7 +194,7 @@
 ### 2. 云开发配置
 
 - [x] 云开发初始化代码
-- [x] 环境 ID 配置：`db-2gaczaywd186652b`
+- [x] 环境 ID 配置：`cloudbase-8g1wqiy0823dea4a`
 - [x] 云函数调用方式
 
 ---
@@ -268,7 +268,7 @@
 
 - [x] `project.config.json` 配置正确
 - [x] `cloudbaserc.json` 配置正确
-- [x] 环境 ID 正确：`db-2gaczaywd186652b`
+- [x] 环境 ID 正确：`cloudbase-8g1wqiy0823dea4a`
 
 ### 3. 文件完整性
 
@@ -301,7 +301,7 @@
 
 ### 在腾讯云控制台中
 
-- [ ] 确认环境存在：`db-2gaczaywd186652b`
+- [ ] 确认环境存在：`cloudbase-8g1wqiy0823dea4a`
 - [ ] 创建数据库集合 `users`
 - [ ] 设置集合权限：所有用户可读写
 - [ ] 创建存储目录 `avatars`
@@ -366,7 +366,7 @@
 **确认配置**：
 ```json
 {
-  "envId": "db-2gaczaywd186652b",
+  "envId": "cloudbase-8g1wqiy0823dea4a",
   ...
 }
 ```
@@ -400,7 +400,7 @@
 - 环境 ID 错误
 
 **解决方案**：
-1. 关联云开发环境：`db-2gaczaywd186652b`
+1. 关联云开发环境：`cloudbase-8g1wqiy0823dea4a`
 2. 上传所有云函数
 3. 检查环境 ID 配置
 

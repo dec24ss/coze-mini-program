@@ -13,7 +13,7 @@
 - 图标库：lucide-react-taro 1.2.0
 - 云服务：腾讯云开发（云函数 + 云数据库 + 云存储）
 
-**环境 ID**：`db-2gaczaywd186652b`
+**环境 ID**：`cloudbase-8g1wqiy0823dea4a`
 
 **项目地址**：https://github.com/dec24ss/coze-mini-program
 
@@ -28,7 +28,7 @@
   - `cloudfunctionRoot: "cloudfunctions/"`
   - `cloudbaseRoot: "./"`
 - [x] `cloudbaserc.json` 已配置
-  - 环境 ID：`db-2gaczaywd186652b`
+  - 环境 ID：`cloudbase-8g1wqiy0823dea4a`
   - 6 个云函数配置
   - 数据库和存储配置
 - [x] `src/app.ts` 已配置
@@ -140,7 +140,7 @@ pnpm build:weapp
 
 ### 步骤 5：配置云开发
 
-1. 关联云开发环境：`db-2gaczaywd186652b`
+1. 关联云开发环境：`cloudbase-8g1wqiy0823dea4a`
 2. 上传 6 个云函数
 3. 创建数据库集合 `users`
 4. 创建存储目录 `avatars`
@@ -174,7 +174,7 @@ wx.cloud.callFunction({
 - [x] `project.config.json` 配置正确
 - [x] `cloudbaserc.json` 配置正确
 - [x] `src/app.ts` 云开发初始化代码正确
-- [x] 环境 ID 正确：`db-2gaczaywd186652b`
+- [x] 环境 ID 正确：`cloudbase-8g1wqiy0823dea4a`
 
 ### 云函数
 

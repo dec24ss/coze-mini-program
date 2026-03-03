@@ -63,7 +63,7 @@ pnpm build:weapp
 
 1. 点击顶部菜单 "云开发"
 2. 点击 "开通"
-3. 选择环境：`db-2gaczaywd186652b`
+3. 选择环境：`cloudbase-8g1wqiy0823dea4a`
 4. 点击 "确定"
 
 #### 5.2 创建数据库集合
@@ -71,7 +71,7 @@ pnpm build:weapp
 在腾讯云控制台：
 
 1. 打开 https://console.cloud.tencent.com/tcb
-2. 选择环境：`db-2gaczaywd186652b`
+2. 选择环境：`cloudbase-8g1wqiy0823dea4a`
 3. 进入 **数据库**
 4. 新建集合：`users`
 5. 权限：所有用户可读写
@@ -124,7 +124,7 @@ wx.cloud.callFunction({
 - [ ] 小程序已编译（`dist` 目录存在）
 - [ ] `dist` 和 `cloudfunctions` 已下载
 - [ ] 微信开发者工具已打开项目
-- [ ] 云开发环境已关联：`db-2gaczaywd186652b`
+- [ ] 云开发环境已关联：`cloudbase-8g1wqiy0823dea4a`
 - [ ] 数据库集合 `users` 已创建
 - [ ] 6 个云函数已上传
 - [ ] 测试通过
@@ -171,9 +171,10 @@ pnpm build:weapp
 
 1. 检查云开发环境是否已关联
 2. 检查云函数是否已上传
-3. 检查环境 ID：`db-2gaczaywd186652b`
+3. 检查环境 ID：`cloudbase-8g1wqiy0823dea4a`
 
 ### 问题 3：数据库操作失败
+
 
 1. 检查数据库集合 `users` 是否已创建
 2. 检查权限是否设置为"所有用户可读写"
