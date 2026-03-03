@@ -14,7 +14,7 @@ export default ({ children }: PropsWithChildren<any>) => {
     if (Taro.getEnv() === Taro.ENV_TYPE.WEAPP) {
       try {
         Taro.cloud.init({
-          env: 'your-env-id',  // 替换为你的腾讯云环境 ID
+          env: 'db-2gaczaywd186652b',  // 腾讯云环境 ID
           traceUser: true
         })
         console.log('腾讯云开发环境初始化成功')
