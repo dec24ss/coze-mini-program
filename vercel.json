@@ -1,25 +1,22 @@
 {
   "version": 2,
-  "name": "coze-mini-program",
-  "buildCommand": "pnpm build",
-  "outputDirectory": "dist",
+  "buildCommand": "pnpm build:server",
+  "outputDirectory": "server/dist",
+  "installCommand": "pnpm install --filter server",
   "builds": [
     {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "src": "server/package.json",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/$1"
+      "dest": "server/dist/main.js"
     }
   ],
   "functions": {
-    "api/**/*.ts": {
+    "server/dist/main.js": {
       "runtime": "nodejs20.x",
       "memory": 1024,
       "maxDuration": 60
