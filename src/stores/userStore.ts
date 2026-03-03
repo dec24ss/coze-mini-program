@@ -81,9 +81,17 @@ export const useUserStore = create<UserState>((set, get) => ({
       if (loginRes.code) {
         console.log('微信登录成功，code:', loginRes.code)
 
+        // 构建登录 API URL
+        const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
+        const loginUrl = isWeapp
+          ? 'http://localhost:3000/api/users/login'  // 小程序环境使用 localhost
+          : '/api/users/login'  // H5 环境使用代理
+
+        console.log('登录 API URL:', loginUrl)
+
         // 调用后端登录 API
         const response = await Network.request({
-          url: '/api/users/login',
+          url: loginUrl,
           method: 'POST',
           data: {
             openid: loginRes.code,
@@ -95,41 +103,64 @@ export const useUserStore = create<UserState>((set, get) => ({
         console.log('后端响应:', response)
         console.log('响应状态码:', response.statusCode)
         console.log('响应数据:', response.data)
+        console.log('响应数据类型:', typeof response.data)
+        console.log('response.data.data:', response.data?.data)
 
-        if (response.data?.data) {
-          const apiUser = response.data.data
-          const userInfo: UserInfo = {
-            openid: apiUser.openid,
-            nickname: apiUser.nickname || '拼图玩家',
-            avatarUrl: apiUser.avatar_url || '',
-            highestLevel: apiUser.highest_level || 0,
-            points: apiUser.points || 0
-          }
+        // 检查 HTTP 状态码
+        if (response.statusCode !== 200) {
+          console.error('HTTP 状态码错误:', response.statusCode)
+          throw new Error(`服务器返回错误: HTTP ${response.statusCode}`)
+        }
 
-          // 从本地存储读取关卡图片映射（本地缓存）
-          const savedLevelImages = Taro.getStorageSync('levelImages')
-          const levelImages = savedLevelImages ? JSON.parse(savedLevelImages) : {}
+        // 检查响应数据格式
+        if (!response.data) {
+          console.error('响应数据为空')
+          throw new Error('登录失败：服务器未返回数据')
+        }
 
-          // 从本地存储读取解锁的关卡（优先使用本地数据，确保游戏进度不会丢失）
-          const savedUnlockedLevels = Taro.getStorageSync('unlockedLevels')
-          const unlockedLevels = savedUnlockedLevels ? Math.max(parseInt(savedUnlockedLevels), 1) : 1
+        // 检查业务状态码
+        if (response.data.code !== 200) {
+          console.error('业务状态码错误:', response.data.code, response.data.msg)
+          throw new Error(`登录失败: ${response.data.msg || '未知错误'}`)
+        }
 
-          // 保存 openid 到本地存储
-          Taro.setStorageSync('openid', apiUser.openid)
-
-          set({
-            userInfo,
-            isLoggedIn: true,
-            isLoading: false,
-            unlockedLevels,
-            levelImages
-          })
-
-          console.log('用户登录成功:', userInfo)
-          console.log('已加载关卡图片映射:', Object.keys(levelImages).length, '个关卡')
-        } else {
+        // 检查数据字段
+        if (!response.data.data) {
+          console.error('响应数据中缺少 data 字段')
+          console.error('完整响应:', JSON.stringify(response.data))
           throw new Error('登录失败：服务器返回数据格式错误')
         }
+
+        const apiUser = response.data.data
+        const userInfo: UserInfo = {
+          openid: apiUser.openid,
+          nickname: apiUser.nickname || '拼图玩家',
+          avatarUrl: apiUser.avatar_url || '',
+          highestLevel: apiUser.highest_level || 0,
+          points: apiUser.points || 0
+        }
+
+        // 从本地存储读取关卡图片映射（本地缓存）
+        const savedLevelImages = Taro.getStorageSync('levelImages')
+        const levelImages = savedLevelImages ? JSON.parse(savedLevelImages) : {}
+
+        // 从本地存储读取解锁的关卡（优先使用本地数据，确保游戏进度不会丢失）
+        const savedUnlockedLevels = Taro.getStorageSync('unlockedLevels')
+        const unlockedLevels = savedUnlockedLevels ? Math.max(parseInt(savedUnlockedLevels), 1) : 1
+
+        // 保存 openid 到本地存储
+        Taro.setStorageSync('openid', apiUser.openid)
+
+        set({
+          userInfo,
+          isLoggedIn: true,
+          isLoading: false,
+          unlockedLevels,
+          levelImages
+        })
+
+        console.log('用户登录成功:', userInfo)
+        console.log('已加载关卡图片映射:', Object.keys(levelImages).length, '个关卡')
       } else {
         throw new Error('登录失败：未获取到微信登录 code')
       }
@@ -162,8 +193,10 @@ export const useUserStore = create<UserState>((set, get) => ({
 
     // 同步更新到后端
     try {
+      const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
+      const updateUrl = isWeapp ? 'http://localhost:3000/api/users/update' : '/api/users/update'
       await Network.request({
-        url: '/api/users/update',
+        url: updateUrl,
         method: 'POST',
         data: {
           openid: userInfo.openid,
@@ -231,8 +264,10 @@ export const useUserStore = create<UserState>((set, get) => ({
 
       // 同步更新到后端数据库
       try {
+        const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
+        const updateLevelUrl = isWeapp ? 'http://localhost:3000/api/users/update-level' : '/api/users/update-level'
         await Network.request({
-          url: '/api/users/update-level',
+          url: updateLevelUrl,
           method: 'POST',
           data: {
             openid: userInfo.openid,
@@ -255,8 +290,10 @@ export const useUserStore = create<UserState>((set, get) => ({
   // 获取排行榜（从 Supabase 获取真实数据）
   fetchRankList: async () => {
     try {
+      const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
+      const rankUrl = isWeapp ? 'http://localhost:3000/api/users/rank/list' : '/api/users/rank/list'
       const response = await Network.request({
-        url: '/api/users/rank/list',
+        url: rankUrl,
         method: 'GET'
       })
 
@@ -326,8 +363,10 @@ export const useUserStore = create<UserState>((set, get) => ({
 
     // 同步更新到后端数据库
     try {
+      const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
+      const addPointsUrl = isWeapp ? 'http://localhost:3000/api/users/add-points' : '/api/users/add-points'
       await Network.request({
-        url: '/api/users/add-points',
+        url: addPointsUrl,
         method: 'POST',
         data: {
           openid: userInfo.openid,
@@ -364,8 +403,10 @@ export const useUserStore = create<UserState>((set, get) => ({
 
     // 同步更新到后端数据库
     try {
+      const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
+      const consumePointsUrl = isWeapp ? 'http://localhost:3000/api/users/consume-points' : '/api/users/consume-points'
       await Network.request({
-        url: '/api/users/consume-points',
+        url: consumePointsUrl,
         method: 'POST',
         data: {
           openid: userInfo.openid,

@@ -34,8 +34,10 @@ export default function UserProfileModal({
 
     try {
       // 使用 Network.uploadFile 上传文件
+      const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
+      const uploadUrl = isWeapp ? 'http://localhost:3000/api/users/upload-avatar' : '/api/users/upload-avatar'
       const response = await Network.uploadFile({
-        url: '/api/users/upload-avatar',
+        url: uploadUrl,
         filePath: selectedAvatarUrl,
         name: 'file',
         formData: {
