@@ -1,25 +1,35 @@
 import { View, Text, Image } from '@tarojs/components'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useUserStoreCloudbase } from '@/stores/userStore-cloudbase'
 import { useSettingsStore } from '@/stores/settingsStore'
 import './index.css'
 
 // 判断头像URL是否有效
-const isValidAvatarUrl = (url: string | undefined | null): boolean => {
-  if (!url || !url.trim()) {
+const isValidAvatarUrl = (url: string): boolean => {
+  if (!url || url.trim() === '') {
     return false
   }
 
-  // 过滤掉本地路径
-  return !url.startsWith('wxfile://') && !url.startsWith('file://')
+  // 过滤掉本地路径（wxfile://）
+  if (url.startsWith('wxfile://') || url.startsWith('file://')) {
+    return false
+  }
+
+  // 过滤掉空值或占位符
+  if (url === '' || url === null || url === undefined) {
+    return false
+  }
+
+  return true
 }
 
 // 获取有效的头像URL，如果无效则返回默认头像
-const getAvatarUrl = (nickname: string, avatarUrl: string | undefined): string => {
+const getAvatarUrl = (nickname: string, avatarUrl: string): string => {
   if (isValidAvatarUrl(avatarUrl)) {
-    return avatarUrl!
+    return avatarUrl
   }
 
+  // 使用基于昵称的默认头像
   const seed = encodeURIComponent(nickname || 'default')
   return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9`
 }
@@ -27,24 +37,21 @@ const getAvatarUrl = (nickname: string, avatarUrl: string | undefined): string =
 export default function RankPage() {
   const { userInfo, rankList, isLoggedIn, fetchRankList } = useUserStoreCloudbase()
   const { initSettings } = useSettingsStore()
-  const [refreshing, setRefreshing] = useState(false)
-
-  const loadRankList = async (force = false) => {
-    if (!isLoggedIn) return
-    
-    setRefreshing(true)
-    try {
-      await fetchRankList(force)
-    } finally {
-      setRefreshing(false)
-    }
-  }
 
   useEffect(() => {
     if (isLoggedIn) {
-      loadRankList(true)
-      initSettings()
+      fetchRankList().then(() => {
+        // 调试：打印排行榜数据
+        const currentRankList = useUserStoreCloudbase.getState().rankList
+        console.log('排行榜数据:', currentRankList)
+        currentRankList.forEach((item, index) => {
+          console.log(`用户 ${index + 1}: 昵称=${item.nickname}, 原始头像URL=${item.avatarUrl}, 有效头像URL=${getAvatarUrl(item.nickname, item.avatarUrl)}`)
+        })
+      })
     }
+    // 初始化设置
+    initSettings()
+    // 依赖登录状态变化时重新获取排行榜
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn])
 
@@ -60,16 +67,6 @@ export default function RankPage() {
 
   return (
     <View className="rank-page">
-      <View className="rank-header">
-        <Text className="block rank-title">排行榜</Text>
-        <View 
-          className="refresh-button" 
-          onClick={() => loadRankList(true)}
-        >
-          <Text className="refresh-text">{refreshing ? '刷新中...' : '刷新'}</Text>
-        </View>
-      </View>
-      
       <View className="rank-list">
         <View className="rank-item header">
           <Text className="block rank-col">排名</Text>
@@ -77,35 +74,37 @@ export default function RankPage() {
           <Text className="block rank-col">关卡</Text>
         </View>
 
-        {rankList.map((item) => {
-          const avatarUrl = getAvatarUrl(item.nickname, item.avatarUrl)
-          
-          return (
-            <View
-              key={item.openid}
-              className={`rank-item ${item.openid === userInfo?.openid ? 'my-item' : ''}`}
-            >
-              <View className="rank-col rank-number">
-                {item.rank <= 3 ? (
-                  <Text className={`block rank-badge rank-${item.rank}`}>
-                    {item.rank}
-                  </Text>
-                ) : (
-                  <Text className="block">{item.rank}</Text>
-                )}
-              </View>
-              <View className="rank-col user-info">
+        {rankList.map((item) => (
+          <View
+            key={item.openid}
+            className={`rank-item ${item.openid === userInfo?.openid ? 'my-item' : ''}`}
+          >
+            <View className="rank-col rank-number">
+              {item.rank <= 3 ? (
+                <Text className={`block rank-badge rank-${item.rank}`}>
+                  {item.rank}
+                </Text>
+              ) : (
+                <Text className="block">{item.rank}</Text>
+              )}
+            </View>
+            <View className="rank-col user-info">
+              {getAvatarUrl(item.nickname, item.avatarUrl) ? (
                 <Image
                   className="user-avatar-small"
-                  src={avatarUrl}
+                  src={getAvatarUrl(item.nickname, item.avatarUrl)}
                   mode="aspectFill"
                 />
-                <Text className="block user-name">{item.nickname}</Text>
-              </View>
-              <Text className="block rank-col level-text">第{item.highestLevel}关</Text>
+              ) : (
+                <View className="user-avatar-placeholder">
+                  <Text className="block">{item.nickname.charAt(0)}</Text>
+                </View>
+              )}
+              <Text className="block user-name">{item.nickname}</Text>
             </View>
-          )
-        })}
+            <Text className="block rank-col level-text">第{item.highestLevel}关</Text>
+          </View>
+        ))}
       </View>
 
       <View className="rank-footer-hint">

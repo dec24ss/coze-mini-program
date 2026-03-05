@@ -37,7 +37,7 @@ interface UserState {
   logout: () => void
   updateUserInfo: (nickname: string, avatarUrl: string) => Promise<void>
   updateHighestLevel: (level: number, imageUrl?: string) => Promise<void>
-  fetchRankList: (forceRefresh?: boolean) => Promise<void>
+  fetchRankList: () => Promise<void>
   checkUnlockedLevels: () => number
   addPoints: (points: number) => Promise<void>
   consumePoints: (points: number) => Promise<boolean>
@@ -340,32 +340,8 @@ export const useUserStoreCloudbase = create<UserState>((set, get) => ({
   },
 
   // 获取排行榜
-  fetchRankList: async (forceRefresh = false) => {
+  fetchRankList: async () => {
     try {
-      // 如果不是强制刷新，首先尝试从本地缓存读取
-      if (!forceRefresh) {
-        const cachedRankList = Taro.getStorageSync('rankList')
-        const cachedMyRank = Taro.getStorageSync('myRank')
-        const cachedRankTime = Taro.getStorageSync('rankCacheTime')
-        
-        // 如果缓存存在且在5分钟内，直接使用缓存
-        if (cachedRankList && cachedRankList.length > 0) {
-          const now = Date.now()
-          const cacheAge = cachedRankTime ? now - parseInt(cachedRankTime) : Infinity
-          
-          if (cacheAge < 5 * 60 * 1000) { // 5分钟缓存
-            console.log('使用本地缓存的排行榜数据，缓存年龄:', Math.round(cacheAge / 1000), '秒')
-            set({ 
-              rankList: cachedRankList, 
-              myRank: cachedMyRank ? parseInt(cachedMyRank) : 0 
-            })
-            return
-          }
-        }
-      } else {
-        console.log('强制刷新排行榜，跳过本地缓存')
-      }
-
       if (USE_CLOUDBASE) {
         const db = await getCloudbaseDB()
         if (!db) {
@@ -397,13 +373,8 @@ export const useUserStoreCloudbase = create<UserState>((set, get) => ({
             myRank = myRankItem?.rank || 0
           }
 
-          // 保存到本地缓存
-          Taro.setStorageSync('rankList', rankList)
-          Taro.setStorageSync('myRank', myRank.toString())
-          Taro.setStorageSync('rankCacheTime', Date.now().toString())
-
           set({ rankList, myRank })
-          console.log('排行榜数据加载成功（云开发），共', rankList.length, '名玩家，已缓存到本地')
+          console.log('排行榜数据加载成功（云开发），共', rankList.length, '名玩家')
         }
       } else {
         // 本地模式：生成模拟数据
@@ -427,30 +398,12 @@ export const useUserStoreCloudbase = create<UserState>((set, get) => ({
           myRank = mockRankList.length
         }
 
-        // 保存到本地缓存
-        Taro.setStorageSync('rankList', mockRankList)
-        Taro.setStorageSync('myRank', myRank.toString())
-        Taro.setStorageSync('rankCacheTime', Date.now().toString())
-
         set({ rankList: mockRankList, myRank })
-        console.log('排行榜数据加载成功（本地模拟），共', mockRankList.length, '名玩家，已缓存到本地')
+        console.log('排行榜数据加载成功（本地模拟），共', mockRankList.length, '名玩家')
       }
     } catch (error) {
       console.error('获取排行榜失败:', error)
-      
-      // 失败时尝试使用本地缓存
-      const cachedRankList = Taro.getStorageSync('rankList')
-      const cachedMyRank = Taro.getStorageSync('myRank')
-      
-      if (cachedRankList && cachedRankList.length > 0) {
-        console.log('网络失败，使用本地缓存的排行榜数据')
-        set({ 
-          rankList: cachedRankList, 
-          myRank: cachedMyRank ? parseInt(cachedMyRank) : 0 
-        })
-      } else {
-        set({ rankList: [], myRank: 0 })
-      }
+      set({ rankList: [], myRank: 0 })
     }
   },
 
@@ -537,17 +490,9 @@ export const useUserStoreCloudbase = create<UserState>((set, get) => ({
     return get().userInfo?.points || 0
   },
 
-  // 获取当前关卡（从上次保存的进度开始，如果没有则从第1关开始）
+  // 获取当前关卡
   getCurrentLevel: () => {
-    try {
-      const gameProgress = Taro.getStorageSync('gameProgress') || {}
-      const currentLevel = gameProgress.currentLevel || 1
-      console.log('📋 获取当前关卡:', currentLevel)
-      return currentLevel
-    } catch (error) {
-      console.error('❌ 获取当前关卡失败:', error)
-      return 1
-    }
+    return get().userInfo?.highestLevel || 0
   },
 
   // 获取关卡图片

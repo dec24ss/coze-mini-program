@@ -149,25 +149,19 @@ const initializeFromStorage = () => {
     const cachedImageList = Taro.getStorageSync('imageList') || []
     const cachedImageVersion = Taro.getStorageSync('imageVersion') || ''
     const cachedIsImagesPreloaded = cachedImageList.length > 0 && Object.keys(cachedLevelImageMap).length > 0
-    
-    // 读取游戏进度
-    const cachedGameProgress = Taro.getStorageSync('gameProgress') || {}
-    const savedCurrentLevel = cachedGameProgress.currentLevel || 1
 
     console.log('📦 从本地存储初始化游戏状态:')
     console.log('- levelImageMap length:', Object.keys(cachedLevelImageMap).length)
     console.log('- imageList length:', cachedImageList.length)
     console.log('- imageVersion:', cachedImageVersion)
     console.log('- isImagesPreloaded:', cachedIsImagesPreloaded)
-    console.log('- savedCurrentLevel:', savedCurrentLevel)
 
     return {
       levelImageMap: cachedLevelImageMap,
       imageList: cachedImageList,
       imageVersion: cachedImageVersion,
       isImagesPreloaded: cachedIsImagesPreloaded,
-      imagesLoaded: cachedImageList.length,
-      currentLevel: savedCurrentLevel
+      imagesLoaded: cachedImageList.length
     }
   } catch (error) {
     console.error('❌ 从本地存储初始化失败:', error)
@@ -666,22 +660,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     // 更新总花费时间
     set({ totalTimeSpent: newTotalTimeSpent })
 
-    // 保存游戏进度到本地存储
-    const nextLevel = currentLevel + 1
-    console.log(`💾 保存游戏进度: 当前关卡 ${currentLevel}，下一关 ${nextLevel}`)
-    try {
-      Taro.setStorageSync('gameProgress', {
-        currentLevel: nextLevel,
-        totalTimeSpent: newTotalTimeSpent,
-        lastPlayTime: Date.now()
-      })
-      console.log('✅ 游戏进度已保存')
-    } catch (error) {
-      console.error('❌ 保存游戏进度失败:', error)
-    }
-
     // 进入下一关（移除10关限制，支持无限关卡）
-    await get().startGame(nextLevel)
+    await get().startGame(currentLevel + 1)
   },
 
   // 自由游玩模式（不倒计时）
