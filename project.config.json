@@ -3,6 +3,7 @@
   "projectname": "coze-mini-program",
   "description": "test",
   "appid": "touristappid",
+  "cloudfunctionRoot": "./cloudfunctions/",
   "setting": {
     "urlCheck": true,
     "es6": false,
