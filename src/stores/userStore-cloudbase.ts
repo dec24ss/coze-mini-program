@@ -537,9 +537,17 @@ export const useUserStoreCloudbase = create<UserState>((set, get) => ({
     return get().userInfo?.points || 0
   },
 
-  // 获取当前关卡
+  // 获取当前关卡（从上次保存的进度开始，如果没有则从第1关开始）
   getCurrentLevel: () => {
-    return get().userInfo?.highestLevel || 0
+    try {
+      const gameProgress = Taro.getStorageSync('gameProgress') || {}
+      const currentLevel = gameProgress.currentLevel || 1
+      console.log('📋 获取当前关卡:', currentLevel)
+      return currentLevel
+    } catch (error) {
+      console.error('❌ 获取当前关卡失败:', error)
+      return 1
+    }
   },
 
   // 获取关卡图片

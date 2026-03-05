@@ -60,6 +60,7 @@ export default function IndexPage() {
   // 确保图片预加载完成后再跳转
   const startGameWithPreload = async () => {
     const { isImagesPreloaded, preloadImages } = useGameStore.getState()
+    const { getCurrentLevel } = useUserStoreCloudbase.getState()
 
     if (!isImagesPreloaded) {
       console.log('图片未预加载，开始预加载...')
@@ -73,7 +74,10 @@ export default function IndexPage() {
       Taro.hideLoading()
     }
 
-    Taro.navigateTo({ url: '/pages/game/index' })
+    // 获取当前关卡并传递给游戏页面
+    const level = getCurrentLevel()
+    console.log(`🎮 从第 ${level} 关开始游戏`)
+    Taro.navigateTo({ url: `/pages/game/index?level=${level}` })
   }
 
   const handleLevelSelect = () => {
