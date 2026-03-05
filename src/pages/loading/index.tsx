@@ -5,7 +5,7 @@ import { useGameStore } from '@/stores/gameStore'
 import './index.css'
 
 // 云开发开关：在 Coze 环境中设为 false，下载到本地后设为 true
-const USE_CLOUDBASE = false
+const USE_CLOUDBASE = true
 
 const TOTAL_IMAGES = 100 // 固定100张图片（对应100个关卡）
 
