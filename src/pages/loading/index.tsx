@@ -4,13 +4,42 @@ import Taro from '@tarojs/taro'
 import { useGameStore } from '@/stores/gameStore'
 import './index.css'
 
+// 云开发开关：在 Coze 环境中设为 false，下载到本地后设为 true
+const USE_CLOUDBASE = false
+
 const TOTAL_IMAGES = 100 // 固定100张图片（对应100个关卡）
 
 export default function LoadingPage() {
   const { preloadImages, imagesLoaded, imageList } = useGameStore()
   const [totalImages] = useState(TOTAL_IMAGES)
+  const [cloudbaseReady, setCloudbaseReady] = useState(!USE_CLOUDBASE)
 
   useEffect(() => {
+    if (!USE_CLOUDBASE) {
+      console.log('⚠️  云开发已禁用（在 Coze 环境中）')
+      setCloudbaseReady(true)
+      return
+    }
+
+    // 初始化云开发
+    const initializeCloudbase = async () => {
+      try {
+        const { initCloudbase } = await import('@/cloudbase')
+        await initCloudbase()
+        console.log('☁️ 云开发初始化成功')
+        setCloudbaseReady(true)
+      } catch (error) {
+        console.error('☁️ 云开发初始化失败:', error)
+        setCloudbaseReady(true) // 即使失败也继续
+      }
+    }
+
+    initializeCloudbase()
+  }, [])
+
+  useEffect(() => {
+    if (!cloudbaseReady) return
+
     // 预加载图片
     preloadImages().then(() => {
       // 图片加载完成后跳转到首页
@@ -18,7 +47,7 @@ export default function LoadingPage() {
         Taro.redirectTo({ url: '/pages/index/index' })
       }, 500)
     })
-  }, [preloadImages])
+  }, [preloadImages, cloudbaseReady])
 
   // 计算加载进度百分比
   const progressPercent = totalImages > 0
