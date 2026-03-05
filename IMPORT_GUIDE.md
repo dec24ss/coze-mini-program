@@ -4,7 +4,7 @@
 
 - **文件名**: `puzzle-game-miniprogram.tar.gz`
 - **文件位置**: `/workspace/projects/puzzle-game-miniprogram.tar.gz`
-- **文件大小**: 191KB
+- **文件大小**: 21MB（包含云函数代码）
 - **打包时间**: 2025-03-05
 
 ## 使用方法
