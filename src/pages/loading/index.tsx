@@ -2,6 +2,7 @@ import { View, Text, Image } from '@tarojs/components'
 import { useEffect, useState } from 'react'
 import Taro from '@tarojs/taro'
 import { useGameStore } from '@/stores/gameStore'
+import { initCloudbase } from '@/cloudbase'
 import './index.css'
 
 const TOTAL_IMAGES = 100 // 固定100张图片（对应100个关卡）
@@ -9,8 +10,29 @@ const TOTAL_IMAGES = 100 // 固定100张图片（对应100个关卡）
 export default function LoadingPage() {
   const { preloadImages, imagesLoaded, imageList } = useGameStore()
   const [totalImages] = useState(TOTAL_IMAGES)
+  const [cloudbaseReady, setCloudbaseReady] = useState(false)
 
   useEffect(() => {
+    // 初始化云开发
+    const initializeCloudbase = async () => {
+      try {
+        await initCloudbase()
+        console.log('☁️ 云开发初始化成功')
+        setCloudbaseReady(true)
+      } catch (error) {
+        console.error('☁️ 云开发初始化失败:', error)
+        // 云开发初始化失败不影响游戏继续运行
+        setCloudbaseReady(true)
+      }
+    }
+
+    initializeCloudbase()
+  }, [])
+
+  useEffect(() => {
+    // 等待云开发初始化完成后再预加载图片
+    if (!cloudbaseReady) return
+
     // 预加载图片
     preloadImages().then(() => {
       // 图片加载完成后跳转到首页
@@ -18,7 +40,7 @@ export default function LoadingPage() {
         Taro.redirectTo({ url: '/pages/index/index' })
       }, 500)
     })
-  }, [preloadImages])
+  }, [preloadImages, cloudbaseReady])
 
   // 计算加载进度百分比
   const progressPercent = totalImages > 0

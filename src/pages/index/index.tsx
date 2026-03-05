@@ -1,14 +1,14 @@
 import { View, Text, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useEffect, useState } from 'react'
-import { useUserStore } from '@/stores/userStore'
+import { useUserStoreCloudbase } from '@/stores/userStore-cloudbase'
 import { useSettingsStore } from '@/stores/settingsStore'
 import SettingsModal from '@/components/settings-modal'
 import UserProfileModal from '@/components/user-profile-modal'
 import './index.css'
 
 export default function IndexPage() {
-  const { userInfo, isLoggedIn, login, logout, updateUserInfo, checkUnlockedLevels, getCurrentLevel } = useUserStore()
+  const { userInfo, isLoggedIn, login, logout, updateUserInfo, checkUnlockedLevels, getCurrentLevel } = useUserStoreCloudbase()
   const { initSettings } = useSettingsStore()
   const [showSettings, setShowSettings] = useState(false)
   const [showUserProfile, setShowUserProfile] = useState(false)
