@@ -94,12 +94,43 @@ export default function GamePage() {
     }
   }, [isWeapp])
 
-  // 监听图片 URL 变化，简化图片加载逻辑
+  // 监听图片 URL 变化，确认图片已准备就绪
   useEffect(() => {
     if (imageUrl) {
-      console.log('🖼️  监听到图片 URL 变化:', imageUrl.substring(0, 80))
-      // 简化处理：直接显示图片，不等待验证
-      setIsImageLoaded(true)
+      console.log('🖼️  监听到图片 URL 变化:', imageUrl)
+      console.log('🖼️  图片长度:', imageUrl.length)
+
+      // 如果是 base64 数据，立即显示（已经是完整的图片数据）
+      if (imageUrl.startsWith('data:image')) {
+        console.log('✅ Base64 图片数据，立即显示')
+        setIsImageLoaded(true)
+        return
+      }
+
+      // 如果是本地路径（wxfile://），立即显示
+      if (imageUrl.startsWith('wxfile://') || imageUrl.startsWith('/')) {
+        console.log('✅ 本地路径图片，立即显示')
+        setIsImageLoaded(true)
+        return
+      }
+
+      // 如果是网络路径，使用 Taro.getImageInfo 验证图片是否可访问
+      setIsImageLoaded(false)
+      Taro.getImageInfo({
+        src: imageUrl,
+        success: () => {
+          console.log('✅ 网络路径图片已验证，立即显示')
+          setIsImageLoaded(true)
+        },
+        fail: (err) => {
+          console.error('❌ 网络路径图片加载失败:', err)
+          // 图片加载失败，降级显示占位符
+          setIsImageLoaded(true)
+          Taro.showToast({ title: '图片加载失败', icon: 'none', duration: 2000 })
+        }
+      })
+    } else {
+      console.log('⚠️  imageUrl 为空')
     }
   }, [imageUrl])
 
