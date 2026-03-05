@@ -95,8 +95,24 @@ export default defineConfig<'vite'>(async (merge, _env) => {
             };
           },
         },
+        {
+          name: 'exclude-cloudbase',
+          config(config) {
+            if (!config.build) {
+              config.build = {};
+            }
+            if (!config.build.rollupOptions) {
+              config.build.rollupOptions = {};
+            }
+            if (!config.build.rollupOptions.external) {
+              config.build.rollupOptions.external = [];
+            }
+            if (Array.isArray(config.build.rollupOptions.external)) {
+              config.build.rollupOptions.external.push('@cloudbase/js-sdk');
+            }
+          },
+        },
         UnifiedViteWeappTailwindcssPlugin({
-          rem2rpx: true,
           cssEntries: [
             // 你 @import "tailwindcss"; 那个文件的绝对路径
             path.resolve(__dirname, '../src/app.css'),
