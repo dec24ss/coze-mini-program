@@ -2,7 +2,7 @@
 const CLOUDBASE_ENV = 'cloudbase-8g1wqiy0823dea4a'
 
 // ⚠️ 关键配置：在 Coze 环境中设为 false，下载到本地后改为 true
-export const USE_CLOUDBASE = true
+export const USE_CLOUDBASE = false
 
 // 初始化云开发实例
 let app: any = null
