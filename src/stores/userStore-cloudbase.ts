@@ -99,7 +99,7 @@ export const useUserStoreCloudbase = create<UserState>((set, get) => ({
 
         if (existingUsers && existingUsers.length > 0) {
           // 用户已存在
-          const existingUser = existingUsers[0]
+          let existingUser = existingUsers[0]
           console.log('用户已存在:', existingUser)
 
           // 检查是否需要更新头像和昵称
@@ -183,12 +183,13 @@ export const useUserStoreCloudbase = create<UserState>((set, get) => ({
             updatedAt: new Date()
           }
 
-          const { id } = await db
+          const result = await db
             .collection('users')
             .add({
               data: newUser
             })
 
+          const id = (result as any).id || (result as any).code
           console.log('创建新用户成功，id:', id)
 
           const userInfo: UserInfo = {

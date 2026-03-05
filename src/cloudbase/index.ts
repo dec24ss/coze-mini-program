@@ -40,5 +40,5 @@ export function getCloudbaseDB() {
 
 export function getCloudbaseStorage() {
   const cloudbase = getCloudbaseApp()
-  return cloudbase.storage()
+  return (cloudbase as any).storage()
 }

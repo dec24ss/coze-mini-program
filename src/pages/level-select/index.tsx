@@ -2,14 +2,14 @@ import { View, Text, Image, ScrollView } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState, useEffect } from 'react'
 import { useGameStore } from '@/stores/gameStore'
-import { useUserStore } from '@/stores/userStore'
+import { useUserStoreCloudbase } from '@/stores/userStore-cloudbase'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { Lock } from 'lucide-react-taro'
 import './index.css'
 
 export default function LevelSelectPage() {
   const { levelImageMap, isImagesPreloaded } = useGameStore()
-  const { userInfo, unlockedLevels, levelImages } = useUserStore()
+  const { userInfo, unlockedLevels, levelImages } = useUserStoreCloudbase()
   const { initSettings } = useSettingsStore()
   const [displayLevels, setDisplayLevels] = useState(20)  // 默认显示20关，最多100关
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set())  // 记录加载失败的图片
@@ -18,7 +18,7 @@ export default function LevelSelectPage() {
     // 初始化设置
     initSettings()
     // 检查已解锁的关卡（确保显示最新的解锁状态）
-    const { checkUnlockedLevels } = useUserStore.getState()
+    const { checkUnlockedLevels } = useUserStoreCloudbase.getState()
     checkUnlockedLevels()
 
     // 调试信息：检查缩略图数据
