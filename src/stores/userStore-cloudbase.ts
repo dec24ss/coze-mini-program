@@ -37,7 +37,7 @@ interface UserState {
   logout: () => void
   updateUserInfo: (nickname: string, avatarUrl: string) => Promise<void>
   updateHighestLevel: (level: number, imageUrl?: string) => Promise<void>
-  fetchRankList: () => Promise<void>
+  fetchRankList: (forceRefresh?: boolean) => Promise<void>
   checkUnlockedLevels: () => number
   addPoints: (points: number) => Promise<void>
   consumePoints: (points: number) => Promise<boolean>
@@ -340,25 +340,30 @@ export const useUserStoreCloudbase = create<UserState>((set, get) => ({
   },
 
   // 获取排行榜
-  fetchRankList: async () => {
+  fetchRankList: async (forceRefresh = false) => {
     try {
-      // 首先尝试从本地缓存读取
-      const cachedRankList = Taro.getStorageSync('rankList')
-      const cachedMyRank = Taro.getStorageSync('myRank')
-      const cachedRankTime = Taro.getStorageSync('rankCacheTime')
-      
-      // 如果缓存存在且在5分钟内，直接使用缓存
-      if (cachedRankList && cachedRankList.length > 0) {
-        const now = Date.now()
-        const cacheAge = cachedRankTime ? now - parseInt(cachedRankTime) : Infinity
+      // 如果不是强制刷新，首先尝试从本地缓存读取
+      if (!forceRefresh) {
+        const cachedRankList = Taro.getStorageSync('rankList')
+        const cachedMyRank = Taro.getStorageSync('myRank')
+        const cachedRankTime = Taro.getStorageSync('rankCacheTime')
         
-        if (cacheAge < 5 * 60 * 1000) { // 5分钟缓存
-          console.log('使用本地缓存的排行榜数据，缓存年龄:', Math.round(cacheAge / 1000), '秒')
-          set({ 
-            rankList: cachedRankList, 
-            myRank: cachedMyRank ? parseInt(cachedMyRank) : 0 
-          })
+        // 如果缓存存在且在5分钟内，直接使用缓存
+        if (cachedRankList && cachedRankList.length > 0) {
+          const now = Date.now()
+          const cacheAge = cachedRankTime ? now - parseInt(cachedRankTime) : Infinity
+          
+          if (cacheAge < 5 * 60 * 1000) { // 5分钟缓存
+            console.log('使用本地缓存的排行榜数据，缓存年龄:', Math.round(cacheAge / 1000), '秒')
+            set({ 
+              rankList: cachedRankList, 
+              myRank: cachedMyRank ? parseInt(cachedMyRank) : 0 
+            })
+            return
+          }
         }
+      } else {
+        console.log('强制刷新排行榜，跳过本地缓存')
       }
 
       if (USE_CLOUDBASE) {

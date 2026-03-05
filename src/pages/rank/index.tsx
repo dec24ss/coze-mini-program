@@ -1,5 +1,5 @@
 import { View, Text, Image } from '@tarojs/components'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useUserStoreCloudbase } from '@/stores/userStore-cloudbase'
 import { useSettingsStore } from '@/stores/settingsStore'
 import './index.css'
@@ -37,21 +37,30 @@ const getAvatarUrl = (nickname: string, avatarUrl: string): string => {
 export default function RankPage() {
   const { userInfo, rankList, isLoggedIn, fetchRankList } = useUserStoreCloudbase()
   const { initSettings } = useSettingsStore()
+  const [refreshing, setRefreshing] = useState(false)
+
+  const loadRankList = async (force = false) => {
+    if (!isLoggedIn) return
+    
+    setRefreshing(true)
+    try {
+      await fetchRankList(force)
+      // 调试：打印排行榜数据
+      const currentRankList = useUserStoreCloudbase.getState().rankList
+      console.log('排行榜数据:', currentRankList)
+      currentRankList.forEach((item, index) => {
+        console.log(`用户 ${index + 1}: 昵称=${item.nickname}, 原始头像URL=${item.avatarUrl}, 有效头像URL=${getAvatarUrl(item.nickname, item.avatarUrl)}`)
+      })
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   useEffect(() => {
-    if (isLoggedIn) {
-      fetchRankList().then(() => {
-        // 调试：打印排行榜数据
-        const currentRankList = useUserStoreCloudbase.getState().rankList
-        console.log('排行榜数据:', currentRankList)
-        currentRankList.forEach((item, index) => {
-          console.log(`用户 ${index + 1}: 昵称=${item.nickname}, 原始头像URL=${item.avatarUrl}, 有效头像URL=${getAvatarUrl(item.nickname, item.avatarUrl)}`)
-        })
-      })
-    }
+    // 每次进入排行榜页面都强制刷新
+    loadRankList(true)
     // 初始化设置
     initSettings()
-    // 依赖登录状态变化时重新获取排行榜
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn])
 
@@ -67,6 +76,16 @@ export default function RankPage() {
 
   return (
     <View className="rank-page">
+      <View className="rank-header">
+        <Text className="block rank-title">排行榜</Text>
+        <View 
+          className="refresh-button" 
+          onClick={() => loadRankList(true)}
+        >
+          <Text className="refresh-text">{refreshing ? '刷新中...' : '刷新'}</Text>
+        </View>
+      </View>
+      
       <View className="rank-list">
         <View className="rank-item header">
           <Text className="block rank-col">排名</Text>

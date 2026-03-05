@@ -8,6 +8,34 @@
   position: relative;
 }
 
+.rank-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.rank-title {
+  font-size: 40px;
+  font-weight: 700;
+  color: #1F2937;
+}
+
+.refresh-button {
+  padding: 8px 16px;
+  background: #3B82F6;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refresh-text {
+  font-size: 24px;
+  color: white;
+  font-weight: 500;
+}
+
 .settings-button-top {
   position: absolute;
   top: 20px;
