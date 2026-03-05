@@ -119,11 +119,10 @@ export default function DifficultySelectPage() {
           }
         }
       })
-      return
+    } else {
+      // 已登录，直接开始游戏
+      startGame(difficulty)
     }
-
-    // 直接开始游戏
-    startGame(difficulty)
   }
 
   const startGame = async (difficulty: DifficultyConfig) => {
@@ -137,12 +136,8 @@ export default function DifficultySelectPage() {
       // 随机选择一个关卡号（1-100）
       const randomLevel = Math.floor(Math.random() * 100) + 1
 
-      // 使用自由游玩模式（不倒计时）
-      await startFreePlayMode(randomLevel)
-
-      // 临时修改难度配置
-      const state = useGameStore.getState()
-      state.gridSize = difficulty.gridSize
+      // 使用自由游玩模式（不倒计时），传入网格大小
+      await startFreePlayMode(randomLevel, difficulty.gridSize)
 
       Taro.hideLoading()
       Taro.showToast({ title: '开始游戏！', icon: 'success', duration: 1000 })

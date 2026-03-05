@@ -90,7 +90,7 @@ interface GameState {
   checkComplete: () => boolean
   checkFailed: () => boolean
   loadNextLevel: () => Promise<void>
-  startFreePlayMode: (level: number) => Promise<void>  // 自由游玩模式（不倒计时）
+  startFreePlayMode: (level: number, gridSize?: number) => Promise<void>  // 自由游玩模式（不倒计时）
 
   // 网络状态管理
   initNetworkMonitoring: () => void  // 初始化网络状态监听
@@ -116,15 +116,23 @@ function getLevelConfig(level: number, imageList: string[], levelImageMap: Recor
 
   const gridSize = difficulty.gridSize
 
-  // 随机从已缓存的图片列表中选择图片
+  // 使用预先规划的每一关的图片映射（优先使用本地路径）
   let imageUrl: string
   let originalUrl: string  // 原始网络图片URL（用于下载）
 
-  // 随机选择一张图片（使用当前关卡作为随机种子，保证每次进入同一关都是同一张图）
-  const randomIndex = (level * 17) % imageList.length  // 使用质数17增加随机性
-  imageUrl = imageList[randomIndex]
-  originalUrl = imageUrl
-  console.log(`🖼️  关卡 ${level} 随机使用图片 ${randomIndex + 1}/${imageList.length}`)
+  if (levelImageMap[level]) {
+    // 优先使用本地路径（已缓存，加载更快）
+    imageUrl = levelImageMap[level].path
+    originalUrl = levelImageMap[level].url  // 保存原始URL
+    console.log(`🖼️  关卡 ${level} 使用本地路径:`, imageUrl)
+  } else {
+    // 降级逻辑：使用预加载的图片列表
+    imageUrl = imageList.length > 0
+      ? imageList[(level - 1) % imageList.length]
+      : 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1440&fit=crop&q=80' // 默认图片
+    originalUrl = imageUrl  // 网络图片，直接使用
+    console.log(`🖼️  关卡 ${level} 使用动态计算的图片（降级逻辑）`)
+  }
 
   return {
     level,
@@ -677,21 +685,35 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   // 自由游玩模式（不倒计时）
-  startFreePlayMode: async (level: number) => {
+  startFreePlayMode: async (level: number, gridSize?: number) => {
     const { imageList, levelImageMap } = get()
-
-    const config = getLevelConfig(level, imageList, levelImageMap)
 
     console.log('🎮 自由游玩模式，关卡:', level)
 
-    // 使用 getLevelConfig 返回的随机图片
-    const finalImageUrl = config.imageUrl
-    const originalUrl = config.originalUrl
+    // 自由模式：随机选择图片
+    let imageUrl: string
+    let originalUrl: string
+
+    if (levelImageMap[level]) {
+      // 如果有缓存的图片，随机选择一张
+      imageUrl = levelImageMap[level].path
+      originalUrl = levelImageMap[level].url
+      console.log(`🖼️  自由模式使用缓存图片: ${level}`)
+    } else {
+      // 否则从 imageList 随机选择
+      const randomIndex = (level * 17) % imageList.length
+      imageUrl = imageList[randomIndex]
+      originalUrl = imageUrl
+      console.log(`🖼️  自由模式随机使用图片 ${randomIndex + 1}/${imageList.length}`)
+    }
+
+    // 如果传入了 gridSize，使用传入的值，否则使用默认的 3
+    const finalGridSize = gridSize || 3
 
     set({
-      currentLevel: config.level,
-      gridSize: config.gridSize,
-      imageUrl: finalImageUrl,
+      currentLevel: level,
+      gridSize: finalGridSize,
+      imageUrl,
       originalImageUrl: originalUrl,  // 保存原始URL用于下载
       isPlaying: true,
       isComplete: false,
@@ -713,7 +735,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     })
 
     // 生成拼图碎片
-    await generatePieces(config.gridSize, finalImageUrl)
+    await generatePieces(finalGridSize, imageUrl)
 
     set({ isLoading: false })
   },
