@@ -2,6 +2,7 @@ import { View, Text, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useEffect, useState } from 'react'
 import { useUserStoreCloudbase } from '@/stores/userStore-cloudbase'
+import { useGameStore } from '@/stores/gameStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import SettingsModal from '@/components/settings-modal'
 import UserProfileModal from '@/components/user-profile-modal'
@@ -37,7 +38,7 @@ export default function IndexPage() {
           if (res.confirm) {
             handleLogin()
           } else {
-            Taro.navigateTo({ url: '/pages/game/index' })
+            startGameWithPreload()
           }
         }
       })
@@ -48,7 +49,27 @@ export default function IndexPage() {
     const level = getCurrentLevel()
     console.log(`从第 ${level} 关开始游戏`)
 
-    // 跳转到游戏页面（游戏页面会自动初始化并从最后未完成关卡开始）
+    // 确保图片预加载完成后再跳转
+    await startGameWithPreload()
+  }
+
+  // 确保图片预加载完成后再跳转
+  const startGameWithPreload = async () => {
+    const { isImagesPreloaded, preloadImages } = useGameStore.getState()
+
+    if (!isImagesPreloaded) {
+      console.log('图片未预加载，开始预加载...')
+      Taro.showLoading({ title: '加载中...', mask: true })
+      try {
+        await preloadImages()
+        console.log('图片预加载完成')
+      } catch (error) {
+        console.error('图片预加载失败:', error)
+      }
+      Taro.hideLoading()
+    }
+
+    // 跳转到游戏页面
     Taro.navigateTo({ url: '/pages/game/index' })
   }
 

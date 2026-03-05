@@ -342,6 +342,25 @@ export const useUserStoreCloudbase = create<UserState>((set, get) => ({
   // 获取排行榜
   fetchRankList: async () => {
     try {
+      // 首先尝试从本地缓存读取
+      const cachedRankList = Taro.getStorageSync('rankList')
+      const cachedMyRank = Taro.getStorageSync('myRank')
+      const cachedRankTime = Taro.getStorageSync('rankCacheTime')
+      
+      // 如果缓存存在且在5分钟内，直接使用缓存
+      if (cachedRankList && cachedRankList.length > 0) {
+        const now = Date.now()
+        const cacheAge = cachedRankTime ? now - parseInt(cachedRankTime) : Infinity
+        
+        if (cacheAge < 5 * 60 * 1000) { // 5分钟缓存
+          console.log('使用本地缓存的排行榜数据，缓存年龄:', Math.round(cacheAge / 1000), '秒')
+          set({ 
+            rankList: cachedRankList, 
+            myRank: cachedMyRank ? parseInt(cachedMyRank) : 0 
+          })
+        }
+      }
+
       if (USE_CLOUDBASE) {
         const db = await getCloudbaseDB()
         if (!db) {
@@ -373,8 +392,13 @@ export const useUserStoreCloudbase = create<UserState>((set, get) => ({
             myRank = myRankItem?.rank || 0
           }
 
+          // 保存到本地缓存
+          Taro.setStorageSync('rankList', rankList)
+          Taro.setStorageSync('myRank', myRank.toString())
+          Taro.setStorageSync('rankCacheTime', Date.now().toString())
+
           set({ rankList, myRank })
-          console.log('排行榜数据加载成功（云开发），共', rankList.length, '名玩家')
+          console.log('排行榜数据加载成功（云开发），共', rankList.length, '名玩家，已缓存到本地')
         }
       } else {
         // 本地模式：生成模拟数据
@@ -398,12 +422,30 @@ export const useUserStoreCloudbase = create<UserState>((set, get) => ({
           myRank = mockRankList.length
         }
 
+        // 保存到本地缓存
+        Taro.setStorageSync('rankList', mockRankList)
+        Taro.setStorageSync('myRank', myRank.toString())
+        Taro.setStorageSync('rankCacheTime', Date.now().toString())
+
         set({ rankList: mockRankList, myRank })
-        console.log('排行榜数据加载成功（本地模拟），共', mockRankList.length, '名玩家')
+        console.log('排行榜数据加载成功（本地模拟），共', mockRankList.length, '名玩家，已缓存到本地')
       }
     } catch (error) {
       console.error('获取排行榜失败:', error)
-      set({ rankList: [], myRank: 0 })
+      
+      // 失败时尝试使用本地缓存
+      const cachedRankList = Taro.getStorageSync('rankList')
+      const cachedMyRank = Taro.getStorageSync('myRank')
+      
+      if (cachedRankList && cachedRankList.length > 0) {
+        console.log('网络失败，使用本地缓存的排行榜数据')
+        set({ 
+          rankList: cachedRankList, 
+          myRank: cachedMyRank ? parseInt(cachedMyRank) : 0 
+        })
+      } else {
+        set({ rankList: [], myRank: 0 })
+      }
     }
   },
 
