@@ -116,23 +116,15 @@ function getLevelConfig(level: number, imageList: string[], levelImageMap: Recor
 
   const gridSize = difficulty.gridSize
 
-  // 使用预先规划的每一关的图片映射（优先使用本地路径）
+  // 随机从已缓存的图片列表中选择图片
   let imageUrl: string
   let originalUrl: string  // 原始网络图片URL（用于下载）
-  
-  if (levelImageMap[level]) {
-    // 优先使用本地路径（已缓存，加载更快）
-    imageUrl = levelImageMap[level].path
-    originalUrl = levelImageMap[level].url  // 保存原始URL
-    console.log(`🖼️  关卡 ${level} 使用本地路径:`, imageUrl)
-  } else {
-    // 降级逻辑：使用预加载的图片列表
-    imageUrl = imageList.length > 0
-      ? imageList[(level - 1) % imageList.length]
-      : 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1440&fit=crop&q=80' // 默认图片
-    originalUrl = imageUrl  // 网络图片，直接使用
-    console.log(`🖼️  关卡 ${level} 使用动态计算的图片（降级逻辑）`)
-  }
+
+  // 随机选择一张图片（使用当前关卡作为随机种子，保证每次进入同一关都是同一张图）
+  const randomIndex = (level * 17) % imageList.length  // 使用质数17增加随机性
+  imageUrl = imageList[randomIndex]
+  originalUrl = imageUrl
+  console.log(`🖼️  关卡 ${level} 随机使用图片 ${randomIndex + 1}/${imageList.length}`)
 
   return {
     level,
@@ -692,20 +684,9 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     console.log('🎮 自由游玩模式，关卡:', level)
 
-    // 使用预先规划的每一关的图片映射
-    let imageUrl: string
-    let originalUrl: string  // 原始网络图片URL
-    if (levelImageMap[level]) {
-      imageUrl = levelImageMap[level].path
-      originalUrl = levelImageMap[level].url
-    } else {
-      imageUrl = imageList.length > 0
-        ? imageList[(level - 1) % imageList.length]
-        : 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1080&h=1440&fit=crop&q=80'
-      originalUrl = imageUrl
-    }
-
-    const finalImageUrl = imageUrl
+    // 使用 getLevelConfig 返回的随机图片
+    const finalImageUrl = config.imageUrl
+    const originalUrl = config.originalUrl
 
     set({
       currentLevel: config.level,
