@@ -1,6 +1,6 @@
 import { View, Text, Image } from '@tarojs/components'
 import { useEffect } from 'react'
-import { useUserStoreCloudbase } from '@/stores/userStore-cloudbase'
+import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import './index.css'
 
@@ -35,14 +35,14 @@ const getAvatarUrl = (nickname: string, avatarUrl: string): string => {
 }
 
 export default function RankPage() {
-  const { userInfo, rankList, isLoggedIn, fetchRankList } = useUserStoreCloudbase()
+  const { userInfo, rankList, isLoggedIn, fetchRankList } = useUserStore()
   const { initSettings } = useSettingsStore()
 
   useEffect(() => {
     if (isLoggedIn) {
       fetchRankList().then(() => {
         // 调试：打印排行榜数据
-        const currentRankList = useUserStoreCloudbase.getState().rankList
+        const currentRankList = useUserStore.getState().rankList
         console.log('排行榜数据:', currentRankList)
         currentRankList.forEach((item, index) => {
           console.log(`用户 ${index + 1}: 昵称=${item.nickname}, 原始头像URL=${item.avatarUrl}, 有效头像URL=${getAvatarUrl(item.nickname, item.avatarUrl)}`)
