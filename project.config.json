@@ -1,16 +1,22 @@
 {
   "miniprogramRoot": "./",
   "projectname": "coze-mini-program",
-  "description": "test",
+  "description": "拼图游戏小程序",
   "appid": "touristappid",
   "cloudfunctionRoot": "./cloudfunctions/",
+  "cloudbaseRoot": "",
+  "cloudfunctionTemplateRoot": "",
   "setting": {
     "urlCheck": true,
     "es6": false,
     "enhance": false,
     "compileHotReLoad": false,
     "postcss": false,
-    "minified": false
+    "minified": false,
+    "useCompilerPlugins": [
+      "typescript"
+    ]
   },
-  "compileType": "miniprogram"
+  "compileType": "miniprogram",
+  "libVersion": "3.14.3"
 }

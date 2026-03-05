@@ -108,7 +108,7 @@ const LEVEL_DIFFICULTY_CONFIG = [
 ]
 
 // 关卡配置生成器
-function getLevelConfig(level: number, imageList: string[], levelImageMap: Record<number, { url: string; path: string }>): LevelConfig {
+function getLevelConfig(level: number, imageList: string[]): LevelConfig {
   // 根据关卡查找对应的难度配置
   const difficulty = LEVEL_DIFFICULTY_CONFIG.find(
     config => level >= config.minLevel && level <= config.maxLevel
@@ -398,15 +398,14 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // 开始游戏
   startGame: async (level: number, isFreePlay: boolean = false) => {
-    const { imageList, levelImageMap } = get()
+    const { imageList } = get()
     const isWeapp = Taro.getEnv() === Taro.ENV_TYPE.WEAPP
 
-    const config = getLevelConfig(level, imageList, levelImageMap)
+    const config = getLevelConfig(level, imageList)
 
     console.log('==========================================')
     console.log('🎮 startGame 被调用，关卡:', level, '模式:', isFreePlay ? '自由模式' : '正常模式')
     console.log('📋 imageList 长度:', imageList.length)
-    console.log('📋 levelImageMap 长度:', Object.keys(levelImageMap).length)
     console.log('📋 当前平台:', isWeapp ? '小程序' : 'H5')
 
     console.log('🎮 开始游戏，关卡:', config.level)
@@ -678,9 +677,9 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   // 自由游玩模式（不倒计时）
   startFreePlayMode: async (level: number) => {
-    const { imageList, levelImageMap } = get()
+    const { imageList } = get()
 
-    const config = getLevelConfig(level, imageList, levelImageMap)
+    const config = getLevelConfig(level, imageList)
 
     console.log('🎮 自由游玩模式，关卡:', level)
 
