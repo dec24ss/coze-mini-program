@@ -9,7 +9,7 @@ import UserProfileModal from '@/components/user-profile-modal'
 import './index.css'
 
 export default function IndexPage() {
-  const { userInfo, isLoggedIn, login, logout, updateUserInfo, checkUnlockedLevels, getCurrentLevel } = useUserStoreCloudbase()
+  const { userInfo, isLoggedIn, login, logout, updateUserInfo, checkUnlockedLevels } = useUserStoreCloudbase()
   const { initSettings } = useSettingsStore()
   const [showSettings, setShowSettings] = useState(false)
   const [showUserProfile, setShowUserProfile] = useState(false)
@@ -19,37 +19,41 @@ export default function IndexPage() {
     checkUnlockedLevels()
     // 初始化设置
     initSettings()
-    // 依赖登录状态变化时重新检查关卡
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn])
+  }, [isLoggedIn, checkUnlockedLevels, initSettings])
+
+  // 播放震动（提取公共逻辑）
+  const playVibration = () => {
+    useSettingsStore.getState().playVibration('light')
+  }
+
+  // 显示登录提示（提取公共逻辑）
+  const showLoginPrompt = (content: string, callback?: () => void) => {
+    Taro.showModal({
+      title: '提示',
+      content,
+      confirmText: '去登录',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          handleLogin()
+        } else if (callback) {
+          callback()
+        }
+      }
+    })
+  }
 
   const handleStartGame = async () => {
-    // 播放轻微震动
-    const { playVibration } = useSettingsStore.getState()
-    playVibration('light')
+    playVibration()
 
     if (!isLoggedIn) {
-      Taro.showModal({
-        title: '提示',
-        content: '微信登录后可赢取积分、使用道具、查看排行榜，是否立即登录？',
-        confirmText: '去登录',
-        cancelText: '先玩玩',
-        success: (res) => {
-          if (res.confirm) {
-            handleLogin()
-          } else {
-            startGameWithPreload()
-          }
-        }
+      showLoginPrompt('微信登录后可赢取积分、使用道具、查看排行榜，是否立即登录？', async () => {
+        await startGameWithPreload()
       })
       return
     }
 
-    // 获取当前应该开始的关卡（从上次未完成的关卡开始）
-    const level = getCurrentLevel()
-    console.log(`从第 ${level} 关开始游戏`)
-
-    // 确保图片预加载完成后再跳转
     await startGameWithPreload()
   }
 
@@ -69,96 +73,58 @@ export default function IndexPage() {
       Taro.hideLoading()
     }
 
-    // 跳转到游戏页面
     Taro.navigateTo({ url: '/pages/game/index' })
   }
 
   const handleLevelSelect = () => {
-    // 播放轻微震动
-    const { playVibration } = useSettingsStore.getState()
-    playVibration('light')
+    playVibration()
 
     if (!isLoggedIn) {
-      Taro.showModal({
-        title: '提示',
-        content: '微信登录后可记录关卡进度，是否立即登录？',
-        confirmText: '去登录',
-        cancelText: '取消',
-        success: (res) => {
-          if (res.confirm) {
-            handleLogin()
-          }
-        }
-      })
+      showLoginPrompt('微信登录后可记录关卡进度，是否立即登录？')
       return
     }
     Taro.navigateTo({ url: '/pages/level-select/index' })
   }
 
   const handleRankList = () => {
-    // 播放轻微震动
-    const { playVibration } = useSettingsStore.getState()
-    playVibration('light')
+    playVibration()
 
     if (!isLoggedIn) {
-      Taro.showModal({
-        title: '提示',
-        content: '微信登录后可查看排行榜，是否立即登录？',
-        confirmText: '去登录',
-        cancelText: '取消',
-        success: (res) => {
-          if (res.confirm) {
-            handleLogin()
-          }
-        }
-      })
+      showLoginPrompt('微信登录后可查看排行榜，是否立即登录？')
       return
     }
     Taro.navigateTo({ url: '/pages/rank/index' })
   }
 
   const handleLogin = async () => {
-    // 播放轻微震动
-    const { playVibration } = useSettingsStore.getState()
-    playVibration('light')
-
-    console.log('开始登录...')
+    playVibration()
 
     try {
-      // 先调用微信登录
       await login()
 
-      // 登录成功后检查是否需要设置用户信息
       const { isLoggedIn: isNowLoggedIn, userInfo: currentUser } = useUserStoreCloudbase.getState()
-      console.log('登录结果:', { isLoggedIn: isNowLoggedIn, userInfo: currentUser })
 
       if (isNowLoggedIn && currentUser) {
-        // 如果用户没有设置头像和昵称，或者使用默认值，则显示设置弹窗
-        if (!currentUser.avatarUrl || currentUser.nickname === '拼图玩家' || currentUser.nickname === '微信用户') {
-          console.log('用户未设置头像和昵称，显示设置弹窗')
+        const needSetProfile = !currentUser.avatarUrl || 
+                              currentUser.nickname === '拼图玩家' || 
+                              currentUser.nickname === '微信用户'
+        
+        if (needSetProfile) {
           setShowUserProfile(true)
-        } else {
-          console.log('用户已设置头像和昵称:', currentUser)
         }
       }
     } catch (error) {
       console.error('登录过程出错:', error)
-      Taro.showToast({
-        title: '登录失败，请稍后重试',
-        icon: 'none'
-      })
+      Taro.showToast({ title: '登录失败，请稍后重试', icon: 'none' })
     }
   }
 
   const handleSaveUserProfile = (nickname: string, avatarUrl: string) => {
     updateUserInfo(nickname, avatarUrl)
-    console.log('用户信息已保存:', nickname, avatarUrl)
   }
 
   const handleLogout = () => {
-    // 播放轻微震动
-    const { playVibration } = useSettingsStore.getState()
-    playVibration('light')
+    playVibration()
 
     Taro.showModal({
       title: '确认退出',
