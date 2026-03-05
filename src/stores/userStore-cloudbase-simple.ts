@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import Taro from '@tarojs/taro'
+import { getCloudbaseDB, isCloudbaseEnabled } from '@/cloudbase'
 
 // 用户信息
 export interface UserInfo {

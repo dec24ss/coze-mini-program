@@ -1,14 +1,14 @@
 import { View, Text, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useEffect, useState } from 'react'
-import { useUserStoreCloudbase } from '@/stores/userStore-cloudbase'
+import { useUserStore } from '@/stores/userStore'
 import { useSettingsStore } from '@/stores/settingsStore'
 import SettingsModal from '@/components/settings-modal'
 import UserProfileModal from '@/components/user-profile-modal'
 import './index.css'
 
 export default function IndexPage() {
-  const { userInfo, isLoggedIn, login, logout, updateUserInfo, checkUnlockedLevels, getCurrentLevel } = useUserStoreCloudbase()
+  const { userInfo, isLoggedIn, login, logout, updateUserInfo, checkUnlockedLevels, getCurrentLevel } = useUserStore()
   const { initSettings } = useSettingsStore()
   const [showSettings, setShowSettings] = useState(false)
   const [showUserProfile, setShowUserProfile] = useState(false)
@@ -108,7 +108,7 @@ export default function IndexPage() {
       await login()
 
       // 登录成功后检查是否需要设置用户信息
-      const { isLoggedIn: isNowLoggedIn, userInfo: currentUser } = useUserStoreCloudbase.getState()
+      const { isLoggedIn: isNowLoggedIn, userInfo: currentUser } = useUserStore.getState()
       console.log('登录结果:', { isLoggedIn: isNowLoggedIn, userInfo: currentUser })
 
       if (isNowLoggedIn && currentUser) {
