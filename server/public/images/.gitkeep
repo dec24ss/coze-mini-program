@@ -1,3 +1,0 @@
-# This file ensures the public/images directory is tracked by git
-# Images will be downloaded to this directory when the service starts
-
