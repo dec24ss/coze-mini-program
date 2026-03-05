@@ -1,0 +1,16 @@
+/* 孔雀蓝 + 浅驼色 配色方案 */
+
+/* 主色调变量 */
+:root {
+  --primary-color: #0D7E9E;
+  --primary-dark: #0A5F77;
+  --primary-light: #1496B8;
+  --secondary-color: #D7B9A1;
+  --secondary-light: #E8D4C4;
+  --secondary-dark: #C4A38B;
+  --bg-warm: #F5EDE6;
+  --bg-cool: #E8F4F7;
+  --text-primary: #2D3748;
+  --text-secondary: #4A5568;
+  --white: #FFFFFF;
+}

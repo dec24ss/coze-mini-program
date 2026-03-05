@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
+  background: linear-gradient(135deg, #F5EDE6 0%, #E8F4F7 50%, #F0E8E0 100%);
 }
 
 .loading-content {
@@ -18,7 +18,7 @@
 .loading-title {
   font-size: 48px;
   font-weight: 700;
-  color: #3B82F6;
+  color: #0D7E9E;
   margin-bottom: 48px;
   text-align: center;
 }
@@ -35,14 +35,14 @@
 .loading-progress-bar {
   flex: 1;
   height: 12px;
-  background-color: #E5E7EB;
+  background-color: #E8D4C4;
   border-radius: 9999px;
   overflow: hidden;
 }
 
 .loading-progress-fill {
   height: 100%;
-  background-color: #3B82F6;
+  background: linear-gradient(90deg, #0D7E9E 0%, #1496B8 100%);
   border-radius: 9999px;
   transition: width 0.3s ease;
 }
@@ -51,7 +51,7 @@
 .loading-percent {
   font-size: 20px;
   font-weight: 700;
-  color: #3B82F6;
+  color: #0D7E9E;
   min-width: 60px;
   text-align: right;
 }
@@ -59,7 +59,7 @@
 /* 加载文字 */
 .loading-text {
   font-size: 16px;
-  color: #6B7280;
+  color: #4A5568;
   text-align: center;
   margin-bottom: 16px;
 }
@@ -71,6 +71,6 @@
 
 .loading-tip-text {
   font-size: 14px;
-  color: #9CA3AF;
+  color: #A0AEC0;
   text-align: center;
 }

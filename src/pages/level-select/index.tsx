@@ -23,48 +23,48 @@ const DIFFICULTIES: DifficultyConfig[] = [
     name: '简单模式',
     gridSize: 3,
     description: '3×3 网格，自由模式',
-    color: '#93C5FD',
-    bgColor: 'linear-gradient(135deg, #E0F2FE 0%, #DBEAFE 100%)'
+    color: '#1496B8',
+    bgColor: 'linear-gradient(135deg, #F5EDE6 0%, #EDE3D9 100%)'
   },
   {
     id: 'beginner',
     name: '入门模式',
     gridSize: 4,
     description: '4×4 网格，自由模式',
-    color: '#60A5FA',
-    bgColor: 'linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%)'
+    color: '#0D7E9E',
+    bgColor: 'linear-gradient(135deg, #EDE3D9 0%, #E8F4F7 100%)'
   },
   {
     id: 'normal',
     name: '普通模式',
     gridSize: 5,
     description: '5×5 网格，自由模式',
-    color: '#3B82F6',
-    bgColor: 'linear-gradient(135deg, #BFDBFE 0%, #93C5FD 100%)'
+    color: '#0A5F77',
+    bgColor: 'linear-gradient(135deg, #E8F4F7 0%, #E0EBEF 100%)'
   },
   {
     id: 'hard',
     name: '困难模式',
     gridSize: 6,
     description: '6×6 网格，自由模式',
-    color: '#2563EB',
-    bgColor: 'linear-gradient(135deg, #93C5FD 0%, #60A5FA 100%)'
+    color: '#D7B9A1',
+    bgColor: 'linear-gradient(135deg, #E8D4C4 0%, #D7B9A1 100%)'
   },
   {
     id: 'expert',
     name: '专家模式',
     gridSize: 7,
     description: '7×7 网格，自由模式',
-    color: '#1D4ED8',
-    bgColor: 'linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%)'
+    color: '#C4A38B',
+    bgColor: 'linear-gradient(135deg, #D7B9A1 0%, #C4A38B 100%)'
   },
   {
     id: 'master',
     name: '大师模式',
     gridSize: 8,
     description: '8×8 网格，自由模式',
-    color: '#1E40AF',
-    bgColor: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)'
+    color: '#0D7E9E',
+    bgColor: 'linear-gradient(135deg, #0D7E9E 0%, #1496B8 100%)'
   }
 ]
 
