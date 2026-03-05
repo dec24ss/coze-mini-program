@@ -1,112 +1,102 @@
-'use strict';
-
-const cloud = require('wx-server-sdk');
+// 云函数入口文件
+const cloud = require('wx-server-sdk')
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
-});
+})
 
-const db = cloud.database();
+const db = cloud.database()
 
-// 获取或创建用户
+// 云函数入口函数
 exports.main = async (event, context) => {
-  const { openid, nickname, avatar_url } = event;
+  const { action, openid, avatar_url, nickname } = event
 
   try {
-    // 查询用户是否存在
-    const { data: existingUsers } = await db
-      .collection('users')
-      .where({
-        openid: db.command.eq(openid)
-      })
-      .get();
+    if (action === 'getOrCreate') {
+      // 查询用户是否存在
+      const userRes = await db.collection('users').where({
+        openid
+      }).get()
 
-    if (existingUsers && existingUsers.length > 0) {
-      const existingUser = existingUsers[0];
-      let needUpdate = false;
-      const updateData = {};
-
-      // 检查是否需要更新昵称
-      if (nickname && nickname !== existingUser.nickname) {
-        updateData.nickname = nickname;
-        needUpdate = true;
-      }
-
-      // 检查是否需要更新头像
-      if (avatar_url && avatar_url !== existingUser.avatar_url) {
-        updateData.avatar_url = avatar_url;
-        needUpdate = true;
-      }
-
-      // 如果需要更新
-      if (needUpdate) {
-        updateData.updatedAt = new Date();
-        await db
-          .collection('users')
-          .doc(existingUser._id)
-          .update({
+      if (userRes.data.length > 0) {
+        const existingUser = userRes.data[0]
+        // 如果有新的头像或昵称，更新
+        if (avatar_url || nickname) {
+          const updateData = {}
+          if (avatar_url) updateData.avatar_url = avatar_url
+          if (nickname) updateData.nickname = nickname
+          
+          await db.collection('users').doc(existingUser._id).update({
             data: updateData
-          });
-
-        // 重新查询获取更新后的数据
-        const { data: updatedUsers } = await db
-          .collection('users')
-          .where({
-            openid: db.command.eq(openid)
           })
-          .get();
-
-        if (updatedUsers && updatedUsers.length > 0) {
+          
+          // 返回更新后的用户
+          const updatedRes = await db.collection('users').doc(existingUser._id).get()
           return {
-            code: 200,
-            msg: 'success',
-            data: updatedUsers[0]
-          };
+            success: true,
+            data: updatedRes.data
+          }
+        }
+        return {
+          success: true,
+          data: existingUser
+        }
+      } else {
+        // 创建新用户
+        const newUser = {
+          openid,
+          avatar_url: avatar_url || '',
+          nickname: nickname || '微信用户',
+          level_unlocked: 1,
+          best_scores: {},
+          created_at: new Date(),
+          updated_at: new Date()
+        }
+        
+        const addRes = await db.collection('users').add({
+          data: newUser
+        })
+        
+        return {
+          success: true,
+          data: {
+            _id: addRes._id,
+            ...newUser
+          }
         }
       }
-
-      // 不需要更新，返回现有用户
+    } else if (action === 'update') {
+      // 更新用户信息
+      const updateData = {}
+      if (avatar_url) updateData.avatar_url = avatar_url
+      if (nickname) updateData.nickname = nickname
+      updateData.updated_at = new Date()
+      
+      await db.collection('users').where({
+        openid
+      }).update({
+        data: updateData
+      })
+      
+      const updatedRes = await db.collection('users').where({
+        openid
+      }).get()
+      
       return {
-        code: 200,
-        msg: 'success',
-        data: existingUser
-      };
+        success: true,
+        data: updatedRes.data[0]
+      }
     }
-
-    // 用户不存在，创建新用户
-    const newUser = {
-      openid,
-      nickname: nickname || '匿名用户',
-      avatar_url: avatar_url || '',
-      highestLevel: 0,
-      points: 0,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-
-    const { _id } = await db
-      .collection('users')
-      .add({
-        data: newUser
-      });
-
-    // 查询新创建的用户
-    const { data: createdUsers } = await db
-      .collection('users')
-      .doc(_id)
-      .get();
-
+    
     return {
-      code: 200,
-      msg: 'success',
-      data: createdUsers.data
-    };
+      success: false,
+      error: 'Unknown action'
+    }
   } catch (error) {
-    console.error('用户操作失败:', error);
+    console.error('Error in users function:', error)
     return {
-      code: 500,
-      msg: '操作失败',
-      data: null
-    };
+      success: false,
+      error: error.message
+    }
   }
-};
+}
