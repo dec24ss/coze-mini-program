@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #F5EDE6 0%, #E8F4F7 50%, #F0E8E0 100%);
+  background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 100%);
   position: relative;
 }
 
@@ -19,7 +19,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(13, 126, 158, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: none;
   z-index: 100;
 }
@@ -39,15 +39,14 @@
 .home-title {
   font-size: 56px;
   font-weight: 700;
-  color: #0D7E9E;
+  color: #3B82F6;
   margin-bottom: 20px;
   text-align: center;
-  text-shadow: 2px 2px 4px rgba(13, 126, 158, 0.1);
 }
 
 .home-subtitle {
   font-size: 22px;
-  color: #4A5568;
+  color: #6B7280;
   margin-bottom: 32px;
   text-align: center;
 }
@@ -67,28 +66,27 @@
   height: 80px;
   border-radius: 50%;
   margin-bottom: 12px;
-  border: 3px solid #0D7E9E;
-  box-shadow: 0 4px 12px rgba(13, 126, 158, 0.2);
+  border: 3px solid #3B82F6;
 }
 
 .user-name {
   font-size: 18px;
   font-weight: 600;
-  color: #2D3748;
+  color: #1F2937;
   margin-bottom: 4px;
 }
 
 /* 登录按钮 */
 .login-button {
   width: 100%;
-  background: linear-gradient(135deg, #0D7E9E 0%, #1496B8 100%);
+  background: #07C160;
   color: white;
   border-radius: 9999px;
   padding: 18px;
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 24px;
-  box-shadow: 0 10px 25px -5px rgba(13, 126, 158, 0.35);
+  box-shadow: 0 10px 25px -5px rgba(7, 193, 96, 0.3);
   border: none;
 }
 
@@ -106,13 +104,13 @@
 
 .home-button {
   width: 100%;
-  background: linear-gradient(135deg, #0D7E9E 0%, #1496B8 100%);
+  background: #3B82F6;
   color: white;
   border-radius: 9999px;
   padding: 18px;
   font-size: 20px;
   font-weight: 600;
-  box-shadow: 0 10px 25px -5px rgba(13, 126, 158, 0.35);
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
   border: none;
   display: flex;
   flex-direction: column;
@@ -125,21 +123,21 @@
 }
 
 .home-button.primary {
-  background: linear-gradient(135deg, #0D7E9E 0%, #1496B8 100%);
+  background: #3B82F6;
 }
 
 .home-button.logout {
-  background: linear-gradient(135deg, #0D7E9E 0%, #1496B8 100%);
+  background: #3B82F6;
   color: white;
   border: none;
-  box-shadow: 0 10px 25px -5px rgba(13, 126, 158, 0.35);
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
   font-size: 20px;
   padding: 18px;
 }
 
 .home-button.disabled {
-  background: #E8D4C4;
-  color: #C4A38B;
+  background: #E5E7EB;
+  color: #9CA3AF;
   box-shadow: none;
 }
 

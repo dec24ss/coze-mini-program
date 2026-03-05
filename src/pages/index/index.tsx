@@ -170,7 +170,7 @@ export default function IndexPage() {
             className="home-button"
             onClick={handleLevelSelect}
           >
-            自由模式
+            关卡选择
           </Button>
           <Button
             className="home-button"

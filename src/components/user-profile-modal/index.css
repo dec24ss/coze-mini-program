@@ -1,294 +1,157 @@
-/* 用户信息设置弹窗样式 - 蓝白色系 */
+/* 用户信息设置弹窗样式 */
 .user-profile-modal-mask {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(29, 78, 216, 0.3);
-  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  animation: maskFadeIn 0.3s ease-out;
-}
-
-@keyframes maskFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 .user-profile-modal-content {
   width: 85%;
   max-width: 400px;
-  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
-  border-radius: 24px;
-  padding: 40px 32px 32px;
-  box-shadow:
-    0 20px 40px rgba(29, 78, 216, 0.15),
-    0 0 0 1px rgba(59, 130, 246, 0.1);
-  animation: modalSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  position: relative;
-  overflow: hidden;
+  background: white;
+  border-radius: 24rpx;
+  padding: 48rpx 40rpx 40rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
+  animation: modalFadeIn 0.3s ease-out;
 }
 
-/* 装饰性背景 */
-.user-profile-modal-content::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: conic-gradient(from 0deg, transparent, rgba(59, 130, 246, 0.05), transparent 30%);
-  animation: rotate-bg 8s linear infinite;
-}
-
-@keyframes rotate-bg {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes modalSlideIn {
+@keyframes modalFadeIn {
   from {
     opacity: 0;
-    transform: scale(0.8) translateY(20px);
-  }
-  50% {
-    transform: scale(1.02) translateY(-5px);
+    transform: scale(0.9);
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: scale(1);
   }
 }
 
 .modal-title {
-  font-size: 32px;
-  font-weight: 800;
-  background: linear-gradient(135deg, #1D4ED8 0%, #3B82F6 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1f2937;
   text-align: center;
-  margin-bottom: 8px;
-  position: relative;
-  z-index: 1;
-  text-shadow: 0 2px 4px rgba(29, 78, 216, 0.1);
+  margin-bottom: 16rpx;
 }
 
 .modal-subtitle {
-  font-size: 24px;
-  color: #64748B;
+  font-size: 28rpx;
+  color: #6b7280;
   text-align: center;
-  margin-bottom: 32px;
-  position: relative;
-  z-index: 1;
+  margin-bottom: 48rpx;
 }
 
 .section-label {
-  font-size: 24px;
-  font-weight: 600;
-  color: #1D4ED8;
-  margin-bottom: 12px;
-  position: relative;
-  z-index: 1;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 16rpx;
 }
 
 /* 头像区域 */
 .avatar-section {
-  margin-bottom: 28px;
-  position: relative;
-  z-index: 1;
+  margin-bottom: 32rpx;
 }
 
 .avatar-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 16rpx;
 }
 
 .avatar-image {
-  width: 120px;
-  height: 120px;
+  width: 160rpx;
+  height: 160rpx;
   border-radius: 50%;
-  border: 4px solid #DBEAFE;
-  box-shadow:
-    0 8px 20px rgba(59, 130, 246, 0.2),
-    0 0 0 2px rgba(59, 130, 246, 0.1);
-  animation: avatarGlow 3s ease-in-out infinite alternate;
-}
-
-@keyframes avatarGlow {
-  0% {
-    box-shadow:
-      0 8px 20px rgba(59, 130, 246, 0.2),
-      0 0 0 2px rgba(59, 130, 246, 0.1);
-  }
-  100% {
-    box-shadow:
-      0 8px 30px rgba(59, 130, 246, 0.4),
-      0 0 0 4px rgba(59, 130, 246, 0.2);
-  }
+  border: 4rpx solid #e5e7eb;
 }
 
 .avatar-placeholder {
-  width: 120px;
-  height: 120px;
+  width: 160rpx;
+  height: 160rpx;
   border-radius: 50%;
-  border: 3px dashed #93C5FD;
-  background: linear-gradient(135deg, #F0F9FF 0%, #DBEAFE 100%);
+  border: 4rpx dashed #d1d5db;
+  background-color: #f9fafb;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
 }
 
 .avatar-placeholder-text {
-  font-size: 20px;
-  color: #64748B;
+  font-size: 24rpx;
+  color: #9ca3af;
 }
 
 .avatar-button {
-  width: 180px;
-  height: 48px;
-  line-height: 48px;
-  background: linear-gradient(135deg, #DBEAFE 0%, #93C5FD 100%);
-  color: #1D4ED8;
-  font-size: 24px;
+  width: 200rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  font-size: 28rpx;
   border: none;
-  border-radius: 24px;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-  transition: all 0.3s ease;
-}
-
-.avatar-button:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
+  border-radius: 32rpx;
 }
 
 /* 昵称区域 */
 .nickname-section {
-  margin-bottom: 32px;
-  position: relative;
-  z-index: 1;
+  margin-bottom: 48rpx;
 }
 
 .input-wrapper {
-  background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
-  border-radius: 16px;
-  padding: 4px;
-  border: 2px solid #DBEAFE;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
-  transition: all 0.3s ease;
-}
-
-.input-wrapper:focus-within {
-  border-color: #3B82F6;
-  box-shadow:
-    0 4px 12px rgba(59, 130, 246, 0.2),
-    0 0 0 4px rgba(59, 130, 246, 0.1);
+  background-color: #f9fafb;
+  border-radius: 16rpx;
+  padding: 4rpx;
+  border: 2rpx solid #e5e7eb;
 }
 
 .nickname-input {
   width: 100%;
-  height: 64px;
-  line-height: 64px;
-  padding: 0 20px;
-  font-size: 24px;
-  color: #1D4ED8;
+  height: 80rpx;
+  line-height: 80rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #1f2937;
   background: transparent;
   border: none;
-  font-weight: 500;
-}
-
-.nickname-input::placeholder {
-  color: #93C5FD;
 }
 
 /* 按钮组 */
 .button-group {
   display: flex;
-  gap: 12px;
-  position: relative;
-  z-index: 1;
+  gap: 16rpx;
 }
 
 .cancel-button {
   flex: 1;
-  height: 72px;
-  line-height: 72px;
-  background: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%);
-  color: #64748B;
-  font-size: 28px;
+  height: 88rpx;
+  line-height: 88rpx;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  font-size: 32rpx;
   border: none;
-  border-radius: 16px;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-}
-
-.cancel-button:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  border-radius: 16rpx;
+  font-weight: 500;
 }
 
 .confirm-button {
   flex: 1;
-  height: 72px;
-  line-height: 72px;
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  height: 88rpx;
+  line-height: 88rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  font-size: 28px;
+  font-size: 32rpx;
   border: none;
-  border-radius: 16px;
-  font-weight: 700;
-  box-shadow:
-    0 8px 20px rgba(59, 130, 246, 0.4),
-    0 0 0 2px rgba(59, 130, 246, 0.1);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-/* 按钮光效 */
-.confirm-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s;
-}
-
-.confirm-button:active::before {
-  left: 100%;
-}
-
-.confirm-button:active {
-  transform: scale(0.95);
-  box-shadow:
-    0 4px 10px rgba(59, 130, 246, 0.3),
-    0 0 0 2px rgba(59, 130, 246, 0.1);
+  border-radius: 16rpx;
+  font-weight: 600;
 }
 
 .confirm-button::after {
