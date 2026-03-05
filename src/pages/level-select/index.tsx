@@ -25,35 +25,53 @@ const DIFFICULTIES: DifficultyConfig[] = [
     gridSize: 3,
     description: '3×3 网格，适合新手',
     timeLimit: 60,
-    color: '#3B82F6',
-    bgColor: 'linear-gradient(135deg, #DBEAFE 0%, #93C5FD 100%)'
+    color: '#93C5FD',
+    bgColor: 'linear-gradient(135deg, #E0F2FE 0%, #DBEAFE 100%)'
+  },
+  {
+    id: 'beginner',
+    name: '入门模式',
+    gridSize: 4,
+    description: '4×4 网格，轻松挑战',
+    timeLimit: 120,
+    color: '#60A5FA',
+    bgColor: 'linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%)'
   },
   {
     id: 'normal',
     name: '普通模式',
-    gridSize: 4,
-    description: '4×4 网格，挑战性适中',
-    timeLimit: 120,
-    color: '#60A5FA',
-    bgColor: 'linear-gradient(135deg, #93C5FD 0%, #60A5FA 100%)'
+    gridSize: 5,
+    description: '5×5 网格，挑战性适中',
+    timeLimit: 180,
+    color: '#3B82F6',
+    bgColor: 'linear-gradient(135deg, #BFDBFE 0%, #93C5FD 100%)'
   },
   {
     id: 'hard',
     name: '困难模式',
-    gridSize: 5,
-    description: '5×5 网格，考验观察力',
-    timeLimit: 180,
+    gridSize: 6,
+    description: '6×6 网格，考验观察力',
+    timeLimit: 240,
     color: '#2563EB',
-    bgColor: 'linear-gradient(135deg, #60A5FA 0%, #2563EB 100%)'
+    bgColor: 'linear-gradient(135deg, #93C5FD 0%, #60A5FA 100%)'
   },
   {
     id: 'expert',
     name: '专家模式',
-    gridSize: 6,
-    description: '6×6 网格，大师级挑战',
-    timeLimit: 240,
+    gridSize: 7,
+    description: '7×7 网格，大师级挑战',
+    timeLimit: 300,
     color: '#1D4ED8',
-    bgColor: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)'
+    bgColor: 'linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%)'
+  },
+  {
+    id: 'master',
+    name: '大师模式',
+    gridSize: 8,
+    description: '8×8 网格，极限挑战',
+    timeLimit: 360,
+    color: '#1E40AF',
+    bgColor: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)'
   }
 ]
 
