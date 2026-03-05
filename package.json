@@ -4,7 +4,8 @@
   "private": true,
   "description": "Coze Mini Program Application",
   "scripts": {
-    "build": "pnpm exec concurrently -n lint,tsc,web,weapp,server -c red,blue,green,yellow,magenta \"pnpm lint:build\" \"pnpm tsc\" \"pnpm build:web\" \"pnpm build:weapp\" \"pnpm build:server\"",
+    "build": "pnpm exec concurrently -n lint,tsc,web,server -c red,blue,green,magenta \"pnpm lint:build\" \"pnpm tsc\" \"pnpm build:web\" \"pnpm build:server\"",
+    "build:all": "pnpm exec concurrently -n lint,tsc,web,weapp,server -c red,blue,green,yellow,magenta \"pnpm lint:build\" \"pnpm tsc\" \"pnpm build:web\" \"pnpm build:weapp\" \"pnpm build:server\"",
     "build:server": "pnpm --filter server build",
     "build:weapp": "taro build --type weapp",
     "build:web": "taro build --type h5",
