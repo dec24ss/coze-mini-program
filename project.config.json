@@ -1,16 +1,22 @@
 {
-  "miniprogramRoot": "./",
-  "projectname": "coze-mini-program",
-  "description": "test",
-  "appid": "touristappid",
-  "cloudfunctionRoot": "./cloudfunctions/",
+  "miniprogramRoot": "dist/",
+  "projectname": "海海拼图大作战",
+  "description": "基于 Taro 框架开发的微信小程序拼图游戏",
+  "appid": "your-appid-here",
+  "cloudfunctionRoot": "cloudfunctions/",
   "setting": {
-    "urlCheck": true,
-    "es6": false,
-    "enhance": false,
-    "compileHotReLoad": false,
-    "postcss": false,
-    "minified": false
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "showES6CompileOption": true,
+    "useCompilerPlugins": true,
+    "ignoreUploadUnusedFiles": true
   },
-  "compileType": "miniprogram"
+  "compileType": "miniprogram",
+  "simulatorType": "wechat",
+  "simulatorPluginLibVersion": {}
 }
