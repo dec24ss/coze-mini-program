@@ -106,27 +106,15 @@ export const useUserStore = create<UserState>((set, get) => ({
             points: apiUser.points || 0
           }
 
-          // 从本地存储读取关卡图片映射（本地缓存）
-          const savedLevelImages = Taro.getStorageSync('levelImages')
-          const levelImages = savedLevelImages ? JSON.parse(savedLevelImages) : {}
-
-          // 从本地存储读取解锁的关卡（优先使用本地数据，确保游戏进度不会丢失）
-          const savedUnlockedLevels = Taro.getStorageSync('unlockedLevels')
-          const unlockedLevels = savedUnlockedLevels ? Math.max(parseInt(savedUnlockedLevels), 1) : 1
-
-          // 保存 openid 到本地存储
-          Taro.setStorageSync('openid', apiUser.openid)
-
           set({
             userInfo,
             isLoggedIn: true,
             isLoading: false,
-            unlockedLevels,
-            levelImages
+            unlockedLevels: Math.max(userInfo.highestLevel + 1, 1),  // 从云数据库计算解锁的关卡
+            levelImages: {}  // 关卡图片映射由游戏逻辑管理
           })
 
           console.log('用户登录成功:', userInfo)
-          console.log('已加载关卡图片映射:', Object.keys(levelImages).length, '个关卡')
         } else {
           throw new Error('登录失败：服务器返回数据格式错误')
         }
@@ -188,12 +176,7 @@ export const useUserStore = create<UserState>((set, get) => ({
       myRank: 0,
       levelImages: {}  // 清除关卡图片缓存
     })
-    Taro.removeStorageSync('highestLevel')
-    Taro.removeStorageSync('unlockedLevels')
-    Taro.removeStorageSync('points')
-    Taro.removeStorageSync('levelImages')  // 清除关卡图片缓存
-    Taro.removeStorageSync('openid')  // 清除 openid
-    console.log('用户退出登录，已清除关卡图片缓存')
+    console.log('用户退出登录')
   },
 
   // 更新最高关卡
@@ -220,14 +203,9 @@ export const useUserStore = create<UserState>((set, get) => ({
         levelImages: newLevelImages
       })
 
-      // 保存到本地存储
-      Taro.setStorageSync('highestLevel', level.toString())
-      Taro.setStorageSync('levelImages', JSON.stringify(newLevelImages))
-
       // 同时更新解锁的关卡（下一关）
       const newUnlockedLevels = Math.max(get().unlockedLevels, level + 1)
       set({ unlockedLevels: newUnlockedLevels })
-      Taro.setStorageSync('unlockedLevels', newUnlockedLevels.toString())
 
       // 同步更新到后端数据库
       try {
@@ -294,18 +272,13 @@ export const useUserStore = create<UserState>((set, get) => ({
 
   // 检查已解锁的关卡
   checkUnlockedLevels: () => {
-    const { isLoggedIn } = get()
-    if (!isLoggedIn) {
+    const { userInfo, isLoggedIn } = get()
+    if (!isLoggedIn || !userInfo) {
       return 1  // 未登录只能玩第1关
     }
 
-    const savedUnlockedLevels = Taro.getStorageSync('unlockedLevels')
-    if (savedUnlockedLevels) {
-      const levels = parseInt(savedUnlockedLevels)
-      set({ unlockedLevels: levels })
-      return levels
-    }
-    return 1
+    // 从 highestLevel + 1 开始计算
+    return Math.max(userInfo.highestLevel + 1, 1)
   },
 
   // 添加积分
@@ -320,8 +293,6 @@ export const useUserStore = create<UserState>((set, get) => ({
     const newUserInfo = { ...userInfo, points: newPoints }
     set({ userInfo: newUserInfo })
 
-    // 保存到本地存储
-    Taro.setStorageSync('points', newPoints.toString())
     console.log(`用户积分增加 ${points}，当前积分: ${newPoints}`)
 
     // 同步更新到后端数据库
@@ -358,8 +329,6 @@ export const useUserStore = create<UserState>((set, get) => ({
     const newUserInfo = { ...userInfo, points: newPoints }
     set({ userInfo: newUserInfo })
 
-    // 保存到本地存储
-    Taro.setStorageSync('points', newPoints.toString())
     console.log(`用户使用积分 ${points}，当前积分: ${newPoints}`)
 
     // 同步更新到后端数据库

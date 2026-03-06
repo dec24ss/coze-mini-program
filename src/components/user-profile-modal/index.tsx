@@ -2,6 +2,7 @@ import { View, Text, Input, Button, Image } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import { useState } from 'react'
 import { Network } from '@/network'
+import { useUserStore } from '@/stores/userStore'
 import './index.css'
 
 interface UserProfileModalProps {
@@ -19,6 +20,7 @@ export default function UserProfileModal({
   initialNickname = '',
   initialAvatarUrl = ''
 }: UserProfileModalProps) {
+  const { userInfo } = useUserStore()
   const [nickname, setNickname] = useState(initialNickname)
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl)
   const [isUploading, setIsUploading] = useState(false)
@@ -27,6 +29,15 @@ export default function UserProfileModal({
     const { avatarUrl: selectedAvatarUrl } = e.detail
 
     console.log('用户选择头像（本地路径）:', selectedAvatarUrl)
+
+    if (!userInfo?.openid) {
+      console.error('用户未登录，无法上传头像')
+      Taro.showToast({
+        title: '用户未登录',
+        icon: 'none'
+      })
+      return
+    }
 
     // 显示上传提示
     setIsUploading(true)
@@ -39,7 +50,7 @@ export default function UserProfileModal({
         filePath: selectedAvatarUrl,
         name: 'file',
         formData: {
-          openid: Taro.getStorageSync('openid'),
+          openid: userInfo.openid,
           fileName: 'avatar.jpg'
         }
       })
