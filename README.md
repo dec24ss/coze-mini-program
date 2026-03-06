@@ -112,7 +112,7 @@ const CLOUDBASE_ENV = '你的云开发环境ID'  // 填入环境 ID
 
 ### 后端
 - **NestJS** - Node.js 框架
-- **SQLite** - 本地数据库
+- **Supabase** - 云数据库（可选）
 - **腾讯云开发** - 云服务（可选）
 
 ### 云开发
