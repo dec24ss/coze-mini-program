@@ -9,8 +9,8 @@ export class ImageController {
    * 获取所有图片列表
    */
   @Get('list')
-  getAllImages() {
-    const images = this.imageService.getAllImages()
+  async getAllImages() {
+    const images = await this.imageService.getAllImages()
     return {
       code: 200,
       msg: 'success',

@@ -2,7 +2,7 @@ import { View, Text, Button, Image, Canvas } from '@tarojs/components'
 import { useEffect, useRef, useState } from 'react'
 import Taro, { useRouter } from '@tarojs/taro'
 import { useGameStore } from '@/stores/gameStore'
-import { useUserStoreCloudbase } from '@/stores/userStore-cloudbase'
+import { useUserStore } from '@/stores/userStore-supabase'
 import { useSettingsStore } from '@/stores/settingsStore'
 import type { PuzzlePiece } from '@/stores/gameStore'
 import './index.css'
@@ -55,7 +55,7 @@ export default function GamePage() {
     loadNextLevel
   } = useGameStore()
 
-  const { updateHighestLevel, addPoints, consumePoints, getPoints } = useUserStoreCloudbase()
+  const { updateHighestLevel, addPoints, consumePoints, getPoints } = useUserStore()
 
   const [draggingPiece, setDraggingPiece] = useState<PuzzlePiece | null>(null)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
@@ -162,7 +162,7 @@ export default function GamePage() {
 
     const initGame = async () => {
       const { isImagesPreloaded, levelImageMap, preloadImages } = useGameStore.getState()
-      const { getCurrentLevel } = useUserStoreCloudbase.getState()
+      const { getCurrentLevel } = useUserStore.getState()
 
       console.log('📋 isImagesPreloaded:', isImagesPreloaded)
       console.log('📋 levelImageMap 长度:', Object.keys(levelImageMap).length)

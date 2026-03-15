@@ -70,8 +70,8 @@ except Exception as e:
 function getSupabaseCredentials(): SupabaseCredentials {
   loadEnv();
 
-  const url = process.env.COZE_SUPABASE_URL;
-  const anonKey = process.env.COZE_SUPABASE_ANON_KEY;
+  const url = process.env.COZE_SUPABASE_URL || 'https://egutrdawrbziyklwnuov.supabase.co';
+  const anonKey = process.env.COZE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVndXRyZGF3cmJ6aXlrbHdudW92Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0MjUwMTEsImV4cCI6MjA4ODAwMTAxMX0.PKGOVO2ItYvesw714VRdGxuTjGgNw5WU2LHTDLObQfs';
 
   if (!url) {
     throw new Error('COZE_SUPABASE_URL is not set');

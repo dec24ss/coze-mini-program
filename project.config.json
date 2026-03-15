@@ -2,7 +2,7 @@
   "miniprogramRoot": "dist/",
   "projectname": "海海拼图大作战",
   "description": "基于 Taro 框架开发的微信小程序拼图游戏",
-  "appid": "your-appid-here",
+  "appid": "wx8fe76c181667cec6",
   "cloudfunctionRoot": "cloudfunctions/",
   "setting": {
     "urlCheck": false,
@@ -13,10 +13,30 @@
     "minifyWXSS": true,
     "minifyWXML": true,
     "showES6CompileOption": true,
-    "useCompilerPlugins": true,
-    "ignoreUploadUnusedFiles": true
+    "useCompilerPlugins": false,
+    "ignoreUploadUnusedFiles": true,
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "condition": false,
+    "swc": false,
+    "disableSWC": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
   },
   "compileType": "miniprogram",
   "simulatorType": "wechat",
-  "simulatorPluginLibVersion": {}
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "editorSetting": {}
 }

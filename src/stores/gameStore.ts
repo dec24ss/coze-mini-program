@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import Taro from '@tarojs/taro'
-import { Network } from '@/network'
 
 // 拼图碎片类型
 export interface PuzzlePiece {
@@ -243,158 +242,161 @@ export const useGameStore = create<GameState>((set, get) => ({
           Taro.showToast({ title: '离线模式：使用缓存的图片', icon: 'none', duration: 2000 })
           return
         } else {
-          console.log('⚠️  没有本地缓存，无法离线使用')
-          Taro.showToast({ title: '离线模式：请先联网下载图片', icon: 'none', duration: 3000 })
-          set({
-            isImagesLoading: false,
-            isImagesPreloaded: false
-          })
-          return
+          console.log('⚠️  没有本地缓存，使用默认图片')
         }
       }
 
-      // 在线模式：从服务器获取随机图片列表
-      console.log('🖼️  从服务器获取图片列表...')
-      const response = await Network.request({
-        url: '/api/images/random',
-        method: 'GET'
-      })
+      // 直接使用默认图片列表（API 端点不可用）
+      console.log('🖼️  使用默认图片列表...')
+      const defaultImages = [
+        'https://picsum.photos/id/100/900/1200.jpg',
+        'https://picsum.photos/id/101/900/1200.jpg',
+        'https://picsum.photos/id/102/900/1200.jpg',
+        'https://picsum.photos/id/103/900/1200.jpg',
+        'https://picsum.photos/id/104/900/1200.jpg'
+      ]
 
-      if (response.data?.data?.images) {
-        const serverImages = response.data.data.images
-        const serverVersion = response.data.data.version || '' // 获取服务器版本号
-        console.log(`✅ 从服务器获取到 ${serverImages.length} 张图片，版本号: ${serverVersion}`)
+      const loadedImages: string[] = []
+      const loadedPaths: string[] = []
+      let loadedCount = 0
 
-        // 检查版本号是否变化
-        const localVersion = Taro.getStorageSync('imageVersion') || ''
-        const versionChanged = serverVersion && localVersion && serverVersion !== localVersion
+      // 分批大小：每次加载 5 张图片
+      const BATCH_SIZE = 5
 
-        if (versionChanged) {
-          console.log(`🔄 图片版本号已更新: ${localVersion} -> ${serverVersion}，将重新加载图片`)
-          // 清除本地缓存
-          Taro.removeStorageSync('levelImageMap')
-          Taro.removeStorageSync('imageList')
-        }
+      // 使用 Taro.getImageInfo 预加载每张图片（真正缓存到本地）
+      // 添加重试机制，最多重试 3 次
+      const loadImagePromise = async (url: string, index: number): Promise<void> => {
+        const maxRetries = 3
+        let retryCount = 0
 
-        const loadedImages: string[] = []
-        const loadedPaths: string[] = []  // 新增：保存本地路径
-        let loadedCount = 0
+        const tryLoadImage = async (): Promise<void> => {
+          try {
+            console.log(`📥 正在加载图片 ${index + 1}/${defaultImages.length} ${retryCount > 0 ? `(重试 ${retryCount}/${maxRetries})` : ''}: ${url.substring(0, 50)}...`)
 
-        // 分批大小：每次加载 10 张图片
-        const BATCH_SIZE = 10
+            // 使用 Taro.getImageInfo 下载并缓存图片，并获取本地路径
+            const res = await Taro.getImageInfo({
+              src: url
+            })
 
-        // 使用 Taro.getImageInfo 预加载每张图片（真正缓存到本地）
-        // 添加重试机制，最多重试 3 次
-        const loadImagePromise = async (url: string, index: number): Promise<void> => {
-          const maxRetries = 3
-          let retryCount = 0
-
-          const tryLoadImage = async (): Promise<void> => {
-            try {
-              console.log(`📥 正在加载图片 ${index + 1}/${serverImages.length} ${retryCount > 0 ? `(重试 ${retryCount}/${maxRetries})` : ''}: ${url.substring(0, 50)}...`)
-
-              // 使用 Taro.getImageInfo 下载并缓存图片，并获取本地路径
-              const res = await Taro.getImageInfo({
-                src: url
-              })
-
-              // 保存原始 URL 和本地路径
+            // 保存原始 URL 和本地路径
+            loadedImages[index] = url
+            loadedPaths[index] = res.path  // 保存本地路径
+            loadedCount++
+            set({ imagesLoaded: loadedCount })
+            console.log(`✅ 图片 ${index + 1} 加载完成，本地路径:`, res.path)
+          } catch (error) {
+            retryCount++
+            if (retryCount <= maxRetries) {
+              console.log(`🔄 图片 ${index + 1} 加载失败，正在重试 ${retryCount}/${maxRetries}...`)
+              // 延迟后重试（指数退避：1s, 2s, 4s）
+              await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000))
+              return tryLoadImage()
+            } else {
+              console.error(`❌ 图片 ${index + 1} 加载失败，已重试 ${maxRetries} 次，跳过:`, error)
+              // 加载失败也继续，使用原始 URL
               loadedImages[index] = url
-              loadedPaths[index] = res.path  // 保存本地路径
+              loadedPaths[index] = url  // 降级使用 URL
               loadedCount++
               set({ imagesLoaded: loadedCount })
-              console.log(`✅ 图片 ${index + 1} 加载完成，本地路径:`, res.path)
-            } catch (error) {
-              retryCount++
-              if (retryCount <= maxRetries) {
-                console.log(`🔄 图片 ${index + 1} 加载失败，正在重试 ${retryCount}/${maxRetries}...`)
-                // 延迟后重试（指数退避：1s, 2s, 4s）
-                await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount - 1) * 1000))
-                return tryLoadImage()
-              } else {
-                console.error(`❌ 图片 ${index + 1} 加载失败，已重试 ${maxRetries} 次，跳过:`, error)
-                // 加载失败也继续，使用原始 URL
-                loadedImages[index] = url
-                loadedPaths[index] = url  // 降级使用 URL
-                loadedCount++
-                set({ imagesLoaded: loadedCount })
-              }
             }
           }
-
-          await tryLoadImage()
         }
 
-        // 分批加载所有图片（每次 BATCH_SIZE 张）
-        for (let i = 0; i < serverImages.length; i += BATCH_SIZE) {
-          const batch = serverImages.slice(i, i + BATCH_SIZE)
-          const batchStartIndex = i
-
-          console.log(`📦 加载批次 ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(serverImages.length / BATCH_SIZE)}，共 ${batch.length} 张图片`)
-
-          await Promise.all(
-            batch.map((url, batchIndex) => loadImagePromise(url, batchStartIndex + batchIndex))
-          )
-
-          // 每批加载后短暂延迟，避免网络拥塞
-          if (i + BATCH_SIZE < serverImages.length) {
-            await new Promise(resolve => setTimeout(resolve, 100))
-          }
-        }
-
-        console.log(`✅ 所有图片加载完成，成功 ${loadedCount}/${serverImages.length}`)
-
-        // 预先规划每一关用哪张图片（包含URL和本地路径）
-        // 前100关使用前100张图片，如果图片不够则循环使用
-        const levelImageMap: Record<number, { url: string; path: string }> = {}
-        for (let i = 0; i < 100; i++) {
-          const imageIndex = i % loadedImages.length
-          levelImageMap[i + 1] = {
-            url: loadedImages[imageIndex],
-            path: loadedPaths[imageIndex]
-          }
-          console.log(`📋 关卡 ${i + 1} 使用图片 ${imageIndex + 1}:`, {
-            url: loadedImages[imageIndex].substring(0, 50),
-            path: loadedPaths[imageIndex],
-            pathType: loadedPaths[imageIndex].startsWith('wxfile://') ? '本地路径' : '网络路径'
-          })
-        }
-
-        console.log('✅ levelImageMap 已生成，长度:', Object.keys(levelImageMap).length)
-        console.log('✅ 第一关图片路径:', levelImageMap[1]?.path)
-
-        // 保存版本号到本地
-        if (serverVersion) {
-          Taro.setStorageSync('imageVersion', serverVersion)
-          console.log('💾 保存图片版本号到本地:', serverVersion)
-        }
-
-        // 保存图片到本地缓存（用于离线模式）
-        Taro.setStorageSync('levelImageMap', levelImageMap)
-        Taro.setStorageSync('imageList', loadedImages)
-        console.log('💾 保存图片到本地缓存，支持离线模式')
-
-        set({
-          imageList: loadedImages,
-          imagePaths: loadedPaths,  // 保存本地路径列表
-          imagesLoaded: serverImages.length,
-          isImagesLoading: false,
-          isImagesPreloaded: true,  // 标记图片已预加载完成
-          levelImageMap,  // 保存每一关的图片映射
-          imageVersion: serverVersion  // 保存版本号到状态
-        })
-      } else {
-        throw new Error('服务器返回数据格式错误')
+        await tryLoadImage()
       }
-    } catch (error) {
-      console.error('❌ 获取图片列表失败:', error)
-      // 失败时使用默认图片
+
+      // 分批加载所有图片（每次 BATCH_SIZE 张）
+      for (let i = 0; i < defaultImages.length; i += BATCH_SIZE) {
+        const batch = defaultImages.slice(i, i + BATCH_SIZE)
+        const batchStartIndex = i
+
+        console.log(`📦 加载批次 ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(defaultImages.length / BATCH_SIZE)}，共 ${batch.length} 张图片`)
+
+        await Promise.all(
+          batch.map((url, batchIndex) => loadImagePromise(url, batchStartIndex + batchIndex))
+        )
+
+        // 每批加载后短暂延迟，避免网络拥塞
+        if (i + BATCH_SIZE < defaultImages.length) {
+          await new Promise(resolve => setTimeout(resolve, 100))
+        }
+      }
+
+      console.log(`✅ 所有图片加载完成，成功 ${loadedCount}/${defaultImages.length}`)
+
+      // 预先规划每一关用哪张图片（包含URL和本地路径）
+      // 前100关使用前100张图片，如果图片不够则循环使用
+      const levelImageMap: Record<number, { url: string; path: string }> = {}
+      for (let i = 0; i < 100; i++) {
+        const imageIndex = i % loadedImages.length
+        levelImageMap[i + 1] = {
+          url: loadedImages[imageIndex],
+          path: loadedPaths[imageIndex]
+        }
+        console.log(`📋 关卡 ${i + 1} 使用图片 ${imageIndex + 1}:`, {
+          url: loadedImages[imageIndex].substring(0, 50),
+          path: loadedPaths[imageIndex],
+          pathType: loadedPaths[imageIndex].startsWith('wxfile://') ? '本地路径' : '网络路径'
+        })
+      }
+
+      console.log('✅ levelImageMap 已生成，长度:', Object.keys(levelImageMap).length)
+      console.log('✅ 第一关图片路径:', levelImageMap[1]?.path)
+
+      // 生成版本号（使用日期）
+      const version = new Date().toISOString().split('T')[0].replace(/-/g, '')
+
+      // 保存版本号到本地
+      Taro.setStorageSync('imageVersion', version)
+      console.log('💾 保存图片版本号到本地:', version)
+
+      // 保存图片到本地缓存（用于离线模式）
+      Taro.setStorageSync('levelImageMap', levelImageMap)
+      Taro.setStorageSync('imageList', loadedImages)
+      console.log('💾 保存图片到本地缓存，支持离线模式')
+
       set({
-        imageList: [],
-        imagesLoaded: 0,
+        imageList: loadedImages,
+        imagePaths: loadedPaths,  // 保存本地路径列表
+        imagesLoaded: defaultImages.length,
         isImagesLoading: false,
-        isImagesPreloaded: false
+        isImagesPreloaded: true,  // 标记图片已预加载完成
+        levelImageMap,  // 保存每一关的图片映射
+        imageVersion: version  // 保存版本号到状态
       })
+
+      console.log('✅ 使用默认图片列表，共', defaultImages.length, '张图片')
+    } catch (error) {
+      console.error('❌ 预加载图片失败:', error)
+      // 失败时使用默认图片列表（使用 Lorem Picsum，稳定可靠）
+      const defaultImages = [
+        'https://picsum.photos/id/100/900/1200.jpg',
+        'https://picsum.photos/id/101/900/1200.jpg',
+        'https://picsum.photos/id/102/900/1200.jpg',
+        'https://picsum.photos/id/103/900/1200.jpg',
+        'https://picsum.photos/id/104/900/1200.jpg'
+      ]
+      
+      // 预先规划每一关用哪张图片
+      const levelImageMap: Record<number, { url: string; path: string }> = {}
+      for (let i = 0; i < 100; i++) {
+        const imageIndex = i % defaultImages.length
+        levelImageMap[i + 1] = {
+          url: defaultImages[imageIndex],
+          path: defaultImages[imageIndex]
+        }
+      }
+      
+      set({
+        imageList: defaultImages,
+        imagePaths: defaultImages,
+        imagesLoaded: defaultImages.length,
+        isImagesLoading: false,
+        isImagesPreloaded: true,
+        levelImageMap
+      })
+      
+      console.log('✅ 使用默认图片列表，共', defaultImages.length, '张图片')
     }
   },
 
@@ -412,16 +414,18 @@ export const useGameStore = create<GameState>((set, get) => ({
     console.log('📋 当前平台:', isWeapp ? '小程序' : 'H5')
 
     console.log('🎮 开始游戏，关卡:', config.level)
-    console.log('🖼️  图片 URL:', config.imageUrl.substring(0, 80))
-    console.log('🖼️  图片 URL 长度:', config.imageUrl.length)
+    console.log('🖼️  图片 URL:', config.imageUrl ? config.imageUrl.substring(0, 80) : 'undefined')
+    console.log('🖼️  图片 URL 长度:', config.imageUrl ? config.imageUrl.length : 0)
     console.log('🖼️  图片 URL 类型:',
-      config.imageUrl.startsWith('data:image') ? 'Base64' :
-      config.imageUrl.startsWith('wxfile://') ? '本地路径' : '网络路径'
+      config.imageUrl ? (
+        config.imageUrl.startsWith('data:image') ? 'Base64' :
+        config.imageUrl.startsWith('wxfile://') ? '本地路径' : '网络路径'
+      ) : '未知'
     )
 
-    // 直接使用 getLevelConfig 返回的图片路径
+    // 直接使用 getLevelConfig 返回的图片路径，确保有默认值
     // 小程序端使用本地路径（wxfile://），H5 端使用 Base64 或网络路径
-    const finalImageUrl = config.imageUrl
+    const finalImageUrl = config.imageUrl || 'https://picsum.photos/id/100/900/1200.jpg'
 
     console.log('🖼️  最终图片 URL:', finalImageUrl.substring(0, 80))
     console.log('==========================================')
